@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33414.496
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Substrate.NET.Metadata", "Substrate.NET.Metadata\Substrate.NET.Metadata.csproj", "{E79A1FD5-DB32-4B1A-91BC-1419AFF47517}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Substrate.NET.Metadata.Tests", "Substrate.NET.Metadata.Tests\Substrate.NET.Metadata.Tests.csproj", "{4698095E-1C43-40BA-925B-B9333599E0E4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E79A1FD5-DB32-4B1A-91BC-1419AFF47517}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E79A1FD5-DB32-4B1A-91BC-1419AFF47517}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E79A1FD5-DB32-4B1A-91BC-1419AFF47517}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E79A1FD5-DB32-4B1A-91BC-1419AFF47517}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4698095E-1C43-40BA-925B-B9333599E0E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4698095E-1C43-40BA-925B-B9333599E0E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4698095E-1C43-40BA-925B-B9333599E0E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4698095E-1C43-40BA-925B-B9333599E0E4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0480DF0B-3240-48CE-B84C-2218B514A834}
+	EndGlobalSection
+EndGlobal
