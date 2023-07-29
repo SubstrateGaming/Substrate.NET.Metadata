@@ -15,14 +15,14 @@ namespace Substrate.NET.Metadata.Tests
         }
 
         [Test]
-        public async Task MetadataV11_SpecVersionCompare_V0_And_V1_ShouldSucceedAsync()
+        public void MetadataV11_SpecVersionCompare_V0_And_V1_ShouldSucceed()
         {
             var metadataSource = readMetadataFromFile("V11\\MetadataV11_0");
             var metadataDestination = readMetadataFromFile("V11\\MetadataV11_1");
 
             Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V11));
 
-            var res = await _metadataService.MetadataCompareV11Async(
+            var res = _metadataService.MetadataCompareV11(
                 new MetadataV11(metadataSource),
                 new MetadataV11(metadataDestination));
 
@@ -46,14 +46,14 @@ namespace Substrate.NET.Metadata.Tests
         }
 
         [Test]
-        public async Task MetadataV11_SpecVersionCompare_V6_And_V7_ShouldSucceedAsync()
+        public void MetadataV11_SpecVersionCompare_V6_And_V7_ShouldSucceed()
         {
             var metadataSource = readMetadataFromFile("V11\\MetadataV11_6");
             var metadataDestination = readMetadataFromFile("V11\\MetadataV11_7");
 
             Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V11));
 
-            var res = await _metadataService.MetadataCompareV11Async(
+            var res = _metadataService.MetadataCompareV11(
                 new MetadataV11(metadataSource),
                 new MetadataV11(metadataDestination));
 
@@ -76,14 +76,14 @@ namespace Substrate.NET.Metadata.Tests
         }
 
         [Test]
-        public async Task MetadataV11_SpecVersionCompare_V23_And_V24_ShouldSucceedAsync()
+        public void MetadataV11_SpecVersionCompare_V23_And_V24_ShouldSucceed()
         {
             var metadataSource = readMetadataFromFile("V11\\MetadataV11_23");
             var metadataDestination = readMetadataFromFile("V11\\MetadataV11_24");
 
             Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V11));
 
-            var res = await _metadataService.MetadataCompareV11Async(
+            var res = _metadataService.MetadataCompareV11(
                 new MetadataV11(metadataSource),
                 new MetadataV11(metadataDestination));
 

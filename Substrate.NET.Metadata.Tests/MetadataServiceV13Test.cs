@@ -15,14 +15,14 @@ namespace Substrate.NET.Metadata.Tests
         }
 
         [Test]
-        public async Task MetadataV13_SpecVersionCompare_V9080_And_V9090_ShouldSucceedAsync()
+        public void MetadataV13_SpecVersionCompare_V9080_And_V9090_ShouldSucceed()
         {
             var metadataSource = readMetadataFromFile("V13\\MetadataV13_9080");
             var metadataDestination = readMetadataFromFile("V13\\MetadataV13_9090");
 
             Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V13));
 
-            var res = await _metadataService.MetadataCompareV13Async(
+            var res = _metadataService.MetadataCompareV13(
                 new MetadataV13(metadataSource),
                 new MetadataV13(metadataDestination));
 

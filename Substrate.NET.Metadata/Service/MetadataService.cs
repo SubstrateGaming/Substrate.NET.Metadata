@@ -96,7 +96,7 @@ namespace Substrate.NET.Metadata.Service
         /// <param name="uncommonModules"></param>
         /// <param name="status"></param>
         /// <returns></returns>
-        public IEnumerable<T> FilterModuleByStatus<T>(IEnumerable<T> modulesStart, IEnumerable<(CompareStatus, T)> uncommonModules, CompareStatus status)
+        protected IEnumerable<T> FilterModuleByStatus<T>(IEnumerable<T> modulesStart, IEnumerable<(CompareStatus, T)> uncommonModules, CompareStatus status)
             where T : IMetadataName, IType, new()
         {
             if (uncommonModules.Any())
@@ -189,7 +189,7 @@ namespace Substrate.NET.Metadata.Service
         #endregion
 
         #region Compare V9
-        public Task<MetadataDiffV9> MetadataCompareV9Async(MetadataV9 m1, MetadataV9 m2)
+        protected MetadataDiffV9 MetadataCompareV9(MetadataV9 m1, MetadataV9 m2)
         {
             var resModulesDiff = new List<MetadataDifferentialModulesV9>();
 
@@ -215,13 +215,13 @@ namespace Substrate.NET.Metadata.Service
                 });
             }
 
-            return Task.FromResult(new MetadataDiffV9()
+            return new MetadataDiffV9()
             {
                 AllModulesDiff = resModulesDiff
-            });
+            };
         }
 
-        public IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV9 storage))> CompareModuleStorageV9(
+        protected IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV9 storage))> CompareModuleStorageV9(
             PalletStorageMetadataV9 source,
             PalletStorageMetadataV9 destination)
         {
@@ -239,7 +239,7 @@ namespace Substrate.NET.Metadata.Service
         #endregion
 
         #region Compare V10
-        public Task<MetadataDiffV10> MetadataCompareV10Async(MetadataV10 m1, MetadataV10 m2)
+        public MetadataDiffV10 MetadataCompareV10(MetadataV10 m1, MetadataV10 m2)
         {
             var resModulesDiff = new List<MetadataDifferentialModulesV10>();
 
@@ -267,13 +267,13 @@ namespace Substrate.NET.Metadata.Service
                 });
             }
 
-            return Task.FromResult(new MetadataDiffV10()
+            return new MetadataDiffV10()
             {
                 AllModulesDiff = resModulesDiff
-            });
+            };
         }
 
-        public IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV10 storage))> CompareModuleStorageV10(
+        protected IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV10 storage))> CompareModuleStorageV10(
             PalletStorageMetadataV10? source,
             PalletStorageMetadataV10? destination)
         {
@@ -290,7 +290,7 @@ namespace Substrate.NET.Metadata.Service
         #endregion
 
         #region Compare V11
-        public Task<MetadataDiffV11> MetadataCompareV11Async(MetadataV11 m1, MetadataV11 m2)
+        public MetadataDiffV11 MetadataCompareV11(MetadataV11 m1, MetadataV11 m2)
         {
             var resModulesDiff = new List<MetadataDifferentialModulesV11>();
 
@@ -318,13 +318,13 @@ namespace Substrate.NET.Metadata.Service
                 });
             }
 
-            return Task.FromResult(new MetadataDiffV11()
+            return new MetadataDiffV11()
             {
                 AllModulesDiff = resModulesDiff
-            });
+            };
         }
 
-        public IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV11 storage))> CompareModuleStorageV11(
+        protected IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV11 storage))> CompareModuleStorageV11(
             PalletStorageMetadataV11? source,
             PalletStorageMetadataV11? destination)
         {
@@ -341,7 +341,7 @@ namespace Substrate.NET.Metadata.Service
         #endregion
 
         #region Compare V12
-        public Task<MetadataDiffV12> MetadataCompareV12Async(MetadataV12 m1, MetadataV12 m2)
+        public MetadataDiffV12 MetadataCompareV12(MetadataV12 m1, MetadataV12 m2)
         {
             var resModulesDiff = new List<MetadataDifferentialModulesV12>();
 
@@ -369,13 +369,13 @@ namespace Substrate.NET.Metadata.Service
                 });
             }
 
-            return Task.FromResult(new MetadataDiffV12()
+            return new MetadataDiffV12()
             {
                 AllModulesDiff = resModulesDiff
-            });
+            };
         }
 
-        public IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV11 storage))> CompareModuleStorageV12(
+        protected IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV11 storage))> CompareModuleStorageV12(
             PalletStorageMetadataV12? source,
             PalletStorageMetadataV12? destination)
         {
@@ -392,7 +392,7 @@ namespace Substrate.NET.Metadata.Service
         #endregion
 
         #region Compare V13
-        public Task<MetadataDiffV13> MetadataCompareV13Async(MetadataV13 m1, MetadataV13 m2)
+        public MetadataDiffV13 MetadataCompareV13(MetadataV13 m1, MetadataV13 m2)
         {
             var resModulesDiff = new List<MetadataDifferentialModulesV13>();
 
@@ -420,13 +420,13 @@ namespace Substrate.NET.Metadata.Service
                 });
             }
 
-            return Task.FromResult(new MetadataDiffV13()
+            return new MetadataDiffV13()
             {
                 AllModulesDiff = resModulesDiff
-            });
+            };
         }
 
-        public IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV13 storage))> CompareModuleStorageV13(
+        protected IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV13 storage))> CompareModuleStorageV13(
             PalletStorageMetadataV13? source,
             PalletStorageMetadataV13? destination)
         {
@@ -443,7 +443,7 @@ namespace Substrate.NET.Metadata.Service
         #endregion
 
         #region Compare V14
-        public Task<MetadataDiffV14> MetadataCompareV14Async(MetadataV14 m1, MetadataV14 m2)
+        public MetadataDiffV14 MetadataCompareV14(MetadataV14 m1, MetadataV14 m2)
         {
             var resModulesDiff = new List<MetadataDifferentialModulesV14>();
 
@@ -478,13 +478,13 @@ namespace Substrate.NET.Metadata.Service
                 });
             }
 
-            return Task.FromResult(new MetadataDiffV14()
+            return new MetadataDiffV14()
             {
                 AllModulesDiff = resModulesDiff
-            });
+            };
         }
 
-        public LookupDifferential CompareModuleV14<T>(
+        protected LookupDifferential CompareModuleV14<T>(
             BaseOpt<T> source,
             BaseOpt<T> destination,
             PortableRegistry lookupSource,
@@ -505,7 +505,7 @@ namespace Substrate.NET.Metadata.Service
                 (uint)destination.Value.ElemType.Value.Value, lookupSource, lookupDestination);
         }
 
-        public IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV14 storage))> CompareModuleStorageV14(
+        protected IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV14 storage))> CompareModuleStorageV14(
             PalletStorageMetadataV14? source,
             PalletStorageMetadataV14? destination)
         {
@@ -520,7 +520,7 @@ namespace Substrate.NET.Metadata.Service
                 .Select(x => (prefix, x));
         }
 
-        public LookupDifferential CompareLookup(
+        protected LookupDifferential CompareLookup(
             uint idSource, uint idDestination, PortableRegistry lookupSource, PortableRegistry lookupDestination)
         {
             var result = new LookupDifferential();

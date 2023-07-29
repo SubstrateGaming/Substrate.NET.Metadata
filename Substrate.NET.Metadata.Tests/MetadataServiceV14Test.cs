@@ -15,14 +15,14 @@ namespace Substrate.NET.Metadata.Tests
         }
 
         [Test]
-        public async Task MetadataV14_SpecVersionCompare_V9110_And_V9122_ShouldSucceedAsync()
+        public void MetadataV14_SpecVersionCompare_V9110_And_V9122_ShouldSucceed()
         {
             var metadataSource = readMetadataFromFile("V14\\MetadataV14_9110");
             var metadataDestination = readMetadataFromFile("V14\\MetadataV14_9122");
 
             Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V14));
 
-            var res = await _metadataService.MetadataCompareV14Async(
+            var res = _metadataService.MetadataCompareV14(
                 new MetadataV14(metadataSource),
                 new MetadataV14(metadataDestination));
 
@@ -30,14 +30,14 @@ namespace Substrate.NET.Metadata.Tests
         }
 
         [Test]
-        public async Task MetadataV14_SpecVersionCompare_V9420_And_V9430_ShouldSucceedAsync()
+        public void MetadataV14_SpecVersionCompare_V9420_And_V9430_ShouldSucceed()
         {
             var metadataSource = readMetadataFromFile("V14\\MetadataV14_9420");
             var metadataDestination = readMetadataFromFile("V14\\MetadataV14_9430");
 
             Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V14));
 
-            var res = await _metadataService.MetadataCompareV14Async(
+            var res = _metadataService.MetadataCompareV14(
                 new MetadataV14(metadataSource),
                 new MetadataV14(metadataDestination));
 
@@ -45,14 +45,14 @@ namespace Substrate.NET.Metadata.Tests
         }
 
         [Test]
-        public async Task MetadataV14_SpecVersionCompare_V9370_And_V9420_ShouldSucceedAsync()
+        public void MetadataV14_SpecVersionCompare_V9370_And_V9420_ShouldSucceed()
         {
             var metadataSource = readMetadataFromFile("V14\\MetadataV14_9370");
             var metadataDestination = readMetadataFromFile("V14\\MetadataV14_9420");
 
             Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V14));
 
-            var res = await _metadataService.MetadataCompareV14Async(
+            var res = _metadataService.MetadataCompareV14(
                 new MetadataV14(metadataSource),
                 new MetadataV14(metadataDestination));
 
@@ -82,14 +82,14 @@ namespace Substrate.NET.Metadata.Tests
         }
 
         [Test]
-        public async Task MetadataV14_SpecVersionCompare_V9270_And_V9280_ShouldSucceedAsync()
+        public void MetadataV14_SpecVersionCompare_V9270_And_V9280_ShouldSucceed()
         {
             var metadataSource = readMetadataFromFile("V14\\MetadataV14_9270");
             var metadataDestination = readMetadataFromFile("V14\\MetadataV14_9280");
 
             Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V14));
 
-            var res = await _metadataService.MetadataCompareV14Async(
+            var res = _metadataService.MetadataCompareV14(
                 new MetadataV14(metadataSource),
                 new MetadataV14(metadataDestination));
 
