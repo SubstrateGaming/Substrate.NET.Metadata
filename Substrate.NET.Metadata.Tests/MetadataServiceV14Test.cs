@@ -64,9 +64,21 @@ namespace Substrate.NET.Metadata.Tests
 
             // Some basic other assertions on Balance pallet I checked with file compare
             var palletBalance = res.ChangedModules.FirstOrDefault(x => x.ModuleName == "Balances");
-            
 
 
+            // Some calls has been added and one has been removed
+            var callsMethodChanged = palletBalance.Calls.LookupDifferentialType.TypeVariant.Elems;
+            Assert.That(callsMethodChanged.Count(), Is.GreaterThan(1)); 
+            Assert.IsTrue(callsMethodChanged.Any(x => x.Item1 == CompareStatus.Added && x.Item2.Name.Value == "set_balance_deprecated"));
+            Assert.IsTrue(callsMethodChanged.Any(x => x.Item1 == CompareStatus.Removed && x.Item2.Name.Value == "set_balance"));
+
+            Assert.IsTrue(callsMethodChanged.Any(x => x.Item1 == CompareStatus.Added && x.Item2.Name.Value == "transfer_allow_death"));
+            Assert.IsTrue(callsMethodChanged.Any(x => x.Item1 == CompareStatus.Added && x.Item2.Name.Value == "set_balance_deprecated"));
+            Assert.IsTrue(callsMethodChanged.Any(x => x.Item1 == CompareStatus.Added && x.Item2.Name.Value == "force_set_balance"));
+
+            var upgradeAccounts = callsMethodChanged.FirstOrDefault(x => x.Item1 == CompareStatus.Added && x.Item2.Name.Value == "upgrade_accounts");
+            Assert.That(upgradeAccounts.Item2.VariantFields.Value.Count(), Is.EqualTo(1));
+            Assert.That(upgradeAccounts.Item2.VariantFields.Value.First().FieldTypeName.Value.Value, Is.EqualTo("Vec<T::AccountId>"));
         }
 
         [Test]
