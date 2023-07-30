@@ -4,6 +4,7 @@
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=SubstrateGaming_Substrate.NET.Metadata&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=SubstrateGaming_Substrate.NET.Metadata)
 [![GitHub issues](https://img.shields.io/github/issues/SubstrateGaming/Substrate.NET.Metadata.svg)](https://github.com/SubstrateGaming/Substrate.NET.Metadata/issues)
 [![license](https://img.shields.io/github/license/SubstrateGaming/Substrate.NET.Metadata)](https://github.com/SubstrateGaming/Substrate.NET.Metadata/blob/origin/LICENSE)
+[![Nuget](https://img.shields.io/nuget/v/Substrate.NET.Metadata)](https://www.nuget.org/packages/Substrate.NET.Metadata/)
 
 Project to manage Substrate based blockchain Metadata from V9 to V14
 
