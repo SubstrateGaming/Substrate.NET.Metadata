@@ -1,0 +1,41 @@
+name: publish
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Publish to NuGet
+    runs-on: ubuntu-latest
+        
+    steps:
+      - uses: actions/checkout@v2
+
+      ##
+      # Setup
+      # Setup multiple .NET versions so we can build against all referenced .NET versions.
+      ##
+      - name: Setup .NET 6.0.x
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Setup .NET 7.0.x
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+      
+      ##
+      # Publish
+      ##
+      - name: Publish Substrate.NET.Metadata on version change
+        id: publish_nuget
+        uses: alirezanet/publish-nuget@v3.1.0
+        with:
+          # Filepath of the project to be packaged, relative to root of repository
+          PROJECT_FILE_PATH: Substrate.NET.Metadata/Substrate.NET.Metadata.csproj
+          # NuGet package id, used for version detection & defaults to project name
+          PACKAGE_NAME: Substrate.NET.Metadata
+          # API key to authenticate with NuGet server
+          NUGET_KEY: ${{secrets.NUGET_API_KEY}}
