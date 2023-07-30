@@ -16,7 +16,7 @@ using Substrate.NetApi.Model.Types.Primitive;
 
 namespace Substrate.NET.Metadata.Service
 {
-    public class MetadataService
+    public class MetadataService : IMetadataService
     {
         /// <summary>
         /// Check if metadatas have same major version
@@ -189,7 +189,7 @@ namespace Substrate.NET.Metadata.Service
         #endregion
 
         #region Compare V9
-        protected MetadataDiffV9 MetadataCompareV9(MetadataV9 m1, MetadataV9 m2)
+        public MetadataDiffV9 MetadataCompareV9(MetadataV9 m1, MetadataV9 m2)
         {
             var resModulesDiff = new List<MetadataDifferentialModulesV9>();
 
@@ -501,7 +501,7 @@ namespace Substrate.NET.Metadata.Service
                 return LookupDifferential.FromLookup(CompareStatus.Added, LookupDifferential.FindType(lookupDestination, destination.Value.ElemType));
 
             return CompareLookup(
-                (uint)source.Value.ElemType.Value.Value, 
+                (uint)source.Value.ElemType.Value.Value,
                 (uint)destination.Value.ElemType.Value.Value, lookupSource, lookupDestination);
         }
 
