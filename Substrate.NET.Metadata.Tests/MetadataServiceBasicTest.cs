@@ -208,5 +208,13 @@ namespace Substrate.NET.Metadata.Tests
                 readMetadataFromFile("V11\\MetadataV11_0"), 
                 readMetadataFromFile("V14\\MetadataV14_9420")));
         }
+
+        [Test]
+        public void MetadataV14_GetMetadataVersion_ShouldSucceed()
+        {
+            Assert.That(
+                _metadataService.GetMetadataVersion(readMetadataFromFile("V14\\MetadataV14_9420")), 
+                Is.EqualTo(MetadataVersion.V14));
+        }
     }
 }
