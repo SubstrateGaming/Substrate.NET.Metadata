@@ -6,10 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Substrate.NET.Metadata.Compare.Base;
 
 namespace Substrate.NET.Metadata.Compare
 {
     public class MetadataDifferentialModules<TStorageEntry, TCall, TEvent, TConstant, TError>
+        : IMetadataDifferentialModules
         where TStorageEntry : BaseType, IMetadataName, new()
         where TCall : BaseType, IMetadataName, new()
         where TEvent : BaseType, IMetadataName, new()

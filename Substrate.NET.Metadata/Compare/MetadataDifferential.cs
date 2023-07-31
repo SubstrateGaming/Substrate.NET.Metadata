@@ -1,4 +1,5 @@
 ﻿using Substrate.NET.Metadata.Base;
+using Substrate.NET.Metadata.Compare.Base;
 using Substrate.NET.Metadata.V10;
 using Substrate.NET.Metadata.V11;
 using Substrate.NET.Metadata.V12;
@@ -43,7 +44,7 @@ namespace Substrate.NET.Metadata.Compare
     }
 
     public class MetadataDiffV9 : MetadataDiff<
-        MetadataDifferentialModulesV9, StorageEntryMetadataV9, PalletCallMetadataV9, PalletEventMetadataV9, PalletConstantMetadataV9, PalletErrorMetadataV9>
+        MetadataDifferentialModulesV9, StorageEntryMetadataV9, PalletCallMetadataV9, PalletEventMetadataV9, PalletConstantMetadataV9, PalletErrorMetadataV9>, IMetadataDiffBase<MetadataDifferentialModulesV9>
     {
     }
 
@@ -52,7 +53,7 @@ namespace Substrate.NET.Metadata.Compare
     }
 
     public class MetadataDiffV10 : MetadataDiff<
-        MetadataDifferentialModulesV10, StorageEntryMetadataV10, PalletCallMetadataV10, PalletEventMetadataV10, PalletConstantMetadataV10, PalletErrorMetadataV10>
+        MetadataDifferentialModulesV10, StorageEntryMetadataV10, PalletCallMetadataV10, PalletEventMetadataV10, PalletConstantMetadataV10, PalletErrorMetadataV10>, IMetadataDiffBase<MetadataDifferentialModulesV10>
     {
     }
 
@@ -62,7 +63,7 @@ namespace Substrate.NET.Metadata.Compare
     }
 
     public class MetadataDiffV11 : MetadataDiff<
-        MetadataDifferentialModulesV11, StorageEntryMetadataV11, PalletCallMetadataV11, PalletEventMetadataV11, PalletConstantMetadataV11, PalletErrorMetadataV11>
+        MetadataDifferentialModulesV11, StorageEntryMetadataV11, PalletCallMetadataV11, PalletEventMetadataV11, PalletConstantMetadataV11, PalletErrorMetadataV11>, IMetadataDiffBase<MetadataDifferentialModulesV11>
     {
     }
 
@@ -72,7 +73,7 @@ namespace Substrate.NET.Metadata.Compare
     }
 
     public class MetadataDiffV12 : MetadataDiff<
-        MetadataDifferentialModulesV12, StorageEntryMetadataV11, PalletCallMetadataV12, PalletEventMetadataV12, PalletConstantMetadataV12, PalletErrorMetadataV12>
+        MetadataDifferentialModulesV12, StorageEntryMetadataV11, PalletCallMetadataV12, PalletEventMetadataV12, PalletConstantMetadataV12, PalletErrorMetadataV12>, IMetadataDiffBase<MetadataDifferentialModulesV12>
     {
     }
 
@@ -82,7 +83,7 @@ namespace Substrate.NET.Metadata.Compare
     }
 
     public class MetadataDiffV13 : MetadataDiff<
-        MetadataDifferentialModulesV13, StorageEntryMetadataV13, PalletCallMetadataV13, PalletEventMetadataV13, PalletConstantMetadataV13, PalletErrorMetadataV13>
+        MetadataDifferentialModulesV13, StorageEntryMetadataV13, PalletCallMetadataV13, PalletEventMetadataV13, PalletConstantMetadataV13, PalletErrorMetadataV13>, IMetadataDiffBase<MetadataDifferentialModulesV13>
     {
     }
 
@@ -90,7 +91,7 @@ namespace Substrate.NET.Metadata.Compare
     {
     }
 
-    public class MetadataDiffV14
+    public class MetadataDiffV14 : IMetadataDiffBase<MetadataDifferentialModulesV14>
     {
         public IEnumerable<MetadataDifferentialModulesV14> AllModulesDiff { get; set; }
             = Enumerable.Empty<MetadataDifferentialModulesV14>();
@@ -117,7 +118,7 @@ namespace Substrate.NET.Metadata.Compare
             => AllModulesDiff.Where(x => x.CompareStatus == CompareStatus.Removed);
     }
 
-    public class MetadataDifferentialModulesV14
+    public class MetadataDifferentialModulesV14 : IMetadataDifferentialModules
     {
         public string ModuleName { get; set; } = string.Empty;
 
