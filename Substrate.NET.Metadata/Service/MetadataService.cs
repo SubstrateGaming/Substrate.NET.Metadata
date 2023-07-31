@@ -19,25 +19,17 @@ namespace Substrate.NET.Metadata.Service
     public class MetadataService : IMetadataService
     {
         /// <summary>
-        /// Check if metadatas have same major version
+        /// Get major version from metadata
         /// </summary>
-        /// <param name="hexMetadata1"></param>
-        /// <param name="hexMetadata2"></param>
-        /// <returns></returns>
+        /// <param name="hexMetadata"></param>
+        /// <returns>The major version (V9 to v15)</returns>
         /// <exception cref="MetadataException"></exception>
-        public MetadataVersion EnsureMetadataVersion(string hexMetadata1, string hexMetadata2)
+        public MetadataVersion GetMetadataVersion(string hexMetadata)
         {
-            Guard.Against.NullOrEmpty(hexMetadata1);
-            Guard.Against.NullOrEmpty(hexMetadata2);
+            Guard.Against.NullOrEmpty(hexMetadata);
+            CheckRuntimeMetadata checkVersion = new(hexMetadata);
 
-            // To be compared, Metadata should have same Major version
-            CheckRuntimeMetadata checkVersion1 = new(hexMetadata1);
-            CheckRuntimeMetadata checkVersion2 = new(hexMetadata2);
-
-            if (checkVersion1.MetaDataInfo.Version.Value != checkVersion2.MetaDataInfo.Version.Value)
-                throw new MetadataException($"Cannot compare metadata v{checkVersion1.MetaDataInfo.Version.Value} and v{checkVersion2.MetaDataInfo.Version.Value}. Major version have to be the same.");
-
-            return checkVersion1.MetaDataInfo.Version.Value switch
+            return checkVersion.MetaDataInfo.Version.Value switch
             {
                 9 => MetadataVersion.V9,
                 10 => MetadataVersion.V10,
@@ -46,8 +38,27 @@ namespace Substrate.NET.Metadata.Service
                 13 => MetadataVersion.V13,
                 14 => MetadataVersion.V14,
                 15 => MetadataVersion.V15,
-                _ => throw new MetadataException($"Metadata version {checkVersion1.MetaDataInfo.Version.Value} is not supported")
+                _ => throw new MetadataException($"Metadata version {checkVersion.MetaDataInfo.Version.Value} is not supported")
             };
+        }
+
+        /// <summary>
+        /// Check if metadatas have same major version
+        /// </summary>
+        /// <param name="hexMetadata1"></param>
+        /// <param name="hexMetadata2"></param>
+        /// <returns></returns>
+        /// <exception cref="MetadataException"></exception>
+        public MetadataVersion EnsureMetadataVersion(string hexMetadata1, string hexMetadata2)
+        {
+            // To be compared, Metadata should have same Major version
+            var v1 = GetMetadataVersion(hexMetadata1);
+            var v2 = GetMetadataVersion(hexMetadata2);
+
+            if (v1 != v2)
+                throw new MetadataException($"Cannot compare metadata v{v1} and v{v2}. Major version have to be the same.");
+
+            return v1;
         }
 
         #region Metadata compare
@@ -225,15 +236,15 @@ namespace Substrate.NET.Metadata.Service
             PalletStorageMetadataV9 source,
             PalletStorageMetadataV9 destination)
         {
-            if (source.Prefix.Value != destination.Prefix.Value)
-                throw new InvalidOperationException("Source and Destination prefix should be equals !");
+            if (source == null && destination == null)
+                return Enumerable.Empty<(string prefix, (CompareStatus status, StorageEntryMetadataV9 storage))>();
 
-            var res = CompareName(
-                Sanitize(source.Entries),
-                Sanitize(destination.Entries))
-                .Select(x => (source.Prefix.Value, x));
+            string prefix = source != null ? source.Prefix.Value : destination!.Prefix.Value;
 
-            return res;
+            return CompareName(
+                source != null ? Sanitize(source.Entries) : null,
+                destination != null ? Sanitize(destination.Entries) : null)
+                .Select(x => (prefix, x));
         }
 
         #endregion

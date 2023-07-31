@@ -12,6 +12,13 @@ namespace Substrate.NET.Metadata.Service
     public interface IMetadataService
     {
         /// <summary>
+        /// Get major version from metadata
+        /// </summary>
+        /// <param name="hexMetadata"></param>
+        /// <returns></returns>
+        MetadataVersion GetMetadataVersion(string hexMetadata);
+
+        /// <summary>
         /// Check if metadatas have same major version
         /// </summary>
         /// <param name="hexMetadata1"></param>

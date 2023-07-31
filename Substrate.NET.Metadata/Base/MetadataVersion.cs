@@ -8,12 +8,12 @@ namespace Substrate.NET.Metadata.Base
 {
     public enum MetadataVersion
     {
-        V9,
-        V10,
-        V11,
-        V12,
-        V13,
-        V14,
-        V15
+        V9  = 9,
+        V10 = 10,
+        V11 = 11,
+        V12 = 12,
+        V13 = 13,
+        V14 = 14,
+        V15 = 15
     }
 }
