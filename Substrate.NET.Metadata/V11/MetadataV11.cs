@@ -1,7 +1,4 @@
-﻿using Substrate.NET.Metadata.V10;
-using Substrate.NET.Metadata.Base;
-using Substrate.NetApi.Model.Types.Base;
-using Substrate.NetApi.Model.Types.Metadata.V14;
+﻿using Substrate.NET.Metadata.Base;
 
 namespace Substrate.NET.Metadata.V11
 {

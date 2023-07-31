@@ -6,8 +6,6 @@ using Substrate.NET.Metadata.V13;
 using Substrate.NET.Metadata.V14;
 using Substrate.NET.Metadata.V9;
 using Substrate.NetApi.Model.Types.Base;
-using Substrate.NetApi.Model.Types.Metadata.V14;
-using System.Xml.Linq;
 
 namespace Substrate.NET.Metadata.Compare
 {
