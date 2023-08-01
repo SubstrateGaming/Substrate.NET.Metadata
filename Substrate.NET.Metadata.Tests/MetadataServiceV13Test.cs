@@ -44,5 +44,15 @@ namespace Substrate.NET.Metadata.Tests
             Assert.IsFalse(changedModules[2].HasErrorAdded("test"));
             Assert.IsFalse(changedModules[2].HasErrorRemoved("test2"));
         }
+
+        [Test]
+        public void MetadataV13_V9080_And_V9090_PalletHasChanged_ShouldSucceed()
+        {
+            var metadataSource = readMetadataFromFile("V13\\MetadataV13_9080");
+            var metadataDestination = readMetadataFromFile("V13\\MetadataV13_9090");
+
+            Assert.IsTrue(_metadataService.HasPalletChangedVersionBetween("Balances", metadataSource, metadataDestination));
+            Assert.IsFalse(_metadataService.HasPalletChangedVersionBetween("Babe", metadataSource, metadataDestination));
+        }
     }
 }

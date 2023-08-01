@@ -2,6 +2,7 @@
 using Substrate.NET.Metadata.Base;
 using Substrate.NET.Metadata.Base.Portable;
 using Substrate.NET.Metadata.Compare;
+using Substrate.NET.Metadata.Compare.Base;
 using Substrate.NET.Metadata.Compare.TypeDef;
 using Substrate.NET.Metadata.Exceptions;
 using Substrate.NET.Metadata.V10;
@@ -59,6 +60,26 @@ namespace Substrate.NET.Metadata.Service
                 throw new MetadataException($"Cannot compare metadata v{v1} and v{v2}. Major version have to be the same.");
 
             return v1;
+        }
+
+        public bool HasPalletChangedVersionBetween(string palletName, string hexMetadata1, string hexMetadata2)
+        {
+            Guard.Against.NullOrEmpty(palletName);
+
+            var version = EnsureMetadataVersion(hexMetadata1, hexMetadata2);
+
+            IMetadataDiffBase<IMetadataDifferentialModules> res = version switch
+            {
+                MetadataVersion.V9 => MetadataCompareV9(new MetadataV9(hexMetadata1), new MetadataV9(hexMetadata2)),
+                MetadataVersion.V10 => MetadataCompareV10(new MetadataV10(hexMetadata1), new MetadataV10(hexMetadata2)),
+                MetadataVersion.V11 => MetadataCompareV11(new MetadataV11(hexMetadata1), new MetadataV11(hexMetadata2)),
+                MetadataVersion.V12 => MetadataCompareV12(new MetadataV12(hexMetadata1), new MetadataV12(hexMetadata2)),
+                MetadataVersion.V13 => MetadataCompareV13(new MetadataV13(hexMetadata1), new MetadataV13(hexMetadata2)),
+                MetadataVersion.V14 => MetadataCompareV14(new MetadataV14(hexMetadata1), new MetadataV14(hexMetadata2)),
+                _ => throw new MetadataException($"Comparison for version {version} is not supported")
+            };
+
+            return res.ChangedModules.Any(x => x.ModuleName == palletName);
         }
 
         #region Metadata compare
