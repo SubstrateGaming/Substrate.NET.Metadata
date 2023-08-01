@@ -27,6 +27,15 @@ namespace Substrate.NET.Metadata.Service
         MetadataVersion EnsureMetadataVersion(string hexMetadata1, string hexMetadata2);
 
         /// <summary>
+        /// Return true if pallet version has been found and has been modified
+        /// </summary>
+        /// <param name="palletName"></param>
+        /// <param name="hexMetadata1"></param>
+        /// <param name="hexMetadata2"></param>
+        /// <returns></returns>
+        bool HasPalletChangedVersionBetween(string palletName, string hexMetadata1, string hexMetadata2);
+
+        /// <summary>
         /// Compare V9 metadata
         /// </summary>
         /// <param name="m1"></param>
