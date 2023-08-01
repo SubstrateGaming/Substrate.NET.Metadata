@@ -23,8 +23,7 @@ namespace Substrate.NET.Metadata.Compare
 
         public bool HasChanges()
         {
-            return Id.Count > 0 ||
-                    Path.Count > 0 ||
+            return  Path.Count > 0 ||
                     Params.Count > 0 ||
                     LookupDifferentialType.HasChanges() ||
                     Docs.Count > 0;

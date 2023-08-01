@@ -35,5 +35,15 @@ namespace Substrate.NET.Metadata.Tests
 
             Assert.That(res, Is.Not.Null);
         }
+
+        [Test]
+        public void MetadataV9_V1020_And_V1022_PalletHasChanged_ShouldSucceed()
+        {
+            var metadataSource = readMetadataFromFile("V9\\MetadataV9_Kusama_1020");
+            var metadataDestination = readMetadataFromFile("V9\\MetadataV9_Kusama_1022");
+
+            Assert.IsTrue(_metadataService.HasPalletChangedVersionBetween("Democracy", metadataSource, metadataDestination));
+            Assert.IsFalse(_metadataService.HasPalletChangedVersionBetween("Balances", metadataSource, metadataDestination));
+        }
     }
 }

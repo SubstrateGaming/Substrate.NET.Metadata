@@ -98,5 +98,16 @@ namespace Substrate.NET.Metadata.Tests
             Assert.That(res.AddedModules.Count, Is.EqualTo(1));
             Assert.That(res.AddedModules.First().ModuleName, Is.EqualTo("NominationPools"));
         }
+
+        [Test]
+        public void MetadataV14_V9270_And_V9280_PalletHasChanged_ShouldSucceed()
+        {
+            var metadataSource = readMetadataFromFile("V14\\MetadataV14_9270");
+            var metadataDestination = readMetadataFromFile("V14\\MetadataV14_9280");
+
+            Assert.IsTrue(_metadataService.HasPalletChangedVersionBetween("Auctions", metadataSource, metadataDestination));
+
+            Assert.IsFalse(_metadataService.HasPalletChangedVersionBetween("AuthorityDiscovery", metadataSource, metadataDestination));
+        }
     }
 }

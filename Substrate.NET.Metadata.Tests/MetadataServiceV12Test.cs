@@ -98,5 +98,16 @@ namespace Substrate.NET.Metadata.Tests
             Assert.That(electionPhragmenErrors[3].Item2.Name.Value, Is.EqualTo("InvalidCandidateCount"));
             Assert.IsTrue(electionPhragmenModule.HasErrorRemoved("InvalidCandidateCount"));
         }
+
+        [Test]
+        public void MetadataV12_V27_And_V28_PalletHasChanged_ShouldSucceed()
+        {
+            var metadataSource = readMetadataFromFile("V12\\MetadataV12_27");
+            var metadataDestination = readMetadataFromFile("V12\\MetadataV12_28");
+
+            Assert.IsTrue(_metadataService.HasPalletChangedVersionBetween("ElectionsPhragmen", metadataSource, metadataDestination));
+
+            Assert.IsFalse(_metadataService.HasPalletChangedVersionBetween("Balances", metadataSource, metadataDestination));
+        }
     }
 }
