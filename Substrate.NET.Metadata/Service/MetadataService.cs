@@ -192,17 +192,6 @@ namespace Substrate.NET.Metadata.Service
             return !source.Select(x => x.Value).Except(target.Select(x => x.Value)).Any();
         }
 
-        private IEnumerable<T> Sanitize<T>(IEnumerable<BaseVec<T>> elems)
-            where T : IType, new()
-        {
-            if (elems == null) return Enumerable.Empty<T>();
-
-            var res = elems
-                .SelectMany(x => x.Value);
-
-            return res;
-        }
-
         private IEnumerable<T> Sanitize<T>(BaseOpt<BaseVec<T>> elems)
             where T : IType, new()
         {

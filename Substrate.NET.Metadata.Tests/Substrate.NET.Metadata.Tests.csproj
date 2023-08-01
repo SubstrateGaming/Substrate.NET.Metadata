@@ -22,6 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Mocks\V10\MetadataV10_Kusama_1040.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Mocks\V10\MetadataV10_Kusama_1039.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

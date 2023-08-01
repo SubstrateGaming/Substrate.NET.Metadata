@@ -35,5 +35,31 @@ namespace Substrate.NET.Metadata.Tests
 
             Assert.That(res, Is.Not.Null);
         }
+
+        [Test]
+        public void MetadataV10_SpecVersionCompare_V1039_And_V1040_ShouldSucceed()
+        {
+            var metadataSource = readMetadataFromFile("V10\\MetadataV10_Kusama_1039");
+            var metadataDestination = readMetadataFromFile("V10\\MetadataV10_Kusama_1040");
+
+            Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V10));
+
+            var res = _metadataService.MetadataCompareV10(
+                new MetadataV10(metadataSource),
+                new MetadataV10(metadataDestination));
+
+            Assert.That(res, Is.Not.Null);
+            Assert.That(res.AddedModules.First(x => x.ModuleName == "Society"), Is.Not.Null);
+        }
+
+        [Test]
+        public void MetadataV10_V1039_And_V1040_PalletHasChanged_ShouldSucceed()
+        {
+            var metadataSource = readMetadataFromFile("V10\\MetadataV10_Kusama_1039");
+            var metadataDestination = readMetadataFromFile("V10\\MetadataV10_Kusama_1040");
+
+            Assert.IsFalse(_metadataService.HasPalletChangedVersionBetween("Society", metadataSource, metadataDestination));
+            Assert.IsFalse(_metadataService.HasPalletChangedVersionBetween("Balances", metadataSource, metadataDestination));
+        }
     }
 }
