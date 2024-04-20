@@ -133,10 +133,10 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V11\\MetadataV11_23");
             var metadataDestination = readMetadataFromFile("V11\\MetadataV11_24");
 
-            Assert.IsTrue(_metadataService.HasPalletChangedVersionBetween("Multisig", metadataSource, metadataDestination));
+            Assert.That(_metadataService.HasPalletChangedVersionBetween("Multisig", metadataSource, metadataDestination), Is.True);
 
             // Purschase has been removed, but does not count as changed
-            Assert.IsFalse(_metadataService.HasPalletChangedVersionBetween("Purchase", metadataSource, metadataDestination));
+            Assert.That(_metadataService.HasPalletChangedVersionBetween("Purchase", metadataSource, metadataDestination), Is.False);
         }
     }
 }

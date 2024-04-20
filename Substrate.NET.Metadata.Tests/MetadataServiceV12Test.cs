@@ -40,7 +40,7 @@ namespace Substrate.NET.Metadata.Tests
             Assert.That(changedModules[0].ModuleName, Is.EqualTo("Babe"));
             Assert.That(changedModules[0].Storage.First().Item2.status, Is.EqualTo(CompareStatus.Added));
             Assert.That(changedModules[0].Storage.First().Item2.storage.Name.Value, Is.EqualTo("NextAuthorities"));
-            Assert.IsTrue(changedModules[0].HasStorageAdded("NextAuthorities"));
+            Assert.That(changedModules[0].HasStorageAdded("NextAuthorities"), Is.True);
 
             // Now let's test ElectionsPhragmen which changed a lot
             var electionPhragmenModule = changedModules[1];
@@ -53,32 +53,32 @@ namespace Substrate.NET.Metadata.Tests
             var electionPhragmenCalls = electionPhragmenModule.Calls.ToList();
             Assert.That(electionPhragmenCalls[0].Item1, Is.EqualTo(CompareStatus.Added));
             Assert.That(electionPhragmenCalls[0].Item2.Name.Value, Is.EqualTo("clean_defunct_voters"));
-            Assert.IsTrue(electionPhragmenModule.HasCallAdded("clean_defunct_voters"));
+            Assert.That(electionPhragmenModule.HasCallAdded("clean_defunct_voters"), Is.True);
 
             Assert.That(electionPhragmenCalls[1].Item1, Is.EqualTo(CompareStatus.Removed));
             Assert.That(electionPhragmenCalls[1].Item2.Name.Value, Is.EqualTo("report_defunct_voter"));
-            Assert.IsTrue(electionPhragmenModule.HasCallRemoved("report_defunct_voter"));
+            Assert.That(electionPhragmenModule.HasCallRemoved("report_defunct_voter"), Is.True);
 
             var electionPhragmenConstants = electionPhragmenModule.Constants.ToList();
             Assert.That(electionPhragmenConstants[0].Item1, Is.EqualTo(CompareStatus.Added));
             Assert.That(electionPhragmenConstants[0].Item2.Name.Value, Is.EqualTo("VotingBondBase"));
-            Assert.IsTrue(electionPhragmenModule.HasConstantAdded("VotingBondBase"));
+            Assert.That(electionPhragmenModule.HasConstantAdded("VotingBondBase"), Is.True);
 
             Assert.That(electionPhragmenConstants[1].Item1, Is.EqualTo(CompareStatus.Added));
             Assert.That(electionPhragmenConstants[1].Item2.Name.Value, Is.EqualTo("VotingBondFactor"));
 
             Assert.That(electionPhragmenConstants[2].Item1, Is.EqualTo(CompareStatus.Removed));
             Assert.That(electionPhragmenConstants[2].Item2.Name.Value, Is.EqualTo("VotingBond"));
-            Assert.IsTrue(electionPhragmenModule.HasConstantRemoved("VotingBond"));
+            Assert.That(electionPhragmenModule.HasConstantRemoved("VotingBond"), Is.True);
 
             var electionPhragmenEvents = electionPhragmenModule.Events.ToList();
             Assert.That(electionPhragmenEvents[0].Item1, Is.EqualTo(CompareStatus.Added));
             Assert.That(electionPhragmenEvents[0].Item2.Name.Value, Is.EqualTo("Renounced"));
-            Assert.IsTrue(electionPhragmenModule.HasEventAdded("Renounced"));
+            Assert.That(electionPhragmenModule.HasEventAdded("Renounced"), Is.True);
 
             Assert.That(electionPhragmenEvents[1].Item1, Is.EqualTo(CompareStatus.Removed));
             Assert.That(electionPhragmenEvents[1].Item2.Name.Value, Is.EqualTo("MemberRenounced"));
-            Assert.IsTrue(electionPhragmenModule.HasEventRemoved("MemberRenounced"));
+            Assert.That(electionPhragmenModule.HasEventRemoved("MemberRenounced"), Is.True);
 
             Assert.That(electionPhragmenEvents[2].Item1, Is.EqualTo(CompareStatus.Removed));
             Assert.That(electionPhragmenEvents[2].Item2.Name.Value, Is.EqualTo("VoterReported"));
@@ -86,7 +86,7 @@ namespace Substrate.NET.Metadata.Tests
             var electionPhragmenErrors = electionPhragmenModule.Errors.ToList();
             Assert.That(electionPhragmenErrors[0].Item1, Is.EqualTo(CompareStatus.Added));
             Assert.That(electionPhragmenErrors[0].Item2.Name.Value, Is.EqualTo("RunnerUpSubmit"));
-            Assert.IsTrue(electionPhragmenModule.HasErrorAdded("RunnerUpSubmit"));
+            Assert.That(electionPhragmenModule.HasErrorAdded("RunnerUpSubmit"), Is.True);
 
             Assert.That(electionPhragmenErrors[1].Item1, Is.EqualTo(CompareStatus.Added));
             Assert.That(electionPhragmenErrors[1].Item2.Name.Value, Is.EqualTo("InvalidWitnessData"));
@@ -96,7 +96,7 @@ namespace Substrate.NET.Metadata.Tests
 
             Assert.That(electionPhragmenErrors[3].Item1, Is.EqualTo(CompareStatus.Removed));
             Assert.That(electionPhragmenErrors[3].Item2.Name.Value, Is.EqualTo("InvalidCandidateCount"));
-            Assert.IsTrue(electionPhragmenModule.HasErrorRemoved("InvalidCandidateCount"));
+            Assert.That(electionPhragmenModule.HasErrorRemoved("InvalidCandidateCount"), Is.True);
         }
 
         [Test]
@@ -105,9 +105,9 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V12\\MetadataV12_27");
             var metadataDestination = readMetadataFromFile("V12\\MetadataV12_28");
 
-            Assert.IsTrue(_metadataService.HasPalletChangedVersionBetween("ElectionsPhragmen", metadataSource, metadataDestination));
+            Assert.That(_metadataService.HasPalletChangedVersionBetween("ElectionsPhragmen", metadataSource, metadataDestination), Is.True);
 
-            Assert.IsFalse(_metadataService.HasPalletChangedVersionBetween("Balances", metadataSource, metadataDestination));
+            Assert.That(_metadataService.HasPalletChangedVersionBetween("Balances", metadataSource, metadataDestination), Is.False);
         }
     }
 }
