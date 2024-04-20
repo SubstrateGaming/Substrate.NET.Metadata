@@ -58,9 +58,9 @@ namespace Substrate.NET.Metadata.Tests
 
             Assert.That(res, Is.Not.Null);
 
-            Assert.IsTrue(res.AddedModules.Any(x => x.ModuleName == "ConvictionVoting"));
-            Assert.IsTrue(res.AddedModules.Any(x => x.ModuleName == "Referenda"));
-            Assert.IsTrue(res.AddedModules.Any(x => x.ModuleName == "Whitelist"));
+            Assert.That(res.AddedModules.Any(x => x.ModuleName == "ConvictionVoting"), Is.True);
+            Assert.That(res.AddedModules.Any(x => x.ModuleName == "Referenda"), Is.True);
+            Assert.That(res.AddedModules.Any(x => x.ModuleName == "Whitelist"), Is.True);
 
             // Some basic other assertions on Balance pallet I checked with file compare
             var palletBalance = res.ChangedModules.FirstOrDefault(x => x.ModuleName == "Balances");
@@ -69,12 +69,12 @@ namespace Substrate.NET.Metadata.Tests
             // Some calls has been added and one has been removed
             var callsMethodChanged = palletBalance.Calls.LookupDifferentialType.TypeVariant.Elems;
             Assert.That(callsMethodChanged.Count(), Is.GreaterThan(1)); 
-            Assert.IsTrue(callsMethodChanged.Any(x => x.Item1 == CompareStatus.Added && x.Item2.Name.Value == "set_balance_deprecated"));
-            Assert.IsTrue(callsMethodChanged.Any(x => x.Item1 == CompareStatus.Removed && x.Item2.Name.Value == "set_balance"));
+            Assert.That(callsMethodChanged.Any(x => x.Item1 == CompareStatus.Added && x.Item2.Name.Value == "set_balance_deprecated"), Is.True);
+            Assert.That(callsMethodChanged.Any(x => x.Item1 == CompareStatus.Removed && x.Item2.Name.Value == "set_balance"), Is.True);
 
-            Assert.IsTrue(callsMethodChanged.Any(x => x.Item1 == CompareStatus.Added && x.Item2.Name.Value == "transfer_allow_death"));
-            Assert.IsTrue(callsMethodChanged.Any(x => x.Item1 == CompareStatus.Added && x.Item2.Name.Value == "set_balance_deprecated"));
-            Assert.IsTrue(callsMethodChanged.Any(x => x.Item1 == CompareStatus.Added && x.Item2.Name.Value == "force_set_balance"));
+            Assert.That(callsMethodChanged.Any(x => x.Item1 == CompareStatus.Added && x.Item2.Name.Value == "transfer_allow_death"), Is.True);
+            Assert.That(callsMethodChanged.Any(x => x.Item1 == CompareStatus.Added && x.Item2.Name.Value == "set_balance_deprecated"), Is.True);
+            Assert.That(callsMethodChanged.Any(x => x.Item1 == CompareStatus.Added && x.Item2.Name.Value == "force_set_balance"), Is.True);
 
             var upgradeAccounts = callsMethodChanged.FirstOrDefault(x => x.Item1 == CompareStatus.Added && x.Item2.Name.Value == "upgrade_accounts");
             Assert.That(upgradeAccounts.Item2.VariantFields.Value.Count(), Is.EqualTo(1));
@@ -105,9 +105,9 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V14\\MetadataV14_9270");
             var metadataDestination = readMetadataFromFile("V14\\MetadataV14_9280");
 
-            Assert.IsTrue(_metadataService.HasPalletChangedVersionBetween("Auctions", metadataSource, metadataDestination));
+            Assert.That(_metadataService.HasPalletChangedVersionBetween("Auctions", metadataSource, metadataDestination), Is.True);
 
-            Assert.IsFalse(_metadataService.HasPalletChangedVersionBetween("AuthorityDiscovery", metadataSource, metadataDestination));
+            Assert.That(_metadataService.HasPalletChangedVersionBetween("AuthorityDiscovery", metadataSource, metadataDestination), Is.False);
         }
     }
 }

@@ -58,8 +58,8 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V10\\MetadataV10_Kusama_1039");
             var metadataDestination = readMetadataFromFile("V10\\MetadataV10_Kusama_1040");
 
-            Assert.IsFalse(_metadataService.HasPalletChangedVersionBetween("Society", metadataSource, metadataDestination));
-            Assert.IsFalse(_metadataService.HasPalletChangedVersionBetween("Balances", metadataSource, metadataDestination));
+            Assert.That(_metadataService.HasPalletChangedVersionBetween("Society", metadataSource, metadataDestination), Is.False);
+            Assert.That(_metadataService.HasPalletChangedVersionBetween("Balances", metadataSource, metadataDestination), Is.False);
         }
     }
 }
