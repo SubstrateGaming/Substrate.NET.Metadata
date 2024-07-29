@@ -34,10 +34,10 @@ namespace Substrate.NET.Metadata.Base
             Hasher = new BaseEnum<THasher>();
             Hasher.Decode(byteArray, ref p);
 
-            var Key = new Str();
+            Key = new Str();
             Key.Decode(byteArray, ref p);
 
-            var Value = new Str();
+            Value = new Str();
             Value.Decode(byteArray, ref p);
 
             Linked = new Bool();
