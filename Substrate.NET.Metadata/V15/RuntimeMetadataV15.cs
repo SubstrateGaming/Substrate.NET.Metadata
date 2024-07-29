@@ -30,6 +30,12 @@ namespace Substrate.NET.Metadata.V15
             Apis = new BaseVec<RuntimeApiMetadataV15>();
             Apis.Decode(byteArray, ref p);
 
+            OuterEnums = new OuterEnums15();
+            OuterEnums.Decode(byteArray, ref p);
+
+            Custom = new CustomMetadata15();
+            Custom.Decode(byteArray, ref p);
+
             TypeSize = p - start;
         }
 
@@ -42,5 +48,9 @@ namespace Substrate.NET.Metadata.V15
         public BaseVec<RuntimeApiMetadataV15> Apis { get; private set; }
 
         public TType TypeId { get; private set; }
+
+        public OuterEnums15 OuterEnums { get; private set; }
+
+        public CustomMetadata15 Custom { get; private set; }
     }
 }
