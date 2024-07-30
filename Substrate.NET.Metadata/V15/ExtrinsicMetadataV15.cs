@@ -54,6 +54,6 @@ namespace Substrate.NET.Metadata.V15
         public TType CallType { get; private set; } = default!;
         public TType SignatureType { get; private set; } = default!;
         public TType ExtraType { get; private set; } = default!;
-        public BaseVec<SignedExtensionMetadataV14> SignedExtensions { get; private set; }
+        public BaseVec<SignedExtensionMetadataV14> SignedExtensions { get; private set; } = default!;
     }
 }
