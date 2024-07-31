@@ -30,17 +30,27 @@ namespace Substrate.NET.Metadata.V15
             Apis = new BaseVec<RuntimeApiMetadataV15>();
             Apis.Decode(byteArray, ref p);
 
+            OuterEnums = new OuterEnums15();
+            OuterEnums.Decode(byteArray, ref p);
+
+            Custom = new CustomMetadata15();
+            Custom.Decode(byteArray, ref p);
+
             TypeSize = p - start;
         }
 
-        public PortableRegistry Lookup { get; private set; }
+        public PortableRegistry Lookup { get; private set; } = default!;
 
-        public BaseVec<ModuleMetadataV15> Modules { get; private set; }
+        public BaseVec<ModuleMetadataV15> Modules { get; private set; } = default!;
 
-        public ExtrinsicMetadataV15 Extrinsic { get; private set; }
+        public ExtrinsicMetadataV15 Extrinsic { get; private set; } = default!;
 
-        public BaseVec<RuntimeApiMetadataV15> Apis { get; private set; }
+        public BaseVec<RuntimeApiMetadataV15> Apis { get; private set; } = default!;
 
-        public TType TypeId { get; private set; }
+        public TType TypeId { get; private set; } = default!;
+
+        public OuterEnums15 OuterEnums { get; private set; } = default!;
+
+        public CustomMetadata15 Custom { get; private set; } = default!;
     }
 }
