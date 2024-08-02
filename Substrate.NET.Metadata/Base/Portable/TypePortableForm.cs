@@ -5,6 +5,19 @@ namespace Substrate.NET.Metadata.Base.Portable
 {
     public class TypePortableForm : BaseType
     {
+        public TypePortableForm() { }
+
+        internal TypePortableForm(Path path,
+                                  BaseVec<TypeParameter> typeParams,
+                                  BaseEnumExt<TypeDefEnum, TypeDefComposite, TypeDefVariant, TypeDefSequence, TypeDefArray, TypeDefTuple, BaseEnum<TypeDefPrimitive>, TypeDefCompact, TypeDefBitSequence, BaseVoid> typeDef,
+                                  BaseVec<Str> docs)
+        {
+            Path = path;
+            TypeParams = typeParams;
+            TypeDef = typeDef;
+            Docs = docs;
+        }
+
         public override string TypeName() => "Type<T: Form = MetaForm>";
 
         public override byte[] Encode()

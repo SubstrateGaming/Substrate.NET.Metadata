@@ -7,6 +7,14 @@ namespace Substrate.NET.Metadata.Base.Portable
 {
     public class PortableType : BaseType
     {
+        public PortableType() { }
+
+        internal PortableType(U32 id, TypePortableForm ty) 
+        {
+            Id = id;
+            Ty = ty;
+        }
+
         public override string TypeName() => "PortableType";
 
         public override byte[] Encode()

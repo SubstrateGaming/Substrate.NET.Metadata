@@ -1,8 +1,11 @@
-﻿using Substrate.NetApi.Model.Types.Base;
+﻿using Substrate.NET.Metadata.Base.Portable;
+using Substrate.NET.Metadata.Conversion;
+using Substrate.NetApi.Model.Types.Base;
+using Substrate.NetApi.Model.Types.Primitive;
 
 namespace Substrate.NET.Metadata.V9
 {
-    public class RuntimeMetadataV9 : BaseType
+    public class RuntimeMetadataV9 : BaseType, IMetadataConversion
     {
         public BaseVec<ModuleMetadataV9> Modules { get; private set; }
 
@@ -19,6 +22,11 @@ namespace Substrate.NET.Metadata.V9
         public override byte[] Encode()
         {
             throw new NotImplementedException();
+        }
+
+        public void AddToDictionnary(PortableRegistry lookup, string palletName)
+        {
+            
         }
     }
 }

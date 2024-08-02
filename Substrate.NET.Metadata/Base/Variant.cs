@@ -6,6 +6,16 @@ namespace Substrate.NET.Metadata.Base
 {
     public class Variant : BaseType, IMetadataName
     {
+        public Variant() { }
+
+        public Variant(Str name, BaseVec<Field> variantFields, U8 index, BaseVec<Str> docs)
+        {
+            Name = name;
+            VariantFields = variantFields;
+            Index = index;
+            Docs = docs;
+        }
+
         public override string TypeName() => "Variant<T: Form = MetaForm>";
 
         public override byte[] Encode()

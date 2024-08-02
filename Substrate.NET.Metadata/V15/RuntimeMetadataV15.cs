@@ -15,8 +15,8 @@ namespace Substrate.NET.Metadata.V15
         {
             var start = p;
 
-            Lookup = new PortableRegistry();
-            Lookup.Decode(byteArray, ref p);
+            Types = new PortableRegistry();
+            Types.Decode(byteArray, ref p);
 
             Modules = new BaseVec<ModuleMetadataV15>();
             Modules.Decode(byteArray, ref p);
@@ -33,7 +33,7 @@ namespace Substrate.NET.Metadata.V15
             TypeSize = p - start;
         }
 
-        public PortableRegistry Lookup { get; private set; }
+        public PortableRegistry Types { get; private set; }
 
         public BaseVec<ModuleMetadataV15> Modules { get; private set; }
 

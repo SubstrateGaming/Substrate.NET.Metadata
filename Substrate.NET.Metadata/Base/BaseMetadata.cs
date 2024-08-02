@@ -2,7 +2,7 @@
 
 namespace Substrate.NET.Metadata.Base
 {
-    public abstract class BaseMetadata<T> : BaseType
+    public abstract class BaseMetadata<T> : BaseType, IMetaDataInfo
         where T : BaseType, new()
     {
         protected BaseMetadata()
@@ -34,7 +34,7 @@ namespace Substrate.NET.Metadata.Base
             TypeSize = p - start;
         }
 
-        public MetaDataInfo MetaDataInfo { get; private set; }
-        public T RuntimeMetadataData { get; private set; }
+        public MetaDataInfo MetaDataInfo { get; private set; } = default!;
+        public T RuntimeMetadataData { get; private set; } = default!;
     }
 }
