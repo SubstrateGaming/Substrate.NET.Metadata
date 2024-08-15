@@ -49,6 +49,14 @@ namespace Substrate.NET.Metadata.Base
     public class TType : CompactIntegerType
     {
         public override string TypeName() => "T::Type";
+
+        public static TType From(uint i)
+        {
+            var compactIntegerType = new TType();
+            compactIntegerType.Value = new CompactInteger(new U32(i));
+
+            return compactIntegerType;
+        }
     }
 
     public enum TypeDefEnum
@@ -119,7 +127,7 @@ namespace Substrate.NET.Metadata.Base
             TypeSize = p - start;
         }
 
-        public BaseVec<Variant> TypeParam { get; private set; }
+        public BaseVec<Variant> TypeParam { get; internal set; }
     }
 
     public class TypeDefSequence : BaseType, IMetadataType

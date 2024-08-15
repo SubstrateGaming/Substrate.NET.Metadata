@@ -1,4 +1,7 @@
 ﻿using Substrate.NET.Metadata.Base;
+using Substrate.NET.Metadata.Base.Portable;
+using Substrate.NET.Metadata.Conversion;
+using Substrate.NET.Metadata.V14;
 using Substrate.NetApi.Model.Types.Base;
 using Substrate.NetApi.Model.Types.Primitive;
 
@@ -25,6 +28,15 @@ namespace Substrate.NET.Metadata.V9
             Docs.Decode(byteArray, ref p);
 
             TypeSize = p - num;
+        }
+
+        public PalletErrorMetadataV14 ToPalletErrorMetadataV14(PortableRegistry lookup)
+        {
+            var result = new PalletErrorMetadataV14();
+
+            result.ElemType = ConversionV14Helper.AddToLookup(lookup, null);
+
+            return result;
         }
     }
 }

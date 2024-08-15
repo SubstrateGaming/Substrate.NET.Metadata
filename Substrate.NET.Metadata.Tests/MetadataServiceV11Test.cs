@@ -138,5 +138,16 @@ namespace Substrate.NET.Metadata.Tests
             // Purschase has been removed, but does not count as changed
             Assert.IsFalse(_metadataService.HasPalletChangedVersionBetween("Purchase", metadataSource, metadataDestination));
         }
+
+        [Test]
+        public void MetadataV11_ConvertToV14_ShouldSucceed()
+        {
+            var metadataV11 = new MetadataV11(readMetadataFromFile("V11\\MetadataV11_0"));
+            Assert.That(metadataV11, Is.Not.Null);
+
+            var runtimeMetadataV14 = metadataV11.RuntimeMetadataData.ToRuntimeMetadataV14();
+
+            Assert.That(runtimeMetadataV14, Is.Not.Null);
+        }
     }
 }

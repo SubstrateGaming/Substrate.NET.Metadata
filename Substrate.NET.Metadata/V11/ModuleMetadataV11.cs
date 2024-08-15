@@ -5,6 +5,9 @@ using Substrate.NET.Metadata.Compare;
 using Substrate.NetApi.Model.Types.Base;
 using Substrate.NetApi.Model.Types.Primitive;
 using System.Linq;
+using Substrate.NET.Metadata.V14;
+using Substrate.NET.Metadata.Base.Portable;
+using Substrate.NET.Metadata.Conversion.Internal;
 
 namespace Substrate.NET.Metadata.V11
 {
@@ -61,6 +64,35 @@ namespace Substrate.NET.Metadata.V11
                     Storage.Value.Entries.Value.Select(x => (Storage.Value.Prefix.Value, (status, x))) :
                     Enumerable.Empty<(string, (CompareStatus, StorageEntryMetadataV11))>(),
             };
+        }
+
+        public ModuleMetadataV14 ToModuleMetadataV14(ConversionBuilder conversionBuilder)
+        {
+            var result = new ModuleMetadataV14();
+
+            if(Storage.OptionFlag)
+            {
+                result.Storage = new BaseOpt<PalletStorageMetadataV14>(this.Storage.Value.ToStorageMetadataV14(conversionBuilder));
+            } 
+            //else
+            //{
+            //    result.Storage = new BaseOpt<PalletStorageMetadataV14>();
+            //}
+
+            if(Events.OptionFlag)
+            {
+                var eventsVariants = Events.Value.Value.Select(x => x.ToVariant(conversionBuilder)).ToArray();
+
+                var palletEvent = new PalletEventMetadataV14();
+                palletEvent.ElemType = TType.From(conversionBuilder.AddEventRuntimeLookup(Name.Value, eventsVariants).Value);
+                result.Events = new BaseOpt<PalletEventMetadataV14>(palletEvent);
+            }
+            
+
+            //result.Errors = this.Errors
+            
+
+            return result;
         }
     }
 }

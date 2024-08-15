@@ -1,4 +1,5 @@
-﻿using Substrate.NetApi.Model.Types.Base;
+﻿using Newtonsoft.Json.Linq;
+using Substrate.NetApi.Model.Types.Base;
 
 namespace Substrate.NET.Metadata.Base
 {
@@ -18,7 +19,10 @@ namespace Substrate.NET.Metadata.Base
 
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(MetaDataInfo.Encode());
+            result.AddRange(RuntimeMetadataData.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)

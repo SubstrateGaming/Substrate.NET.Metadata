@@ -1,4 +1,7 @@
-﻿using Substrate.NetApi.Model.Types.Base;
+﻿using Substrate.NET.Metadata.Conversion;
+using Substrate.NetApi;
+using Substrate.NetApi.Model.Meta;
+using Substrate.NetApi.Model.Types.Base;
 using Substrate.NetApi.Model.Types.Primitive;
 
 namespace Substrate.NET.Metadata.Base.Portable
@@ -44,10 +47,45 @@ namespace Substrate.NET.Metadata.Base.Portable
             TypeSize = p - start;
         }
 
-        public Path Path { get; private set; }
-        public BaseVec<TypeParameter> TypeParams { get; private set; }
-        public BaseEnumExt<TypeDefEnum, TypeDefComposite, TypeDefVariant, TypeDefSequence, TypeDefArray, TypeDefTuple, BaseEnum<TypeDefPrimitive>, TypeDefCompact, TypeDefBitSequence, BaseVoid> TypeDef { get; private set; }
-        public BaseVec<Str> Docs { get; private set; }
+        public Path Path { get; internal set; }
+        public BaseVec<TypeParameter> TypeParams { get; internal set; }
+        public BaseEnumExt<TypeDefEnum, TypeDefComposite, TypeDefVariant, TypeDefSequence, TypeDefArray, TypeDefTuple, BaseEnum<TypeDefPrimitive>, TypeDefCompact, TypeDefBitSequence, BaseVoid> TypeDef { get; internal set; }
+        public BaseVec<Str> Docs { get; internal set; }
+
+        public static TypePortableForm CreatePrimitive(NodeTypePrimitive nodeTypePrimitive)
+        {
+            var ty = CreateCommon(nodeTypePrimitive);
+
+            ty.TypeDef = new BaseEnumExt<TypeDefEnum, TypeDefComposite, TypeDefVariant, TypeDefSequence, TypeDefArray, TypeDefTuple, BaseEnum<TypeDefPrimitive>, TypeDefCompact, TypeDefBitSequence, BaseVoid>();
+
+            var mapPrimitive = Enum.Parse(typeof(TypeDefPrimitive), nodeTypePrimitive.Primitive.ToString());
+            if(mapPrimitive == null)
+            {
+                throw new MetadataConversionException($"Unable to find {nodeTypePrimitive.Primitive} into enum {typeof(TypeDefPrimitive)}");
+            }
+
+            ty.TypeDef.Create(TypeDefEnum.Primitive, new BaseEnum<TypeDefPrimitive>((TypeDefPrimitive)nodeTypePrimitive.Primitive));
+
+            return ty;
+        }
+
+        private static TypePortableForm CreateCommon(NodeType nodeTypePrimitive)
+        {
+            var ty = new TypePortableForm();
+
+            ty.Path = new Path();
+            ty.Path.Create(nodeTypePrimitive.Path.Select(x => new Str(x)).ToArray());
+
+            ty.TypeParams = new BaseVec<TypeParameter>(
+                nodeTypePrimitive.TypeParams.Select(x => new TypeParameter(new Str(x.Name), x.TypeId != null ? new BaseOpt<TType>(TType.From(x.TypeId.Value)) : new BaseOpt<TType>())).ToArray());
+
+            ty.Docs = new BaseVec<Str>();
+            ty.Docs.Create(nodeTypePrimitive.Docs.Select(x => new Str(x)).ToArray());
+
+            //ty.TypeDef
+
+            return ty;
+        }
     }
 
     public class Path : BaseVec<Str>
@@ -57,6 +95,14 @@ namespace Substrate.NET.Metadata.Base.Portable
 
     public class TypeParameter : BaseType, IMetadataName
     {
+        public TypeParameter() { }
+
+        public TypeParameter(Str name, BaseOpt<TType> typeParameterType)
+        {
+            Name = name;
+            TypeParameterType = typeParameterType;
+        }
+
         public override string TypeName() => "TypeParameter<T: Form = MetaForm>";
 
         public override byte[] Encode()
@@ -77,7 +123,7 @@ namespace Substrate.NET.Metadata.Base.Portable
             TypeSize = p - start;
         }
 
-        public Str Name { get; private set; }
-        public BaseOpt<TType> TypeParameterType { get; private set; }
+        public Str Name { get; internal set; } = default!;
+        public BaseOpt<TType> TypeParameterType { get; internal set; } = default!;
     }
 }

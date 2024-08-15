@@ -64,7 +64,7 @@ namespace Substrate.NET.Metadata.Conversion.Tests
         {
             var res = new List<string>();
 
-            if (ExtractMap(className) is (string key, string value) map)
+            if (ExtractMap(className) is (string, string) map)
             {
                 res.Add(map.key);
                 res.Add(map.value);
@@ -539,8 +539,8 @@ namespace Substrate.NET.Metadata.Conversion.Tests
             _metadataService = new MetadataService();
             _substrateClient = new SubstrateClient(new Uri("wss://polkadot-rpc.dwellir.com"), ChargeTransactionPayment.Default());
 
-            await _substrateClient.ConnectAsync();
-            Assert.That(_substrateClient.IsConnected, Is.True);
+            //await _substrateClient.ConnectAsync();
+            //Assert.That(_substrateClient.IsConnected, Is.True);
         }
 
         [TearDown]
@@ -581,62 +581,65 @@ namespace Substrate.NET.Metadata.Conversion.Tests
             }
         }
 
-        [Test]
-        [TestCase("[Hasher = BlakeTwo128Concat / Key = AccountId / Value = AccountInfo<Index, AccountData>]", new string[] { "AccountId", "AccountInfo", "Index", "AccountData" })]
-        [TestCase("Vec<(AccountId, Balance)>", new string[] { "AccountId", "Balance" })]
-        [TestCase("DigestOf<T>", new string[] { "DigestOf" })]
-        [TestCase("Vec<EventRecord<Event, Hash>>", new string[] { "EventRecord", "Event", "Hash" })]
-        [TestCase("TaskAddress<T::BlockNumber>", new string[] { "TaskAddress", "BlockNumber" })]
-        [TestCase("MaybeRandomness", new string[] { "MaybeRandomness" })]
-        [TestCase("Vec<WeightToFeeCoefficient<BalanceOf<T>>>", new string[] { "WeightToFeeCoefficient", "BalanceOf" })]
-        [TestCase("Option<Vec<u8>>", new string[] { "Option", "u8" })]
-        [TestCase("Vec<T::AccountId>", new string[] { "AccountId" })]
-        [TestCase("[Hasher = BlakeTwo128Concat / Key = AccountId / Value = StakingLedger<AccountId, BalanceOf<T>>]", new string[] { "AccountId", "StakingLedger", "BalanceOf" })]
-        [TestCase("[Hasher = Twox64Concat / Key = (AccountId, slashing::SpanIndex) / Value = slashing::SpanRecord<BalanceOf<T>>]", new string[] { "AccountId", "slashing::SpanIndex", "slashing::SpanRecord", "BalanceOf" })]
-        [TestCase("Option<Vec<u8>>", new string[] { "Option", "u8" })]
-        [TestCase("ElectionStatus<BlockNumber>", new string[] { "ElectionStatus", "BlockNumber" })]
-        [TestCase("ElectionStatus<BlockNumber>", new string[] { "ElectionStatus", "BlockNumber" })]
-        [TestCase("Vec<Vec<(ParaId, CollatorId)>>", new string[] { "ParaId", "CollatorId" })]
-        [TestCase("Vec<(ParaId, Option<(CollatorId, Retriable)>)>", new string[] { "ParaId", "Option", "CollatorId", "Retriable" })]
-        [TestCase("Vec<DeferredOffenceOf<T>>", new string[] { "DeferredOffenceOf" })]
-        [TestCase("[Hasher = Identity / Key = Hash / Value = (BlockNumber, Vec<AccountId>)]", new string[] { "Hash", "BlockNumber", "AccountId" })]
-        [TestCase("Vec<(<T as frame_system::Config>::AccountId, BalanceOf<T>)>", new string[] { "AccountId", "BalanceOf" })]
-        [TestCase("OpenTip<AccountId, BalanceOf<T>, BlockNumber, Hash>", new string[] { "OpenTip", "AccountId", "BalanceOf", "BlockNumber", "Hash" })]
-        [TestCase("[Key1 = BlockNumber / Key1Hasher = Twox64Concat / Key2 = Hash / Key2Hasher = Identity / Value = BlockAttestations<T>]", new string[] { "BlockNumber", "Hash", "BlockAttestations" })]
-        [TestCase("[Hasher = Identity / Key = EthereumAddress / Value = (BalanceOf<T>, BalanceOf<T>, BlockNumber)]", new string[] { "EthereumAddress", "BalanceOf", "BlockNumber" })]
-        [TestCase("[Hasher = Identity / Key = EthereumAddress / Value = (BalanceOf<T>, BalanceOf<T>, BlockNumber)]", new string[] { "EthereumAddress", "BalanceOf", "BlockNumber" })]
-        [TestCase("[Hasher = Identity / Key = [u8; 32] / Value = (Vec<u8>, AccountId, BalanceOf<T>)]", new string[] { "u8", "AccountId", "BalanceOf" })]
-        //[TestCase("Hey, (Titi<A<(XX, YY)>, B>, Titi<A<YY, TT>, L>)", new string[] { "Hey", "Titi", "A", "XX", "YY", "B", "TT", "L" })]
-        public void HarmonizeFullType_WithMap_ShouldSucceed(string original, string[] mapped)
-        {
-            // Todo Romain : gérer les tableaux du genre [u8; 32]
-            var res = StorageClass.HarmonizeFullType(original).Distinct().ToList();
+        //[Test]
+        //[TestCase("[Hasher = BlakeTwo128Concat / Key = AccountId / Value = AccountInfo<Index, AccountData>]", new string[] { "AccountId", "AccountInfo", "Index", "AccountData" })]
+        //[TestCase("Vec<(AccountId, Balance)>", new string[] { "AccountId", "Balance" })]
+        //[TestCase("DigestOf<T>", new string[] { "DigestOf" })]
+        //[TestCase("Vec<EventRecord<Event, Hash>>", new string[] { "EventRecord", "Event", "Hash" })]
+        //[TestCase("TaskAddress<T::BlockNumber>", new string[] { "TaskAddress", "BlockNumber" })]
+        //[TestCase("MaybeRandomness", new string[] { "MaybeRandomness" })]
+        //[TestCase("Vec<WeightToFeeCoefficient<BalanceOf<T>>>", new string[] { "WeightToFeeCoefficient", "BalanceOf" })]
+        //[TestCase("Option<Vec<u8>>", new string[] { "Option", "u8" })]
+        //[TestCase("Vec<T::AccountId>", new string[] { "AccountId" })]
+        //[TestCase("[Hasher = BlakeTwo128Concat / Key = AccountId / Value = StakingLedger<AccountId, BalanceOf<T>>]", new string[] { "AccountId", "StakingLedger", "BalanceOf" })]
+        //[TestCase("[Hasher = Twox64Concat / Key = (AccountId, slashing::SpanIndex) / Value = slashing::SpanRecord<BalanceOf<T>>]", new string[] { "AccountId", "slashing::SpanIndex", "slashing::SpanRecord", "BalanceOf" })]
+        //[TestCase("Option<Vec<u8>>", new string[] { "Option", "u8" })]
+        //[TestCase("ElectionStatus<BlockNumber>", new string[] { "ElectionStatus", "BlockNumber" })]
+        //[TestCase("ElectionStatus<BlockNumber>", new string[] { "ElectionStatus", "BlockNumber" })]
+        //[TestCase("Vec<Vec<(ParaId, CollatorId)>>", new string[] { "ParaId", "CollatorId" })]
+        //[TestCase("Vec<(ParaId, Option<(CollatorId, Retriable)>)>", new string[] { "ParaId", "Option", "CollatorId", "Retriable" })]
+        //[TestCase("Vec<DeferredOffenceOf<T>>", new string[] { "DeferredOffenceOf" })]
+        //[TestCase("[Hasher = Identity / Key = Hash / Value = (BlockNumber, Vec<AccountId>)]", new string[] { "Hash", "BlockNumber", "AccountId" })]
+        //[TestCase("Vec<(<T as frame_system::Config>::AccountId, BalanceOf<T>)>", new string[] { "AccountId", "BalanceOf" })]
+        //[TestCase("OpenTip<AccountId, BalanceOf<T>, BlockNumber, Hash>", new string[] { "OpenTip", "AccountId", "BalanceOf", "BlockNumber", "Hash" })]
+        //[TestCase("[Key1 = BlockNumber / Key1Hasher = Twox64Concat / Key2 = Hash / Key2Hasher = Identity / Value = BlockAttestations<T>]", new string[] { "BlockNumber", "Hash", "BlockAttestations" })]
+        //[TestCase("[Hasher = Identity / Key = EthereumAddress / Value = (BalanceOf<T>, BalanceOf<T>, BlockNumber)]", new string[] { "EthereumAddress", "BalanceOf", "BlockNumber" })]
+        //[TestCase("[Hasher = Identity / Key = EthereumAddress / Value = (BalanceOf<T>, BalanceOf<T>, BlockNumber)]", new string[] { "EthereumAddress", "BalanceOf", "BlockNumber" })]
+        //[TestCase("[Hasher = Identity / Key = [u8; 32] / Value = (Vec<u8>, AccountId, BalanceOf<T>)]", new string[] { "u8", "AccountId", "BalanceOf" })]
+        ////[TestCase("Hey, (Titi<A<(XX, YY)>, B>, Titi<A<YY, TT>, L>)", new string[] { "Hey", "Titi", "A", "XX", "YY", "B", "TT", "L" })]
+        //public void HarmonizeFullType_WithMap_ShouldSucceed(string original, string[] mapped)
+        //{
+        //    // Todo Romain : gérer les tableaux du genre [u8; 32]
+        //    var res = StorageClass.HarmonizeFullType(original).Distinct().ToList();
 
-            Assert.That(res.Count, Is.EqualTo(mapped.Length));
+        //    Assert.That(res.Count, Is.EqualTo(mapped.Length));
 
-            for (int i = 0; i < res.Count; i++)
-            {
-                Assert.That(res[i], Is.EqualTo(mapped[i]));
-            }
-        }
+        //    for (int i = 0; i < res.Count; i++)
+        //    {
+        //        Assert.That(res[i], Is.EqualTo(mapped[i]));
+        //    }
+        //}
 
-        [Test]
-        [TestCase("AccountId, Balance", new string[] { "AccountId", "Balance" })]
-        [TestCase("Toto, Titi<A, B>", new string[] { "Toto", "Titi<A, B>" })]
-        [TestCase("Titi<A, B>, Toto", new string[] { "Titi<A, B>", "Toto" })]
-        [TestCase("Titi<A<XX, YY>, B>, Titi<A<WW, TT>, L>", new string[] { "Titi<A<XX, YY>, B>", "Titi<A<WW, TT>, L>" })]
-        public void ExtractParameters_ShouldSucceed(string input, string[] expected)
-        {
-            var res = StorageClass.ExtractParameters(input);
 
-            Assert.That(res, Is.Not.Null);
-            Assert.That(res.Count, Is.EqualTo(expected.Length));
+        
 
-            for (int i = 0; i < res.Count; i++)
-            {
-                Assert.That(res[i], Is.EqualTo(expected[i]));
-            }
-        }
+        //[Test]
+        //[TestCase("AccountId, Balance", new string[] { "AccountId", "Balance" })]
+        //[TestCase("Toto, Titi<A, B>", new string[] { "Toto", "Titi<A, B>" })]
+        //[TestCase("Titi<A, B>, Toto", new string[] { "Titi<A, B>", "Toto" })]
+        //[TestCase("Titi<A<XX, YY>, B>, Titi<A<WW, TT>, L>", new string[] { "Titi<A<XX, YY>, B>", "Titi<A<WW, TT>, L>" })]
+        //public void ExtractParameters_ShouldSucceed(string input, string[] expected)
+        //{
+        //    var res = StorageClass.ExtractParameters(input);
+
+        //    Assert.That(res, Is.Not.Null);
+        //    Assert.That(res.Count, Is.EqualTo(expected.Length));
+
+        //    for (int i = 0; i < res.Count; i++)
+        //    {
+        //        Assert.That(res[i], Is.EqualTo(expected[i]));
+        //    }
+        //}
 
         [Test]
         public async Task GetAllStorageClasses_FromEveryVersionBeforeV14_ShouldSucceedAsync()

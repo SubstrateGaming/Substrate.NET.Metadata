@@ -2,15 +2,24 @@
 using Substrate.NET.Metadata.Base;
 using Substrate.NetApi.Model.Types.Base;
 using Substrate.NetApi.Model.Types.Primitive;
+using System.Collections.Generic;
 using static Substrate.NET.Metadata.StorageType;
 
 namespace Substrate.NET.Metadata.V14
 {
     public class PalletStorageMetadataV14 : BaseType
     {
-        public Str Prefix { get; private set; }
+        public PalletStorageMetadataV14() { }
 
-        public BaseVec<StorageEntryMetadataV14> Entries { get; private set; }
+        public PalletStorageMetadataV14(string prefix, IEnumerable<StorageEntryMetadataV14> entries)
+        {
+            Prefix = new Str(prefix);
+            Entries = new BaseVec<StorageEntryMetadataV14>(entries.ToArray());
+        }
+
+        public Str Prefix { get; private set; } = default!;
+
+        public BaseVec<StorageEntryMetadataV14> Entries { get; private set; } = default!;
 
         public override byte[] Encode()
         {
@@ -30,6 +39,17 @@ namespace Substrate.NET.Metadata.V14
 
     public class StorageEntryMetadataV14 : BaseType, IMetadataName
     {
+        public StorageEntryMetadataV14() { }
+
+        public StorageEntryMetadataV14(Str name, BaseEnum<ModifierV9> storageModifier, BaseEnumExt<StorageType.Type, TType, StorageEntryTypeMapV14> storageType, ByteGetter storageDefault, BaseVec<Str> documentation)
+        {
+            Name = name;
+            StorageModifier = storageModifier;
+            StorageType = storageType;
+            StorageDefault = storageDefault;
+            Documentation = documentation;
+        }
+
         public override byte[] Encode()
         {
             throw new NotImplementedException();
@@ -57,18 +77,31 @@ namespace Substrate.NET.Metadata.V14
             TypeSize = p - start;
         }
 
-        public Str Name { get; private set; }
-        public BaseEnum<ModifierV9> StorageModifier { get; private set; }
-        public BaseEnumExt<StorageType.Type, TType, StorageEntryTypeMapV14> StorageType { get; private set; }
-        public ByteGetter StorageDefault { get; private set; }
-        public BaseVec<Str> Documentation { get; private set; }
+        public Str Name { get; private set; } = default!;
+        public BaseEnum<ModifierV9> StorageModifier { get; private set; } = default!;
+        public BaseEnumExt<StorageType.Type, TType, StorageEntryTypeMapV14> StorageType { get; private set; } = default!;
+        public ByteGetter StorageDefault { get; private set; } = default!;
+        public BaseVec<Str> Documentation { get; private set; } = default!;
     }
 
     public class StorageEntryTypeMapV14 : BaseType
     {
+        public StorageEntryTypeMapV14() { }
+
+        public StorageEntryTypeMapV14(BaseVec<BaseEnum<Hasher>> hashers, TType key, TType value)
+        {
+            Hashers = hashers;
+            Key = key;
+            Value = value;
+        }
+
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Hashers.Encode());
+            result.AddRange(Key.Encode());
+            result.AddRange(Value.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)
@@ -87,9 +120,9 @@ namespace Substrate.NET.Metadata.V14
             TypeSize = p - start;
         }
 
-        public BaseVec<BaseEnum<Hasher>> Hashers { get; private set; }
-        public TType Key { get; private set; }
-        public TType Value { get; private set; }
+        public BaseVec<BaseEnum<Hasher>> Hashers { get; internal set; } = default!;
+        public TType Key { get; internal set; } = default!;
+        public TType Value { get; internal set; } = default!;
     }
 
     public class PalletCallMetadataV14 : BaseType, IMetadataName, IMetadataType
@@ -109,7 +142,7 @@ namespace Substrate.NET.Metadata.V14
             TypeSize = p - start;
         }
 
-        public TType ElemType { get; private set; }
+        public TType ElemType { get; private set; } = default!;
         public Str Name => new Str(ElemType.ToString());
     }
 
@@ -130,7 +163,7 @@ namespace Substrate.NET.Metadata.V14
             TypeSize = p - start;
         }
 
-        public TType ElemType { get; private set; }
+        public TType ElemType { get; internal set; } = default!;
 
         public Str Name => new Str(ElemType.ToString());
     }
@@ -161,10 +194,10 @@ namespace Substrate.NET.Metadata.V14
             TypeSize = p - start;
         }
 
-        public Str Name { get; private set; }
-        public TType ConstantType { get; private set; }
-        public ByteGetter ConstantValue { get; private set; }
-        public BaseVec<Str> Documentation { get; private set; }
+        public Str Name { get; internal set; } = default!;
+        public TType ConstantType { get; internal set; } = default!;
+        public ByteGetter ConstantValue { get; internal set; } = default!;
+        public BaseVec<Str> Documentation { get; internal set; } = default!;
     }
 
     public class PalletErrorMetadataV14 : BaseType, IMetadataName, IMetadataType
@@ -184,7 +217,7 @@ namespace Substrate.NET.Metadata.V14
             TypeSize = p - start;
         }
 
-        public TType ElemType { get; private set; }
+        public TType ElemType { get; internal set; } = default!;
         public Str Name => new Str(ElemType.ToString());
     }
 }

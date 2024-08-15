@@ -42,9 +42,9 @@ namespace Substrate.NET.Metadata.Base
             TypeSize = p - start;
         }
 
-        public Str Name { get; private set; }
-        public BaseVec<Field> VariantFields { get; private set; }
-        public U8 Index { get; private set; }
-        public BaseVec<Str> Docs { get; private set; }
+        public Str Name { get; internal set; }
+        public BaseVec<Field> VariantFields { get; internal set; }
+        public U8 Index { get; internal set; }
+        public BaseVec<Str> Docs { get; internal set; }
     }
 }

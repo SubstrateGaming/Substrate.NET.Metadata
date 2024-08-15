@@ -1,4 +1,7 @@
-﻿using Substrate.NET.Metadata.V10;
+﻿using Substrate.NET.Metadata.Base.Portable;
+using Substrate.NET.Metadata.Conversion.Internal;
+using Substrate.NET.Metadata.V10;
+using Substrate.NET.Metadata.V14;
 using Substrate.NetApi.Model.Types.Base;
 using Substrate.NetApi.Model.Types.Primitive;
 
@@ -24,7 +27,17 @@ namespace Substrate.NET.Metadata.V11
             TypeSize = p - start;
         }
 
-        public Str Prefix { get; private set; }
-        public BaseVec<StorageEntryMetadataV11> Entries { get; private set; }
+        public Str Prefix { get; private set; } = default!;
+        public BaseVec<StorageEntryMetadataV11> Entries { get; private set; } = default!;
+
+        public PalletStorageMetadataV14 ToStorageMetadataV14(ConversionBuilder conversionBuilder)
+        {
+            var storage = new PalletStorageMetadataV14(
+                prefix: Prefix.Value,
+                entries: Entries.Value.Select(x => x.ToStorageEntryMetadataV14(conversionBuilder))
+            );
+
+            return storage;
+        }
     }
 }

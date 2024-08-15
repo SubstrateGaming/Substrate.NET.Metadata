@@ -41,13 +41,13 @@ namespace Substrate.NET.Metadata.V14
             TypeSize = p - start;
         }
 
-        public Str Name { get; private set; }
-        public BaseOpt<PalletStorageMetadataV14> Storage { get; private set; }
-        public BaseOpt<PalletCallMetadataV14> Calls { get; private set; }
-        public BaseOpt<PalletEventMetadataV14> Events { get; private set; }
-        public BaseVec<PalletConstantMetadataV14> Constants { get; private set; }
-        public BaseOpt<PalletErrorMetadataV14> Errors { get; private set; }
-        public U8 Index { get; private set; }
+        public Str Name { get; internal set; } = default!;
+        public BaseOpt<PalletStorageMetadataV14> Storage { get; internal set; } = default!;
+        public BaseOpt<PalletCallMetadataV14> Calls { get; internal set; } = default!;
+        public BaseOpt<PalletEventMetadataV14> Events { get; internal set; } = default!;
+        public BaseVec<PalletConstantMetadataV14> Constants { get; internal set; } = default!;
+        public BaseOpt<PalletErrorMetadataV14> Errors { get; internal set; } = default!;
+        public U8 Index { get; internal set; } = default!;
 
         public MetadataDifferentialModulesV14 ToDifferentialModules(CompareStatus status, PortableRegistry lookup)
         {

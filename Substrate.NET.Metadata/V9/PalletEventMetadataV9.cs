@@ -1,4 +1,5 @@
 ﻿using Substrate.NET.Metadata.Base;
+using Substrate.NET.Metadata.Conversion.Internal;
 using Substrate.NetApi.Model.Types.Base;
 using Substrate.NetApi.Model.Types.Primitive;
 
@@ -30,5 +31,20 @@ namespace Substrate.NET.Metadata.V9
         public Str Name { get; set; }
         public BaseVec<Str> Args { get; set; }
         public BaseVec<Str> Docs { get; set; }
+
+        public Variant ToVariant(ConversionBuilder conversionBuilder)
+        {
+            var res = new Variant();
+
+            res.Name = Name;
+            res.Docs = Docs;
+
+            var argsType = Args.Value.Select(x => new { Name = x, TypeId = conversionBuilder.BuildLookup(x.Value) });
+            res.VariantFields = new BaseVec<Field>(
+                argsType.Select(x => new Field(new BaseOpt<Str>(x.Name), TType.From(x.TypeId.Value), new BaseOpt<Str>(), new BaseVec<Str>())
+                ).ToArray());
+
+            return res;
+        }
     }
 }

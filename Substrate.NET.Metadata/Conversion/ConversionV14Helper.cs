@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using Substrate.NET.Metadata.Base;
+using Substrate.NET.Metadata.Base.Portable;
 using Substrate.NET.Metadata.V14;
 using Substrate.NetApi.Model.Types.Base;
 using Substrate.NetApi.Model.Types.Primitive;
@@ -28,6 +29,18 @@ namespace Substrate.NET.Metadata.Conversion
 
                 return _referenceV14Metadata;
             }
+        }
+
+        /// <summary>
+        /// Search <paramref name="classType"/> into <paramref name="lookup"/> and return it ID.
+        /// If ID doesn't exists, create it
+        /// </summary>
+        /// <param name="lookup">V14 types</param>
+        /// <param name="classType">The class to search into the dictionnary</param>
+        /// <returns></returns>
+        public static TType AddToLookup(PortableRegistry lookup, string classType)
+        {
+            return null;
         }
 
         internal static bool? TryFindModuleInV14(string moduleName)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection.PortableExecutable;
 using Substrate.NetApi;
 using Substrate.NetApi.Model.Types.Base;
 using Substrate.NetApi.Model.Types.Primitive;
@@ -19,7 +20,10 @@ namespace Substrate.NET.Metadata.Base.Portable
 
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Id.Encode());
+            result.AddRange(Ty.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)

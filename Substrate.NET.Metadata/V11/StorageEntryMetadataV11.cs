@@ -1,5 +1,9 @@
 ﻿using Substrate.NET.Metadata;
 using Substrate.NET.Metadata.Base;
+using Substrate.NET.Metadata.Base.Portable;
+using Substrate.NET.Metadata.Conversion;
+using Substrate.NET.Metadata.Conversion.Internal;
+using Substrate.NET.Metadata.V14;
 using Substrate.NetApi.Model.Types.Base;
 using Substrate.NetApi.Model.Types.Primitive;
 
@@ -40,10 +44,44 @@ namespace Substrate.NET.Metadata.V11
             TypeSize = p - start;
         }
 
-        public Str Name { get; private set; }
-        public BaseEnum<StorageType.ModifierV9> StorageModifier { get; private set; }
-        public BaseEnumExt<StorageType.TypeV9, Str, StorageEntryTypeMapV11, StorageEntryTypeDoubleMapV11> StorageType { get; private set; }
-        public ByteGetter StorageDefault { get; private set; }
-        public BaseVec<Str> Documentation { get; private set; }
+        public Str Name { get; private set; } = default!;
+        public BaseEnum<StorageType.ModifierV9> StorageModifier { get; private set; } = default!;
+        public BaseEnumExt<StorageType.TypeV9, Str, StorageEntryTypeMapV11, StorageEntryTypeDoubleMapV11> StorageType { get; private set; } = default!;
+        public ByteGetter StorageDefault { get; private set; } = default!;
+        public BaseVec<Str> Documentation { get; private set; } = default!;
+
+        public StorageEntryMetadataV14 ToStorageEntryMetadataV14(ConversionBuilder conversionBuilder)
+        {
+            var mapStorageType = new BaseEnumExt<StorageType.Type, TType, StorageEntryTypeMapV14>();
+
+            if (StorageType.Value == Metadata.StorageType.TypeV9.Plain)
+            {
+                var val = StorageType.Value2 as Str;
+                //var idx = ConversionV14Helper.AddToLookup(lookup, val!.Value);
+                var index = conversionBuilder.BuildLookup(val!.Value);
+
+                mapStorageType.Create(Metadata.StorageType.Type.Plain, TType.From(index.Value));
+            }
+            else if (StorageType.Value == Metadata.StorageType.TypeV9.Map)
+            {
+                var map = (StorageEntryTypeMapV11)StorageType.Value2;
+                mapStorageType.Create(Metadata.StorageType.Type.Map, map.ToStorageEntryTypeMapV14(conversionBuilder));
+            }
+            else
+            {
+                // DoubleMap and NMap exists but should never happened
+                throw new MetadataConversionException($"Error while converting StorageEntryMetadataV11. Received storage type {StorageType.Value} while should never happened");
+            }
+
+            var storageEntry = new StorageEntryMetadataV14(
+                name: Name,
+                storageModifier: StorageModifier,
+                storageType: mapStorageType,
+                storageDefault: StorageDefault,
+                documentation: Documentation
+            );
+
+            return storageEntry;
+        }
     }
 }
