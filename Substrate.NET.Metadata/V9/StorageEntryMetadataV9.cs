@@ -9,7 +9,13 @@ namespace Substrate.NET.Metadata.V9
     {
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Name.Encode());
+            result.AddRange(Modifier.Encode());
+            result.AddRange(StorageType.Encode());
+            result.AddRange(Default.Encode());
+            result.AddRange(Documentation.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)

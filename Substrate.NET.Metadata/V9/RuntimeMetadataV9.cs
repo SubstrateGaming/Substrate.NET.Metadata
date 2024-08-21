@@ -1,5 +1,6 @@
 ﻿using Substrate.NET.Metadata.Base.Portable;
 using Substrate.NET.Metadata.Conversion;
+using Substrate.NetApi.Model.Extrinsics;
 using Substrate.NetApi.Model.Types.Base;
 using Substrate.NetApi.Model.Types.Primitive;
 
@@ -21,7 +22,9 @@ namespace Substrate.NET.Metadata.V9
 
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Modules.Encode());
+            return result.ToArray();
         }
 
         public void AddToDictionnary(PortableRegistry lookup, string palletName)

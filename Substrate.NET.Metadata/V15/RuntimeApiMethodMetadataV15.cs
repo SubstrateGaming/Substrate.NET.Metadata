@@ -1,4 +1,5 @@
 ﻿using Substrate.NET.Metadata.Base;
+using Substrate.NetApi.Model.Extrinsics;
 using Substrate.NetApi.Model.Types.Base;
 using Substrate.NetApi.Model.Types.Primitive;
 using System;
@@ -32,7 +33,12 @@ namespace Substrate.NET.Metadata.V15
 
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Name.Encode());
+            result.AddRange(Inputs.Encode());
+            result.AddRange(Output.Encode());
+            result.AddRange(Docs.Encode());
+            return result.ToArray();
         }
 
         public Str Name { get; private set; }

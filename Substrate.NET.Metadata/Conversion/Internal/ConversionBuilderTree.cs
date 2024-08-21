@@ -1,5 +1,6 @@
 ﻿using Substrate.NET.Metadata.Base;
 using Substrate.NET.Metadata.Base.Portable;
+using Substrate.NetApi.Model.Meta;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -82,9 +83,8 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             {
                 var content = HarmonizeTypeName(nodeBuilderType.Adapted);
                 nodeBuilderType = new NodeBuilderTypeComposite(
-                    SearchV14.HardBinding(
-                        HarmonizeTypeName(nodeBuilderType.Adapted)), 
-                    nodeBuilderType.Adapted);
+                    SearchV14.HardBinding(content), 
+                    nodeBuilderType.Raw);
             }
 
             if (nodeBuilderType.Children.Count > 0)
@@ -136,6 +136,8 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
             var splitted = className.Split(new[] { "," }, StringSplitOptions.None).Select(x => x.Trim()).ToList();
             result.AddRange(splitted);
+
+            if (splitted.Any(x => x.Contains("("))) return null;
 
             if (splitted.Count > 1)
             {
@@ -243,6 +245,8 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 var array = new NodeBuilderTypeArray(className, int.Parse(match.Groups[2].Value));
 
                 array.Children.Add(new NodeBuilderTypeUndefined(match.Groups[1].Value));
+
+                return array;
             }
 
             return null;
@@ -355,15 +359,25 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 NodeBuilderType result = typeDef switch
                 {
                     TypeDefEnum.Sequence => new NodeBuilderTypeSequence(className),
+                    TypeDefEnum.Variant => new NodeBuilderTypeVariant(className),
                     TypeDefEnum.Composite => new NodeBuilderTypeComposite(
                         SearchV14.HardBinding(match.Groups[1].Value), 
-                        match.Groups[1].Value),
+                        className),
                     _ => throw new MetadataConversionException($"TypeDef {typeDef} is not handled")
                 };
 
                 if (!GenericValueToIgnore.Contains(genericParameters))
                 {
-                    result.Children.Add(new NodeBuilderTypeUndefined(genericParameters));
+                    if (ExtractParameters(genericParameters) is List<string> parameters)
+                    {
+                        foreach (var param in parameters)
+                        {
+                            result.Children.Add(new NodeBuilderTypeUndefined(param));
+                        }
+                    } else
+                    {
+                        result.Children.Add(new NodeBuilderTypeUndefined(genericParameters));
+                    }
                 }
 
                 return result;
@@ -393,6 +407,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             return genericType switch
             {
                 "Vec" => TypeDefEnum.Sequence,
+                "Option" => TypeDefEnum.Variant,
                 _ => TypeDefEnum.Composite
             };
         }

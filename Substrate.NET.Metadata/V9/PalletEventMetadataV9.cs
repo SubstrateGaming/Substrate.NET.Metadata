@@ -9,7 +9,11 @@ namespace Substrate.NET.Metadata.V9
     {
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Name.Encode());
+            result.AddRange(Args.Encode());
+            result.AddRange(Docs.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)
@@ -32,16 +36,17 @@ namespace Substrate.NET.Metadata.V9
         public BaseVec<Str> Args { get; set; }
         public BaseVec<Str> Docs { get; set; }
 
-        public Variant ToVariant(ConversionBuilder conversionBuilder)
+        public Variant ToVariant(ConversionBuilder conversionBuilder, int index)
         {
             var res = new Variant();
 
             res.Name = Name;
             res.Docs = Docs;
+            res.Index = new U8((byte)index);
 
             var argsType = Args.Value.Select(x => new { Name = x, TypeId = conversionBuilder.BuildLookup(x.Value) });
             res.VariantFields = new BaseVec<Field>(
-                argsType.Select(x => new Field(new BaseOpt<Str>(x.Name), TType.From(x.TypeId.Value), new BaseOpt<Str>(), new BaseVec<Str>())
+                argsType.Select(x => new Field(new BaseOpt<Str>(x.Name), TType.From(x.TypeId.Value), new BaseOpt<Str>(), new BaseVec<Str>(new Str[0]))
                 ).ToArray());
 
             return res;

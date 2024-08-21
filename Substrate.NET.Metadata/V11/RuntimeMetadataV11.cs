@@ -25,17 +25,21 @@ namespace Substrate.NET.Metadata.V11
 
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Modules.Encode());
+            result.AddRange(Extrinsic.Encode());
+            return result.ToArray();
         }
 
         public RuntimeMetadataV14 ToRuntimeMetadataV14()
         {
             var conversion = new ConversionBuilder(new List<PortableType>());
+            conversion.ClearEventBlockchainRuntimeEvent();
 
             var res = new RuntimeMetadataV14();
 
             res.Modules = new BaseVec<ModuleMetadataV14>(
-                Modules.Value.Select(x => x.ToModuleMetadataV14(conversion))
+                Modules.Value.Select((x, i) => x.ToModuleMetadataV14(conversion, i))
                 .ToArray());
 
             return res;

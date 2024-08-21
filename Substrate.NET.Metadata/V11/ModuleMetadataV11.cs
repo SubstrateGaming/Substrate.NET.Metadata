@@ -47,7 +47,14 @@ namespace Substrate.NET.Metadata.V11
 
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Name.Encode());
+            result.AddRange(Storage.Encode());
+            result.AddRange(Calls.Encode());
+            result.AddRange(Events.Encode());
+            result.AddRange(Constants.Encode());
+            result.AddRange(Errors.Encode());
+            return result.ToArray();
         }
 
         public MetadataDifferentialModulesV11 ToDifferentialModule(CompareStatus status)
@@ -66,33 +73,64 @@ namespace Substrate.NET.Metadata.V11
             };
         }
 
-        public ModuleMetadataV14 ToModuleMetadataV14(ConversionBuilder conversionBuilder)
+        public ModuleMetadataV14 ToModuleMetadataV14(ConversionBuilder conversionBuilder, int index)
         {
             var result = new ModuleMetadataV14();
+            result.Name = Name;
+            result.Index = new U8((byte)index);
 
-            if(Storage.OptionFlag)
+            // We do not do Calls conversion
+
+            if (Events.OptionFlag)
+            {
+                result.Events = ToPalletEventV14(conversionBuilder);
+
+                var variantField = new Field(
+                    name: new BaseOpt<Str>(), 
+                    fieldTy: result.Events.Value.ElemType, 
+                    fieldTypeName: new BaseOpt<Str>(new Str($"{Name.Value}::Event<Runtime")),
+                    docs: new BaseVec<Str>(new Str[0]));
+
+                var eventVariant = new Variant(
+                    name: Name, 
+                    variantFields: new BaseVec<Field>(new Field[1] { variantField }), 
+                    index: new U8((byte)index), 
+                    docs: new BaseVec<Str>(new Str[0]));
+
+                conversionBuilder.AddPalletEventBlockchainRuntimeEvent(eventVariant);
+            }
+
+            result.Errors = ToPalletErrorV14(conversionBuilder);
+
+            result.Constants = new BaseVec<PalletConstantMetadataV14>(Constants.Value.Select(x => x.ToPalletConstantMetadataV14(conversionBuilder)).ToArray());
+
+
+            if (Storage.OptionFlag)
             {
                 result.Storage = new BaseOpt<PalletStorageMetadataV14>(this.Storage.Value.ToStorageMetadataV14(conversionBuilder));
-            } 
-            //else
-            //{
-            //    result.Storage = new BaseOpt<PalletStorageMetadataV14>();
-            //}
-
-            if(Events.OptionFlag)
-            {
-                var eventsVariants = Events.Value.Value.Select(x => x.ToVariant(conversionBuilder)).ToArray();
-
-                var palletEvent = new PalletEventMetadataV14();
-                palletEvent.ElemType = TType.From(conversionBuilder.AddEventRuntimeLookup(Name.Value, eventsVariants).Value);
-                result.Events = new BaseOpt<PalletEventMetadataV14>(palletEvent);
             }
-            
-
-            //result.Errors = this.Errors
-            
 
             return result;
         }
+
+        private BaseOpt<PalletErrorMetadataV14> ToPalletErrorV14(ConversionBuilder conversionBuilder)
+        {
+            var errorsVariants = Errors.Value.Select((x, i) => x.ToVariant(conversionBuilder, i)).ToArray();
+            var palletError = new PalletErrorMetadataV14();
+            palletError.ElemType = TType.From(conversionBuilder.AddErrorRuntimeLookup(Name.Value, errorsVariants).Value);
+            return new BaseOpt<PalletErrorMetadataV14>(palletError);
+        }
+
+        private BaseOpt<PalletEventMetadataV14> ToPalletEventV14(ConversionBuilder conversionBuilder)
+        {
+            var eventsVariants = Events.Value.Value.Select((x, i) => x.ToVariant(conversionBuilder, i)).ToArray();
+
+            var palletEvent = new PalletEventMetadataV14();
+            palletEvent.ElemType = TType.From(conversionBuilder.AddEventRuntimeLookup(Name.Value, eventsVariants).Value);
+
+            return new BaseOpt<PalletEventMetadataV14>(palletEvent);
+        }
+
+
     }
 }

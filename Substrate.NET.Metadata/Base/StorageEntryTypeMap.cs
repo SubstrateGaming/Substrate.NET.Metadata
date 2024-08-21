@@ -24,7 +24,12 @@ namespace Substrate.NET.Metadata.Base
 
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Hasher.Encode());
+            result.AddRange(Key.Encode());
+            result.AddRange(Value.Encode());
+            result.AddRange(Linked.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)

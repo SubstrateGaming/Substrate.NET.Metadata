@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -26,36 +27,76 @@ using TypeDefExt = Substrate.NetApi.Model.Types.Base.BaseEnumExt<
 
 namespace Substrate.NET.Metadata.Conversion.Internal
 {
+    public class ConversionElementState
+    {
+        public ConversionElementState(string className, NodeBuilderType nodeBuilderType)
+        {
+            ClassName = className;
+            NodeBuilderType = nodeBuilderType;
+        }
+
+        public string ClassName { get; set; }
+        public NodeBuilderType NodeBuilderType { get; set; }
+        public uint? IndexFoundInV14 { get; set; }
+        public uint? IndexCreated { get; set; }
+
+        public bool IsSuccessfullyMapped
+        {
+            get
+            {
+                return IndexFoundInV14 != null || IndexCreated != null;
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"{ClassName} (=> {NodeBuilderType.Adapted}) | V14 = {IndexFoundInV14} | CustomIndex = {IndexCreated} | Mapped = {IsSuccessfullyMapped}";
+        }
+    }
+
     public class ConversionBuilder
     {
         public List<PortableType> PortableTypes { get; init; }
+        public List<ConversionElementState> ElementsState { get; init; }
+        public const int START_INDEX = 1_000;
 
         public ConversionBuilder(List<PortableType> portableTypes)
         {
             PortableTypes = portableTypes;
+            ElementsState = new List<ConversionElementState>();
         }
 
-        //private PortableType[] Push(this PortableType[] pt, PortableType p)
-        //{
-        //    var list = pt.ToList();
-        //    list.Add(p);
-
-        //    return list.ToArray();
-        //}
+        /// <summary>
+        /// Conversion that are not handle by the <see cref="ConversionBuilder"/> because it is not necessary or too complex
+        /// </summary>
+        public static List<string> UnhandleConversion = new List<string>()
+        {
+            "Vec<Option<Scheduled<<T as Trait>::Call, T::BlockNumber>>>" // Pallet scheduler => Storage => Agenda
+        };
 
         public U32 GetNewIndex()
         {
-            var max = PortableTypes.Max(x => x.Id);
-
-            if (max is null) return new U32(0);
-            return new U32(max.Value + 1);
+            if (!PortableTypes.Any()) return new U32(START_INDEX);
+            return new U32(Math.Max(START_INDEX, PortableTypes.Max(x => x.Id.Value) + 1));
         }
 
         public U32 BuildLookup(string className)
         {
-            var portableType = GetNodeFromV14(className) ?? CreateNode(className, GetNewIndex());
+            if (UnhandleConversion.Contains(className)) return new U32(0); // Ok this is bad
 
+            var founded = GetNodeFromV14(className);
+
+            if(founded != null)
+            {
+                ElementsState[^1].IndexFoundInV14 = founded.Id.Value;
+                return founded.Id;
+            }
+
+            var portableType = CreateNode(className, GetNewIndex());
+
+            ElementsState[^1].IndexCreated = portableType.Id.Value;
             return portableType.Id;
+            
         }
 
         /// <summary>
@@ -65,8 +106,18 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         /// <returns></returns>
         public PortableType? GetNodeFromV14(string className)
         {
-            var nodeType = ConversionBuilderTree.Build(new NodeBuilderTypeUndefined(className));
+            var nodeRaw = new NodeBuilderTypeUndefined(className);
+
+            // Node like events has do not have to be seached in V14
+            if (nodeRaw.IndexHardBinding != null)
+            {
+                ElementsState.Add(new ConversionElementState(className, nodeRaw));
+                return LoopFromV14((int)nodeRaw.IndexHardBinding!);
+            }
+
+            var nodeType = ConversionBuilderTree.Build(nodeRaw);
             var index = SearchV14.FindIndexByNode(nodeType);
+            ElementsState.Add(new ConversionElementState(className, nodeType));
 
             if (index == null) return null;
 
@@ -76,8 +127,11 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         public PortableType LoopFromV14(int index)
         {
             var portableType = SearchV14.FindTypeByIndex(index);
-            PortableTypes.Add(portableType);
+            var alreadyInserted = PortableTypes.SingleOrDefault(x => x.Id.Value == index);
 
+            if (alreadyInserted != null) return alreadyInserted;
+
+            PortableTypes.Add(portableType);
             switch(portableType.Ty.TypeDef.Value)
             {
                 case TypeDefEnum.Composite:
@@ -139,6 +193,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         /// <exception cref="MetadataConversionException"></exception>
         public static PortableType CreateNode(string className, U32 currentMaxIndex)
         {
+
             var tpf = new TypePortableForm();
 
             if (ExtractPrimitive(className) is TypeDefPrimitive prim)
@@ -467,28 +522,31 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             };
         }
 
-        //public static int? TryHardBinding(string className)
-        //{
-        //    return className switch
-        //    {
-        //        "u8" => 2,
-        //        "u16" => 73,
-        //        "u32" => 4,
-        //        "u64" => 8,
-        //        "u128" => 6,
-        //        "bool" => 58,
-        //        "Str" => 108,
-        //        "Vec<WeightToFeeCoefficient<BalanceOf<T>>>" => 386,
-        //        "LockIdentifier" => 125,
-        //        "[u8;8]" => 125,
-        //        _ => null
-        //    };
-        //}
 
+
+        /// <summary>
+        /// Create a pallet runtime events
+        /// </summary>
+        /// <param name="palletName"></param>
+        /// <param name="variants"></param>
+        /// <returns></returns>
         public U32 AddEventRuntimeLookup(string palletName, Variant[] variants)
+            => AddRuntimeLookup("Event", palletName, variants);
+
+        public U32 AddErrorRuntimeLookup(string palletName, Variant[] variants)
+            => AddRuntimeLookup("Error", palletName, variants);
+
+        /// <summary>
+        /// Create a pallet runtime events / calls / errors / constants
+        /// </summary>
+        /// <param name="objType"></param>
+        /// <param name="palletName"></param>
+        /// <param name="variants"></param>
+        /// <returns></returns>
+        private U32 AddRuntimeLookup(string objType, string palletName, Variant[] variants)
         {
             var path = new Base.Portable.Path();
-            path.Create(new List<string>() { palletName, "pallet", "Event" }.Select(x => new Str(x)).ToArray());
+            path.Create(new List<string>() { palletName, "pallet", objType }.Select(x => new Str(x)).ToArray());
 
             var typeParams = new BaseVec<TypeParameter>([ 
                 new TypeParameter(new Str("T"), new BaseOpt<TType>())
@@ -521,22 +579,24 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             return res;
         }
 
-        public PalletConstantMetadataV14 ConvertToConstantV14(string constantName, string constantType, ByteGetter defaultValue)
-        {
-            var res = new PalletConstantMetadataV14();
-            res.Name = new Str(constantName);
-            res.ConstantValue = defaultValue;
-            res.ConstantType = TType.From(BuildLookup(constantType).Value);
+        public uint GetStorageEventIndex() => SearchV14.HardIndexBinding("Vec<EventRecord<T::Event, T::Hash>>").Value;
 
-            return res;
+        public void ClearEventBlockchainRuntimeEvent()
+        {
+            var portableType = LoopFromV14(SearchV14.PolkadotRuntimeEventIndex);
+            var tdv = portableType.Ty.TypeDef.Value2 as TypeDefVariant;
+            tdv.TypeParam = new BaseVec<Variant>(new Variant[0]);
         }
-
-        public PalletErrorMetadataV14 ConvertToErrorV14(string errorName)
+        public void AddPalletEventBlockchainRuntimeEvent(Variant variant)
         {
-            var res = new PalletErrorMetadataV14();
-            res.ElemType = TType.From(BuildLookup(errorName).Value);
+            var portableType = LoopFromV14(SearchV14.PolkadotRuntimeEventIndex);
 
-            return res;
+            var tdv = portableType.Ty.TypeDef.Value2 as TypeDefVariant;
+
+            var list = tdv.TypeParam.Value.ToList();
+            list.Add(variant);
+
+            tdv.TypeParam = new BaseVec<Variant>(list.ToArray());
         }
     }
 }

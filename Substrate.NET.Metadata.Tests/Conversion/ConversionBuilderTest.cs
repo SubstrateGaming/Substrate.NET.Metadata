@@ -41,23 +41,40 @@ namespace Substrate.NET.Metadata.Conversion.Tests
         }
 
         [Test]
-        
+        [TestCase("schnorrkel::Randomness", 1, 2)]
+        [TestCase("[u8;32]", 1, 2)]
+        [TestCase("Vec<(AuthorityId, BabeAuthorityWeight)>", 367, 7)]
+        [TestCase("AuthorityId", 137, 4)]
+        [TestCase("TaskAddress<BlockNumber>", 29, 2)]
+        [TestCase("Option<Vec<u8>>", 30, 3)]
+        [TestCase("Vec<(T::BlockNumber, EventIndex)>", 105, 3)]
+        [TestCase("Vec<(EraIndex, SessionIndex)>", 105, 3)]
+        [TestCase("AccountInfo<T::Index, T::AccountData>", 3, 4)]
+        [TestCase("u32", 4, 1)]
+        [TestCase("ExtrinsicsWeight", 7, 2)] // Should be bound with PerDispatchClass
         [TestCase("DispatchInfo", 22, 4)]
         [TestCase("Weight", 8, 1)]
         [TestCase("T::BlockNumber", 4, 1)]
         [TestCase("T::AccountId", 0, 3)]
-        [TestCase("AccountInfo<T::Index, T::AccountData>", 3, 10)]
         [TestCase("Vec<AccountId>", 55, 4)]
         [TestCase("BalanceOf<T>", 6, 1)]
-        [TestCase("U32", 4, 1)]
-        [TestCase("Vec<(EraIndex, SessionIndex)>", 105, 4)]
         //[TestCase("Vec<DeferredOffenceOf<T>>", 22, 4)]
         public void GetIndex_FromComposite_ShouldSucceed(string rustType, int indexExpected, int lengthExpected)
         {
             var res = _builder.BuildLookup(rustType);
 
-            Assert.That(res.Value, Is.EqualTo(indexExpected));
-            Assert.That(_builder.PortableTypes.Count, Is.EqualTo(lengthExpected));
+            Assert.That(res.Value, Is.EqualTo(indexExpected), "Index are not equals");
+            Assert.That(_builder.PortableTypes.Count, Is.EqualTo(lengthExpected), "Portable elements are not equals");
+
+            var elementState = _builder.ElementsState.Single(x => x.ClassName.ToLower() == rustType.ToLower());
+            Assert.That(elementState.IsSuccessfullyMapped, Is.True);
+        }
+
+        [Test]
+        [TestCase("Vec<EventRecord<T::Event, T::Hash>>")]
+        public void BuildNode_ShouldSucceed(string rustType)
+        {
+            Assert.Fail();
         }
 
         [Test]

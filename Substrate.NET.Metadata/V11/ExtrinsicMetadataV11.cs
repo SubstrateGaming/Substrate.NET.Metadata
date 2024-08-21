@@ -23,7 +23,10 @@ namespace Substrate.NET.Metadata.V11
 
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Version.Encode());
+            result.AddRange(SignedExtensions.Encode());
+            return result.ToArray();
         }
     }
 }

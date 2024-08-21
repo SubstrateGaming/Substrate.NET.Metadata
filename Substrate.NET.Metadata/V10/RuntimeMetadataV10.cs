@@ -1,10 +1,13 @@
 ﻿using Substrate.NET.Metadata.V9;
+using Substrate.NetApi.Model.Meta;
 using Substrate.NetApi.Model.Types.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Xml.Linq;
 
 namespace Substrate.NET.Metadata.V10
 {
@@ -24,7 +27,9 @@ namespace Substrate.NET.Metadata.V10
 
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Modules.Encode());
+            return result.ToArray();
         }
     }
 }

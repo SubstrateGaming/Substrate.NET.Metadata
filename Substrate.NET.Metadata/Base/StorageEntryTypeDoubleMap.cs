@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Substrate.NET.Metadata.Base
 {
@@ -25,7 +26,13 @@ namespace Substrate.NET.Metadata.Base
 
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Key1Hasher.Encode());
+            result.AddRange(Key1.Encode());
+            result.AddRange(Key2.Encode());
+            result.AddRange(Value.Encode());
+            result.AddRange(Key2Hasher.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)

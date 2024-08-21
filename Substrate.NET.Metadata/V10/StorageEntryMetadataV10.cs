@@ -2,6 +2,7 @@
 using Substrate.NetApi.Model.Types.Primitive;
 using Substrate.NET.Metadata.Base;
 using Substrate.NET.Metadata;
+using System.Reflection;
 
 namespace Substrate.NET.Metadata.V10
 {
@@ -9,7 +10,13 @@ namespace Substrate.NET.Metadata.V10
     {
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Name.Encode());
+            result.AddRange(StorageModifier.Encode());
+            result.AddRange(StorageType.Encode());
+            result.AddRange(StorageDefault.Encode());
+            result.AddRange(Documentation.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)

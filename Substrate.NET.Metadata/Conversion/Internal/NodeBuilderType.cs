@@ -13,6 +13,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         public abstract TypeDefEnum TypeDef {  get; }
         public string Adapted { get; set; }
         public string Raw { get; set; }
+        public uint? IndexHardBinding => SearchV14.HardIndexBinding(Adapted);
 
         protected NodeBuilderType(string content, string raw)
         {
@@ -94,7 +95,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
         public int Length { get; set; }
 
-        public override TypeDefEnum TypeDef => TypeDefEnum.Tuple;
+        public override TypeDefEnum TypeDef => TypeDefEnum.Array;
     }
 
     public class NodeBuilderTypeCompact : NodeBuilderType

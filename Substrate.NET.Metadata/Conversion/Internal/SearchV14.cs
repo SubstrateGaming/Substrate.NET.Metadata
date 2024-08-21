@@ -4,6 +4,7 @@ using Substrate.NET.Metadata.V14;
 using Substrate.NetApi.Model.Types.Base;
 using System;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Substrate.NET.Metadata.Conversion.Internal
 {
@@ -27,11 +28,32 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             }
         }
 
+        public const int StorageEventIndex = 18;
+        public const int PolkadotRuntimeEventIndex = 20;
+        public static uint? HardIndexBinding(string type)
+        {
+            return type switch
+            {
+                "Vec<EventRecord<T::Event, T::Hash>>" => 18,
+                "TaskAddress<BlockNumber>" => 29,
+                "TaskAddress<T::BlockNumber>" => 29,
+                _ => null
+            };
+        }
+
         public static string HardBinding(string type)
         {
             return type switch
             {
                 "BalanceOf" => "U128",
+                "ExtrinsicsWeight" => "PerDispatchClass",
+                "DigestOf" => "Digest",
+                "EventIndex" => "U32",
+                "Moment" => "U64",
+                //"AuthorityId" => "sr25519::Public",
+                "AuthorityId" => "sp_consensus_babe::app::Public",
+                "BabeAuthorityWeight" => "U64",
+                "schnorrkel::Randomness" => "[u8;32]",
                 _ => type
             };
         }
@@ -107,7 +129,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 }
                 else if (typeDef.Ty.TypeDef.Value2 is BaseEnum<TypeDefPrimitive> tdp)
                 {
-                    var index = FindIndexByClass(tdp.ToString());
+                    var index = FindIndexByClass(tdp.Value.ToString());
 
                     if (index == null) throw new MetadataConversionException($"Primitive {tdp} not found. Should never happened");
 
@@ -146,14 +168,20 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
                 foreach (var entry in storage.Entries.Value)
                 {
-                    if (entry.Name.Value == storageClass)
-                    {
-                        return ((CompactIntegerType)entry.StorageType.Value2).Value;
-                    }
+                    //if (entry.Name.Value == storageClass)
+                    //{
+                    //    return ((CompactIntegerType)entry.StorageType.Value2).Value;
+                    //}
 
                     if (entry.StorageType.Value == StorageType.Type.Plain)
                     {
                         var storagePlainIndex = entry.StorageType.Value2 as TType ?? throw new InvalidOperationException();
+                        var typeNode = MetadataV14.RuntimeMetadataData.Lookup.Value[storagePlainIndex.Value].Ty;
+
+                        if(typeNode.Path.Value.Any() && typeNode.Path.Value[^1].Value == storageClass)
+                        {
+                            return storagePlainIndex.Value;
+                        }
                         var typeDef = MetadataV14.RuntimeMetadataData.Lookup.Value[storagePlainIndex.Value].Ty.TypeDef;
                         var storagePlainName = "";
                         if (typeDef.Value2 is BaseEnum<TypeDefPrimitive> typeDefPrimitive)
@@ -224,8 +252,25 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 }
             }
 
-            // Last chance bro
-            //return StorageClass.TryHardBinding(storageClass);
+            var splitted = storageClass.Split("::");
+
+            foreach (var lookup in MetadataV14.RuntimeMetadataData.Lookup.Value)
+            {
+                
+                if(lookup.Ty.TypeDef.Value2 is BaseEnum<TypeDefPrimitive> prim && prim.Value.ToString().Equals(splitted[0], StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return (int)lookup.Id.Value;
+                }
+
+                var path = lookup.Ty.Path.Value;
+                if (path is not null && 
+                    path.Any() &&
+                    ConversionUtils.EndsWithArray(path.Select(x => x.Value).ToArray(), splitted))
+                {
+                        return (int)lookup.Id.Value;
+                }
+            }
+
             return null;
         }
     }

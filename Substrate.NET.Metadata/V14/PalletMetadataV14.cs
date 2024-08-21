@@ -1,8 +1,10 @@
 ﻿using Substrate.NET.Metadata;
 using Substrate.NET.Metadata.Base;
+using Substrate.NetApi.Model.Extrinsics;
 using Substrate.NetApi.Model.Types.Base;
 using Substrate.NetApi.Model.Types.Primitive;
 using System.Collections.Generic;
+using System.Net.Mime;
 using static Substrate.NET.Metadata.StorageType;
 
 namespace Substrate.NET.Metadata.V14
@@ -23,7 +25,10 @@ namespace Substrate.NET.Metadata.V14
 
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Prefix.Encode());
+            result.AddRange(Entries.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)
@@ -52,7 +57,13 @@ namespace Substrate.NET.Metadata.V14
 
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Name.Encode());
+            result.AddRange(StorageModifier.Encode());
+            result.AddRange(StorageType.Encode());
+            result.AddRange(StorageDefault.Encode());
+            result.AddRange(Documentation.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)
@@ -129,7 +140,9 @@ namespace Substrate.NET.Metadata.V14
     {
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(ElemType.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)
@@ -150,7 +163,9 @@ namespace Substrate.NET.Metadata.V14
     {
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(ElemType.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)
@@ -172,7 +187,12 @@ namespace Substrate.NET.Metadata.V14
     {
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Name.Encode());
+            result.AddRange(ConstantType.Encode());
+            result.AddRange(ConstantValue.Encode());
+            result.AddRange(Documentation.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)
@@ -204,7 +224,9 @@ namespace Substrate.NET.Metadata.V14
     {
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(ElemType.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)

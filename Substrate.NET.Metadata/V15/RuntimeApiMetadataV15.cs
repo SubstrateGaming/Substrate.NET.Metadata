@@ -31,7 +31,11 @@ namespace Substrate.NET.Metadata.V15
 
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Name.Encode());
+            result.AddRange(Methods.Encode());
+            result.AddRange(Docs.Encode());
+            return result.ToArray();
         }
 
         public Str Name { get; private set; }

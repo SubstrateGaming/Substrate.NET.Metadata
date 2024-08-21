@@ -1,6 +1,7 @@
 ﻿using Substrate.NET.Metadata.Base;
 using Substrate.NET.Metadata.Base.Portable;
 using Substrate.NetApi.Model.Types.Base;
+using System.Linq;
 
 namespace Substrate.NET.Metadata.V15
 {
@@ -8,7 +9,13 @@ namespace Substrate.NET.Metadata.V15
     {
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Types.Encode());
+            result.AddRange(Modules.Encode());
+            result.AddRange(Extrinsic.Encode());
+            result.AddRange(TypeId.Encode());
+            result.AddRange(Apis.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)

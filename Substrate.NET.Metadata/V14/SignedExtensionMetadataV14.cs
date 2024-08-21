@@ -13,7 +13,11 @@ namespace Substrate.NET.Metadata.V14
     {
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(SignedIdentifier.Encode());
+            result.AddRange(SignedExtType.Encode());
+            result.AddRange(AddSignedExtType.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)
