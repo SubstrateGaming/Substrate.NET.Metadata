@@ -1,4 +1,6 @@
-﻿using Substrate.NetApi.Model.Types.Base;
+﻿using Substrate.NET.Metadata.Conversion.Internal;
+using Substrate.NET.Metadata.V14;
+using Substrate.NetApi.Model.Types.Base;
 using Substrate.NetApi.Model.Types.Primitive;
 using System;
 using System.Collections.Generic;
@@ -6,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using static Substrate.NET.Metadata.StorageType;
 
 namespace Substrate.NET.Metadata.Base
 {
@@ -55,6 +58,22 @@ namespace Substrate.NET.Metadata.Base
             Key2Hasher.Decode(byteArray, ref p);
 
             TypeSize = p - num;
+        }
+
+        public StorageEntryTypeMapV14 ToStorageEntryTypeMapV14(ConversionBuilder conversionBuilder)
+        {
+            var result = new StorageEntryTypeMapV14();
+
+            result.Hashers = new BaseVec<BaseEnum<Hasher>>(
+            [
+                new BaseEnum<Hasher>((Hasher)Enum.Parse(typeof(THasher), Key1Hasher.Value.ToString())),
+                new BaseEnum<Hasher>((Hasher)Enum.Parse(typeof(THasher), Key2Hasher.Value.ToString())),
+            ]);
+
+            result.Key = TType.From(conversionBuilder.BuildPortableTypes($"({Key1.Value}, {Key2.Value})").Value);
+            result.Value = TType.From(conversionBuilder.BuildPortableTypes(Value.Value).Value);
+
+            return result;
         }
     }
 }

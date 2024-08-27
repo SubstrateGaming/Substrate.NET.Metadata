@@ -60,8 +60,8 @@ namespace Substrate.NET.Metadata.Base
                 new BaseEnum<Hasher>((Hasher)Enum.Parse(typeof(Hasher), Hasher.Value.ToString()))
             ]);
 
-            result.Key = TType.From(conversionBuilder.BuildLookup(Key.Value).Value);
-            result.Value = TType.From(conversionBuilder.BuildLookup(Value.Value).Value);
+            result.Key = TType.From(conversionBuilder.BuildPortableTypes(Key.Value).Value);
+            result.Value = TType.From(conversionBuilder.BuildPortableTypes(Value.Value).Value);
 
             return result;
         }

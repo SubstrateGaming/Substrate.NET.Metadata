@@ -44,7 +44,12 @@ namespace Substrate.NET.Metadata.V9
             res.Docs = Docs;
             res.Index = new U8((byte)index);
 
-            var argsType = Args.Value.Select(x => new { Name = x, TypeId = conversionBuilder.BuildLookup(x.Value) });
+            if(Args.Value is not null && Args.Value.Length == 1 && Args.Value[0].Value.Contains("PhantomData"))
+            {
+                Args = new BaseVec<Str>(new Str[0]);
+            }
+
+            var argsType = Args.Value.Select(x => new { Name = x, TypeId = conversionBuilder.BuildPortableTypes(x.Value) });
             res.VariantFields = new BaseVec<Field>(
                 argsType.Select(x => new Field(new BaseOpt<Str>(x.Name), TType.From(x.TypeId.Value), new BaseOpt<Str>(), new BaseVec<Str>(new Str[0]))
                 ).ToArray());

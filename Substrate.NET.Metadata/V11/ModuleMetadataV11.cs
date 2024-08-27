@@ -79,6 +79,8 @@ namespace Substrate.NET.Metadata.V11
             result.Name = Name;
             result.Index = new U8((byte)index);
 
+            conversionBuilder.CurrentPallet = Name.Value;
+
             // We do not do Calls conversion
 
             if (Events.OptionFlag)

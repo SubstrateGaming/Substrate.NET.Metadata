@@ -34,22 +34,37 @@ namespace Substrate.NET.Metadata.Conversion.Tests
         [TestCase("u32")]
         public void GetNode_FromPrimitive_ShouldSucceed(string primitiveType)
         {
-            var res = _builder.GetNodeFromV14(primitiveType);
+            var res = _builder.GetPortableType(primitiveType);
 
-            Assert.That(res.Ty.TypeDef.Value, Is.EqualTo(TypeDefEnum.Primitive));
-            Assert.That(((BaseEnum<TypeDefPrimitive>)res.Ty.TypeDef.Value2).Value, Is.EqualTo(TypeDefPrimitive.U32));
+            Assert.That(res.portableType.Ty.TypeDef.Value, Is.EqualTo(TypeDefEnum.Primitive));
+            Assert.That(((BaseEnum<TypeDefPrimitive>)res.portableType.Ty.TypeDef.Value2).Value, Is.EqualTo(TypeDefPrimitive.U32));
         }
 
         [Test]
+        //[TestCase("<T as Trait<I>>::Proposal", 46, 4, "ImOnline")]
+        [TestCase("LockIdentifier", 125, 2)]
+        [TestCase("(T::BlockNumber, Hash)", 1000, 1)]
+        [TestCase("(BalanceOf<T>, Vec<T::AccountId>)", 1000, 1)]
+        [TestCase("AuthorityId", 46, 4, "ImOnline")]
+        [TestCase("AuthorityId", 137, 4, "Babe")]
+        [TestCase("Vec<(AuthorityId, BabeAuthorityWeight)>", 367, 7, "Babe")]
+        [TestCase("Vec<IdentificationTuple>", 48, 10)]
+        [TestCase("Vec<(T::ValidatorId, T::Keys)>", 411, 14)]
+        [TestCase("Vec<T::ValidatorId>", 55, 4)]
+        [TestCase("ReportIdOf<T>", 9, 3)]
+        [TestCase("(T::AccountId, slashing::SpanIndex)", 400, 5)]
+        [TestCase("slashing::SpanRecord<BalanceOf<T>>", 406, 2)]
+        [TestCase("(EraIndex, T::AccountId)", 396, 5)]
+        [TestCase("Exposure<T::AccountId, BalanceOf<T>>", 50, 8)]
+        [TestCase("Multiplier", 384, 2)]
+        [TestCase("MaybeRandomness", 370, 3)]
+        [TestCase("AccountInfo<T::Index, T::AccountData>", 3, 4)]
         [TestCase("schnorrkel::Randomness", 1, 2)]
         [TestCase("[u8;32]", 1, 2)]
-        [TestCase("Vec<(AuthorityId, BabeAuthorityWeight)>", 367, 7)]
-        [TestCase("AuthorityId", 137, 4)]
         [TestCase("TaskAddress<BlockNumber>", 29, 2)]
         [TestCase("Option<Vec<u8>>", 30, 3)]
         [TestCase("Vec<(T::BlockNumber, EventIndex)>", 105, 3)]
         [TestCase("Vec<(EraIndex, SessionIndex)>", 105, 3)]
-        [TestCase("AccountInfo<T::Index, T::AccountData>", 3, 4)]
         [TestCase("u32", 4, 1)]
         [TestCase("ExtrinsicsWeight", 7, 2)] // Should be bound with PerDispatchClass
         [TestCase("DispatchInfo", 22, 4)]
@@ -59,9 +74,10 @@ namespace Substrate.NET.Metadata.Conversion.Tests
         [TestCase("Vec<AccountId>", 55, 4)]
         [TestCase("BalanceOf<T>", 6, 1)]
         //[TestCase("Vec<DeferredOffenceOf<T>>", 22, 4)]
-        public void GetIndex_FromComposite_ShouldSucceed(string rustType, int indexExpected, int lengthExpected)
+        public void GetIndex_FromComposite_ShouldSucceed(string rustType, int indexExpected, int lengthExpected, string palletContext = "")
         {
-            var res = _builder.BuildLookup(rustType);
+            _builder.CurrentPallet = palletContext;
+            var res = _builder.BuildPortableTypes(rustType);
 
             Assert.That(res.Value, Is.EqualTo(indexExpected), "Index are not equals");
             Assert.That(_builder.PortableTypes.Count, Is.EqualTo(lengthExpected), "Portable elements are not equals");
@@ -81,7 +97,7 @@ namespace Substrate.NET.Metadata.Conversion.Tests
         [TestCase("u32")]
         public void GetIndex_FromPrimitive_ShouldSucceed(string primitiveType)
         {
-            var res = _builder.BuildLookup(primitiveType);
+            var res = _builder.BuildPortableTypes(primitiveType);
 
             Assert.That(res.Value, Is.EqualTo(0));
             Assert.That(_builder.PortableTypes.Count, Is.EqualTo(1));
@@ -94,7 +110,7 @@ namespace Substrate.NET.Metadata.Conversion.Tests
         [TestCase("Vec<DeferredOffenceOf<T>>")]
         public void Build_FromSequence_ShouldSucceed(string sequenceClass)
         {
-            var node = new NodeBuilderTypeUndefined(sequenceClass);
+            var node = new NodeBuilderTypeUndefined(sequenceClass, string.Empty);
             var res = ConversionBuilderTree.Build(node);
 
             Assert.That(res, Is.Not.Null);
@@ -117,6 +133,7 @@ namespace Substrate.NET.Metadata.Conversion.Tests
         }
 
         [Test]
+        [TestCase("Vec<(<T as frame_system::Config>::AccountId, BalanceOf<T>)>", new string[] { "AccountId", "BalanceOf" })]
         [TestCase("[Hasher = BlakeTwo128Concat / Key = AccountId / Value = AccountInfo<Index, AccountData>]", new string[] { "AccountId", "AccountInfo", "Index", "AccountData" })]
         [TestCase("Vec<(AccountId, Balance)>", new string[] { "AccountId", "Balance" })]
         [TestCase("DigestOf<T>", new string[] { "DigestOf" })]
@@ -135,7 +152,6 @@ namespace Substrate.NET.Metadata.Conversion.Tests
         [TestCase("Vec<(ParaId, Option<(CollatorId, Retriable)>)>", new string[] { "ParaId", "Option", "CollatorId", "Retriable" })]
         [TestCase("Vec<DeferredOffenceOf<T>>", new string[] { "DeferredOffenceOf" })]
         [TestCase("[Hasher = Identity / Key = Hash / Value = (BlockNumber, Vec<AccountId>)]", new string[] { "Hash", "BlockNumber", "AccountId" })]
-        [TestCase("Vec<(<T as frame_system::Config>::AccountId, BalanceOf<T>)>", new string[] { "AccountId", "BalanceOf" })]
         [TestCase("OpenTip<AccountId, BalanceOf<T>, BlockNumber, Hash>", new string[] { "OpenTip", "AccountId", "BalanceOf", "BlockNumber", "Hash" })]
         [TestCase("[Key1 = BlockNumber / Key1Hasher = Twox64Concat / Key2 = Hash / Key2Hasher = Identity / Value = BlockAttestations<T>]", new string[] { "BlockNumber", "Hash", "BlockAttestations" })]
         [TestCase("[Hasher = Identity / Key = EthereumAddress / Value = (BalanceOf<T>, BalanceOf<T>, BlockNumber)]", new string[] { "EthereumAddress", "BalanceOf", "BlockNumber" })]

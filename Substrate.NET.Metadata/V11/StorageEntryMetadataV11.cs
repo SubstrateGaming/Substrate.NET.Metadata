@@ -58,7 +58,7 @@ namespace Substrate.NET.Metadata.V11
             {
                 var val = StorageType.Value2 as Str;
                 //var idx = ConversionV14Helper.AddToLookup(lookup, val!.Value);
-                var index = conversionBuilder.BuildLookup(val!.Value);
+                var index = conversionBuilder.BuildPortableTypes(val!.Value);
 
                 mapStorageType.Create(Metadata.StorageType.Type.Plain, TType.From(index.Value));
             }
@@ -67,7 +67,12 @@ namespace Substrate.NET.Metadata.V11
                 var map = (StorageEntryTypeMapV11)StorageType.Value2;
                 mapStorageType.Create(Metadata.StorageType.Type.Map, map.ToStorageEntryTypeMapV14(conversionBuilder));
             }
-            else
+            else if(StorageType.Value == Metadata.StorageType.TypeV9.DoubleMap)
+            {
+                var map = (StorageEntryTypeDoubleMapV11)StorageType.Value2;
+                mapStorageType.Create(Metadata.StorageType.Type.Map, map.ToStorageEntryTypeMapV14(conversionBuilder));
+                
+            } else
             {
                 // DoubleMap and NMap exists but should never happened
                 throw new MetadataConversionException($"Error while converting StorageEntryMetadataV11. Received storage type {StorageType.Value} while should never happened");

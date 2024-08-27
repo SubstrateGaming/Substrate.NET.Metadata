@@ -40,7 +40,7 @@ namespace Substrate.NET.Metadata.Base.Portable
             TypeSize = p - start;
         }
 
-        public U32 Id { get; private set; }
-        public TypePortableForm Ty { get; private set; }
+        public U32 Id { get; internal set; }
+        public TypePortableForm Ty { get; internal set; }
     }
 }

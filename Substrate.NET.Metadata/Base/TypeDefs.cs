@@ -109,7 +109,7 @@ namespace Substrate.NET.Metadata.Base
             TypeSize = p - start;
         }
 
-        public BaseVec<Field> Fields { get; private set; }
+        public BaseVec<Field> Fields { get; internal set; }
     }
 
     public class TypeDefVariant : BaseType
@@ -210,7 +210,7 @@ namespace Substrate.NET.Metadata.Base
             TypeSize = p - start;
         }
 
-        public BaseVec<TType> Fields { get; private set; }
+        public BaseVec<TType> Fields { get; internal set; }
     }
 
     public enum TypeDefPrimitive

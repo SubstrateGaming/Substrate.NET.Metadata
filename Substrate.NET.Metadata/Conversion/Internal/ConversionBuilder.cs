@@ -1,4 +1,5 @@
-﻿using Substrate.NET.Metadata.Base;
+﻿using Microsoft.VisualBasic;
+using Substrate.NET.Metadata.Base;
 using Substrate.NET.Metadata.Base.Portable;
 using Substrate.NET.Metadata.V14;
 using Substrate.NetApi.Model.Meta;
@@ -13,6 +14,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static Substrate.NET.Metadata.Conversion.Internal.SearchV14;
 using TypeDefExt = Substrate.NetApi.Model.Types.Base.BaseEnumExt<
     Substrate.NET.Metadata.Base.TypeDefEnum,
     Substrate.NET.Metadata.Base.TypeDefComposite,
@@ -58,6 +60,8 @@ namespace Substrate.NET.Metadata.Conversion.Internal
     {
         public List<PortableType> PortableTypes { get; init; }
         public List<ConversionElementState> ElementsState { get; init; }
+        public string CurrentPallet { get; set; } = string.Empty;
+        public uint? UnknowIndex { get; set; } = null;
         public const int START_INDEX = 1_000;
 
         public ConversionBuilder(List<PortableType> portableTypes)
@@ -71,7 +75,17 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         /// </summary>
         public static List<string> UnhandleConversion = new List<string>()
         {
-            "Vec<Option<Scheduled<<T as Trait>::Call, T::BlockNumber>>>" // Pallet scheduler => Storage => Agenda
+            "Vec<Option<Scheduled<<T as Trait>::Call, T::BlockNumber>>>", // Pallet scheduler => Storage => Agenda
+            "ElectionResult<T::AccountId, BalanceOf<T>>", // V11 => Staking => v1 => Storage => QueuedElected
+            "PhragmenScore", // V11 => Staking => v1 => Storage => QueuedScore
+            "ElectionStatus<T::BlockNumber>", // V11 => Staking => v1 => Storage => EraElectionStatus
+            "Vec<DeferredOffenceOf<T>>", // V11 => Offences => v1 => Storage => DeferredOffences
+            "<T as Trait<I>>::Proposal", // V11 => Council => v1 => Storage => ProposalOf
+            //"(BalanceOf<T>, Vec<T::AccountId>)", // V11 => ElectionsPhragmen => v1 => Storage => Voting ==> Easy to create
+            "sp_std::marker::PhantomData<(AccountId, Event)>", // V11 => TechnicalMembership => v1 => Events => Dummy
+            "Vec<UpwardMessage>", // V11 => Parachains => v1 => Storage => RelayDispatchQueue
+            "IncludedBlocks<T>", // V11 => Attestations => v1 => Storage => RecentParaBlocks
+            "BlockAttestations", // V11 => Attestations => v1 => Storage => ParaBlockAttestations
         };
 
         public U32 GetNewIndex()
@@ -80,22 +94,30 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             return new U32(Math.Max(START_INDEX, PortableTypes.Max(x => x.Id.Value) + 1));
         }
 
-        public U32 BuildLookup(string className)
+        public U32 BuildPortableTypes(string className)
         {
-            if (UnhandleConversion.Contains(className)) return new U32(0); // Ok this is bad
+            if (UnhandleConversion.Contains(className)) 
+                return new U32(UnknowIndex!.Value); // Ok this is bad
 
-            var founded = GetNodeFromV14(className);
+            var founded = GetPortableType(className);
 
-            if(founded != null)
-            {
-                ElementsState[^1].IndexFoundInV14 = founded.Id.Value;
-                return founded.Id;
-            }
+            if(founded.searchResult == SearchResult.Founded)
+                ElementsState[^1].IndexFoundInV14 = founded.portableType.Id.Value;
+            else
+                ElementsState[^1].IndexCreated = founded.portableType.Id.Value;
 
-            var portableType = CreateNode(className, GetNewIndex());
+            return founded.portableType.Id;
 
-            ElementsState[^1].IndexCreated = portableType.Id.Value;
-            return portableType.Id;
+            //if (founded != null)
+            //{
+            //    ElementsState[^1].IndexFoundInV14 = founded.Id.Value;
+            //    return founded.Id;
+            //}
+
+            //var portableType = CreateNode(className, GetNewIndex());
+
+            //ElementsState[^1].IndexCreated = portableType.Id.Value;
+            //return portableType.Id;
             
         }
 
@@ -104,32 +126,31 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         /// </summary>
         /// <param name="className"></param>
         /// <returns></returns>
-        public PortableType? GetNodeFromV14(string className)
+        public (PortableType portableType, SearchResult searchResult) GetPortableType(string className)
         {
-            var nodeRaw = new NodeBuilderTypeUndefined(className);
+            var nodeRaw = new NodeBuilderTypeUndefined(className, CurrentPallet);
 
             // Node like events has do not have to be seached in V14
             if (nodeRaw.IndexHardBinding != null)
             {
                 ElementsState.Add(new ConversionElementState(className, nodeRaw));
-                return LoopFromV14((int)nodeRaw.IndexHardBinding!);
+                return (LoopFromV14((int)nodeRaw.IndexHardBinding!), SearchResult.Founded);
             }
 
             var nodeType = ConversionBuilderTree.Build(nodeRaw);
-            var index = SearchV14.FindIndexByNode(nodeType);
+            var index = SearchV14.SearchIndexByNode(nodeType, this);
+
             ElementsState.Add(new ConversionElementState(className, nodeType));
 
-            if (index == null) return null;
-
-            return LoopFromV14(index.Value);
+            return (LoopFromV14(index.index), index.searchResult);
         }
 
         public PortableType LoopFromV14(int index)
         {
-            var portableType = SearchV14.FindTypeByIndex(index);
             var alreadyInserted = PortableTypes.SingleOrDefault(x => x.Id.Value == index);
-
             if (alreadyInserted != null) return alreadyInserted;
+
+            var portableType = SearchV14.FindTypeByIndex(index);
 
             PortableTypes.Add(portableType);
             switch(portableType.Ty.TypeDef.Value)
@@ -196,22 +217,22 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
             var tpf = new TypePortableForm();
 
-            if (ExtractPrimitive(className) is TypeDefPrimitive prim)
-            {
-                tpf.Path = new Base.Portable.Path();
-                tpf.TypeParams = new BaseVec<TypeParameter>();
-                tpf.TypeDef = new TypeDefExt();
-                tpf.TypeDef.Create(TypeDefEnum.Primitive, new BaseEnum<TypeDefPrimitive>(prim));
+            //if (ExtractPrimitive(className) is TypeDefPrimitive prim)
+            //{
+            //    tpf.Path = new Base.Portable.Path();
+            //    tpf.TypeParams = new BaseVec<TypeParameter>();
+            //    tpf.TypeDef = new TypeDefExt();
+            //    tpf.TypeDef.Create(TypeDefEnum.Primitive, new BaseEnum<TypeDefPrimitive>(prim));
 
-                return new PortableType(currentMaxIndex, tpf);
-            }
+            //    return new PortableType(currentMaxIndex, tpf);
+            //}
 
-            var extractGeneric = ExtractGeneric(className);
-            if (extractGeneric is not null)
-            {
-                var toFind = CustomMapping(HarmonizeTypeName(extractGeneric.Value.genericParameters[0]));
-                var index = SearchV14.FindIndexByClass(toFind);
-            }
+            //var extractGeneric = ExtractGeneric(className);
+            //if (extractGeneric is not null)
+            //{
+            //    var toFind = CustomMapping(HarmonizeTypeName(extractGeneric.Value.genericParameters[0]));
+            //    var index = SearchV14.FindIndexByClass(toFind);
+            //}
 
             throw new MetadataConversionException($"Unable to convert {className} to NodeType");
         }
@@ -574,7 +595,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         {
             var res = new PalletEventMetadataV14();
 
-            res.ElemType = TType.From(BuildLookup(eventType).Value);
+            res.ElemType = TType.From(BuildPortableTypes(eventType).Value);
 
             return res;
         }
@@ -598,5 +619,59 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
             tdv.TypeParam = new BaseVec<Variant>(list.ToArray());
         }
+
+        #region Build node
+
+        /// <summary>
+        /// Composite class use for undefined mapping
+        /// </summary>
+        /// <returns></returns>
+        public PortableType CreateUnknownNode()
+        {
+            var unknownNode = new TypeDefComposite();
+            unknownNode.Fields = new BaseVec<Field>(new Field[0]);
+
+            var pt = CreatePortableTypeFromNode(unknownNode);
+            UnknowIndex = pt.Id.Value;
+
+            return pt;
+        }
+        public PortableType CreatePortableTypeFromNode(BaseType node)
+        {
+            
+            var portableType = new PortableType();
+
+            portableType.Id = GetNewIndex();
+            portableType.Ty = new TypePortableForm();
+            portableType.Ty.Docs = new BaseVec<Str>(new Str[0]);
+            portableType.Ty.Path = new Base.Portable.Path();
+            portableType.Ty.Path.Create(new Str[0]);
+            portableType.Ty.TypeParams = new BaseVec<TypeParameter>(new TypeParameter[0]);
+
+            if (node is TypeDefTuple tdt)
+            {
+                portableType.Ty.TypeDef = new TypeDefExt();
+                portableType.Ty.TypeDef.Create(TypeDefEnum.Tuple, tdt);
+            }
+
+            if (node is TypeDefComposite tdc)
+            {
+                portableType.Ty.TypeDef = new TypeDefExt();
+                portableType.Ty.TypeDef.Create(TypeDefEnum.Composite, tdc);
+            }
+
+            PortableTypes.Add(portableType);
+
+            return portableType;
+        }
+        public TypeDefTuple BuildTuple(List<TType> types)
+        {
+            var node = new TypeDefTuple();
+
+            node.Fields = new BaseVec<TType>(types.ToArray());
+
+            return node;
+        }
+        #endregion
     }
 }

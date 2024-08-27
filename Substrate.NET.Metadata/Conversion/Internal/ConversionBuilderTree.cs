@@ -19,72 +19,46 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
         public static NodeBuilderType Build(NodeBuilderType nodeBuilderType)
         {
-            //if (ExtractMap(className) is (string, string) map)
-            //{
-            //    res.Add(map.key);
-            //    res.Add(map.value);
-            //    return ExtractDeeper(res);
-            //}
-
-            //if (ExtractDoubleMap(className) is (string, string, string) doubleMap)
-            //{
-            //    res.Add(doubleMap.key1);
-            //    res.Add(doubleMap.key2);
-            //    res.Add(doubleMap.value);
-
-            //    return ExtractDeeper(res);
-            //}
-
-            if (ExtractTuple(nodeBuilderType.Adapted) is NodeBuilderTypeTuple tuples)
+            if (ExtractTuple(nodeBuilderType) is NodeBuilderTypeTuple tuples &&
+                nodeBuilderType is NodeBuilderTypeUndefined)
             {
-                if (nodeBuilderType is NodeBuilderTypeUndefined)
-                {
-                    nodeBuilderType = tuples;
-                }
-                //return Build(tuples, tuples.Content);
+                nodeBuilderType = tuples;
             }
 
-            if (ExtractArray(nodeBuilderType.Adapted) is NodeBuilderTypeArray array)
+            var extractGeneric = ExtractGeneric(nodeBuilderType);
+
+            if (extractGeneric is not null && nodeBuilderType is NodeBuilderTypeUndefined)
             {
-                if (nodeBuilderType is NodeBuilderTypeUndefined)
-                {
-                    nodeBuilderType = array;
-                }
-                //return Build(array, array.Content);
+                nodeBuilderType = extractGeneric!;
             }
 
-            //if (ExtractParameters(nodeBuilderType.Content) is List<NodeBuilderTypeUndefined> parameters)
-            //{
-            //    //res.AddRange(parameters);
-            //    //return ExtractDeeper(res);
-            //}
-
-            var extractGeneric = ExtractGeneric(nodeBuilderType.Adapted);
-
-            if (extractGeneric is not null)
+            if (ExtractArray(nodeBuilderType) is NodeBuilderTypeArray array && nodeBuilderType is NodeBuilderTypeUndefined)
             {
-                if (nodeBuilderType is NodeBuilderTypeUndefined)
-                {
-                    nodeBuilderType = extractGeneric!;
-                }
+                nodeBuilderType = array;
             }
 
-            if (ExtractPrimitive(nodeBuilderType.Adapted) is NodeBuilderTypePrimitive primitive)
+            if (ExtractPrimitive(nodeBuilderType) is NodeBuilderTypePrimitive primitive && nodeBuilderType is NodeBuilderTypeUndefined)
             {
-                if (nodeBuilderType is NodeBuilderTypeUndefined)
-                {
-                    nodeBuilderType = primitive!;
-                }
-
+                nodeBuilderType = primitive!;
                 return primitive;
             }
 
             if (nodeBuilderType is NodeBuilderTypeUndefined)
             {
                 var content = HarmonizeTypeName(nodeBuilderType.Adapted);
-                nodeBuilderType = new NodeBuilderTypeComposite(
-                    SearchV14.HardBinding(content), 
-                    nodeBuilderType.Raw);
+                var hardBinding = SearchV14.HardBinding(content, nodeBuilderType.PalletContext);
+
+                //if(!hardBinding.Equals(nodeBuilderType.Raw, StringComparison.CurrentCultureIgnoreCase))
+                if (!string.IsNullOrEmpty(hardBinding) && hardBinding != content)
+                {
+                    nodeBuilderType = Build(new NodeBuilderTypeUndefined(hardBinding, nodeBuilderType.Raw, nodeBuilderType.PalletContext));
+                }
+                else
+                {
+                    nodeBuilderType = new NodeBuilderTypeComposite(
+                        SearchV14.HardBinding(content, nodeBuilderType.PalletContext), nodeBuilderType.Raw, nodeBuilderType.PalletContext);
+                }
+
             }
 
             if (nodeBuilderType.Children.Count > 0)
@@ -234,17 +208,21 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         //    return null;
         //}
 
-        private static NodeBuilderTypeArray? ExtractArray(string className)
+        private static NodeBuilderTypeArray? ExtractArray(NodeBuilderType node)
         {
             string pattern = @"\[(.*);\s*(\d+)\]";
-            Match match = Regex.Match(className, pattern);
+            Match match = Regex.Match(node.Adapted, pattern);
 
             if (match.Success)
             {
                 //match.Groups[1].Value -> array size
-                var array = new NodeBuilderTypeArray(className, int.Parse(match.Groups[2].Value));
+                var array = new NodeBuilderTypeArray(
+                    node.Adapted,
+                    node.Raw,
+                    int.Parse(match.Groups[2].Value),
+                    node.PalletContext);
 
-                array.Children.Add(new NodeBuilderTypeUndefined(match.Groups[1].Value));
+                array.Children.Add(new NodeBuilderTypeUndefined(match.Groups[1].Value, node.PalletContext));
 
                 return array;
             }
@@ -252,23 +230,23 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             return null;
         }
 
-        private static NodeBuilderTypeTuple? ExtractTuple(string className)
+        private static NodeBuilderTypeTuple? ExtractTuple(NodeBuilderType node)
         {
             string pattern = @"\((.*)\)$";
-            Match match = Regex.Match(className, pattern);
+            Match match = Regex.Match(node.Adapted, pattern);
 
             if (match.Success)
             {
-                var nodeTuple = new NodeBuilderTypeTuple(className);
+                var nodeTuple = new NodeBuilderTypeTuple(node.Adapted, node.PalletContext);
 
                 if (ExtractParameters(match.Groups[1].Value) is List<string> parameters)
                 {
-                    foreach(var param in parameters)
+                    foreach (var param in parameters)
                     {
-                        nodeTuple.Children.Add(new NodeBuilderTypeUndefined(param));
+                        nodeTuple.Children.Add(new NodeBuilderTypeUndefined(param, node.PalletContext));
                     }
                 }
-                
+
                 return nodeTuple;
             }
 
@@ -328,21 +306,21 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             return null;
         }
 
-        public static NodeBuilderTypePrimitive? ExtractPrimitive(string className)
+        public static NodeBuilderTypePrimitive? ExtractPrimitive(NodeBuilderType node)
         {
             object? res = null;
-            if (Enum.TryParse(typeof(TypeDefPrimitive), className, true, out res))
+            if (Enum.TryParse(typeof(TypeDefPrimitive), node.Adapted, true, out res))
             {
-                return new NodeBuilderTypePrimitive(className, (TypeDefPrimitive)res);
+                return new NodeBuilderTypePrimitive(node.Adapted, (TypeDefPrimitive)res, node.PalletContext);
             }
 
             return null;
         }
 
-        public static NodeBuilderType? ExtractGeneric(string className)
+        public static NodeBuilderType? ExtractGeneric(NodeBuilderType node)
         {
             string pattern = @"([a-zA-Z:]*|)<(.*)>$";
-            Match match = Regex.Match(className, pattern);
+            Match match = Regex.Match(node.Adapted, pattern);
 
             if (match.Success)
             {
@@ -358,11 +336,12 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
                 NodeBuilderType result = typeDef switch
                 {
-                    TypeDefEnum.Sequence => new NodeBuilderTypeSequence(className),
-                    TypeDefEnum.Variant => new NodeBuilderTypeVariant(className),
+                    TypeDefEnum.Sequence => new NodeBuilderTypeSequence(node.Adapted, node.PalletContext),
+                    TypeDefEnum.Variant when match.Groups[1].Value == "Option" => new NodeBuilderTypeOption(node.Adapted, node.Raw, node.PalletContext),
+                    TypeDefEnum.Variant => new NodeBuilderTypeVariant(node.Adapted, node.PalletContext),
                     TypeDefEnum.Composite => new NodeBuilderTypeComposite(
-                        SearchV14.HardBinding(match.Groups[1].Value), 
-                        className),
+                        SearchV14.HardBinding(match.Groups[1].Value, node.PalletContext),
+                        node.Adapted, node.PalletContext),
                     _ => throw new MetadataConversionException($"TypeDef {typeDef} is not handled")
                 };
 
@@ -372,11 +351,12 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                     {
                         foreach (var param in parameters)
                         {
-                            result.Children.Add(new NodeBuilderTypeUndefined(param));
+                            result.Children.Add(new NodeBuilderTypeUndefined(param, node.PalletContext));
                         }
-                    } else
+                    }
+                    else
                     {
-                        result.Children.Add(new NodeBuilderTypeUndefined(genericParameters));
+                        result.Children.Add(new NodeBuilderTypeUndefined(genericParameters, node.PalletContext));
                     }
                 }
 

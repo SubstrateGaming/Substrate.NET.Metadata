@@ -50,7 +50,7 @@ namespace Substrate.NET.Metadata.V9
 
             result.Name = this.Name;
             result.ConstantValue = this.Value;
-            result.ConstantType = TType.From(conversionBuilder.BuildLookup(this.ConstantType.Value).Value);
+            result.ConstantType = TType.From(conversionBuilder.BuildPortableTypes(this.ConstantType.Value).Value);
             result.Documentation = this.Documentation;
 
             return result;
