@@ -145,9 +145,9 @@ namespace Substrate.NET.Metadata.Tests
             var metadataV11 = new MetadataV11(readMetadataFromFile("V11\\MetadataV11_0"));
             Assert.That(metadataV11, Is.Not.Null);
 
-            var runtimeMetadataV14 = metadataV11.RuntimeMetadataData.ToRuntimeMetadataV14();
+            var metadataV14 = metadataV11.ToMetadataV14();
 
-            Assert.That(runtimeMetadataV14, Is.Not.Null);
+            Assert.That(metadataV14, Is.Not.Null);
         }
     }
 }

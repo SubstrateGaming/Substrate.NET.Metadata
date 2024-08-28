@@ -74,6 +74,10 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 "AuthIndex" => "U32",
                 "LockIdentifier" => "[u8;8]",
                 "ModuleId" => "frame_support::PalletId",
+                "LeasePeriod" => "LeasePeriodOf<T>",
+                "SlotRange" => "U32", // Just a guess
+                "CollatorId" => "U32",
+                "&[u8]" when palletContext == "Claims" => "Vec<U8>",
                 _ => type
             };
         }
@@ -187,7 +191,15 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 return ((int)conversionBuilder.CreatePortableTypeFromNode(tuple).Id.Value, SearchResult.Created);
             }
 
-            throw new MetadataConversionException($"Unable to find or create {node.Adapted}");
+            if(node.TypeDef == TypeDefEnum.Sequence)
+            {
+                var sequence = new TypeDefSequence();
+                sequence.ElemType = TType.From((uint)indexesToSearch[0].index);
+
+                return ((int)conversionBuilder.CreatePortableTypeFromNode(sequence).Id.Value, SearchResult.Created);
+            }
+
+            throw new MetadataConversionException($"Unable to find or create {node.Raw}");
         }
 
 

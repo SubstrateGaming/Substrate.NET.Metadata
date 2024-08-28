@@ -44,6 +44,12 @@ namespace Substrate.NET.Metadata.V11
                 Modules.Value.Select((x, i) => x.ToModuleMetadataV14(conversion, i))
                 .ToArray());
 
+            res.Extrinsic = Extrinsic.ToExtrinsicMetadataV14(conversion);
+
+            conversion.CreateRuntime("polkadot");
+            res.Lookup = new PortableRegistry();
+            res.Lookup.Create(conversion.PortableTypes.ToArray());
+
             return res;
         }
     }

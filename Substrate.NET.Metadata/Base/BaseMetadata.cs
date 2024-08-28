@@ -38,7 +38,7 @@ namespace Substrate.NET.Metadata.Base
             TypeSize = p - start;
         }
 
-        public MetaDataInfo MetaDataInfo { get; private set; } = default!;
-        public T RuntimeMetadataData { get; private set; } = default!;
+        public MetaDataInfo MetaDataInfo { get; internal set; } = default!;
+        public T RuntimeMetadataData { get; internal set; } = default!;
     }
 }

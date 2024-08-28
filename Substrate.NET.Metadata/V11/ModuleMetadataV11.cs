@@ -82,24 +82,28 @@ namespace Substrate.NET.Metadata.V11
             conversionBuilder.CurrentPallet = Name.Value;
 
             // We do not do Calls conversion
+            result.Calls = new BaseOpt<PalletCallMetadataV14>(null!);
 
             if (Events.OptionFlag)
             {
                 result.Events = ToPalletEventV14(conversionBuilder);
 
                 var variantField = new Field(
-                    name: new BaseOpt<Str>(), 
-                    fieldTy: result.Events.Value.ElemType, 
+                    name: new BaseOpt<Str>(),
+                    fieldTy: result.Events.Value.ElemType,
                     fieldTypeName: new BaseOpt<Str>(new Str($"{Name.Value}::Event<Runtime")),
                     docs: new BaseVec<Str>(new Str[0]));
 
                 var eventVariant = new Variant(
-                    name: Name, 
-                    variantFields: new BaseVec<Field>(new Field[1] { variantField }), 
-                    index: new U8((byte)index), 
+                    name: Name,
+                    variantFields: new BaseVec<Field>(new Field[1] { variantField }),
+                    index: new U8((byte)index),
                     docs: new BaseVec<Str>(new Str[0]));
 
                 conversionBuilder.AddPalletEventBlockchainRuntimeEvent(eventVariant);
+            } else
+            {
+                result.Events = new BaseOpt<PalletEventMetadataV14>(null!);
             }
 
             result.Errors = ToPalletErrorV14(conversionBuilder);
@@ -110,6 +114,10 @@ namespace Substrate.NET.Metadata.V11
             if (Storage.OptionFlag)
             {
                 result.Storage = new BaseOpt<PalletStorageMetadataV14>(this.Storage.Value.ToStorageMetadataV14(conversionBuilder));
+            }
+            else
+            {
+                result.Storage = new BaseOpt<PalletStorageMetadataV14>(null!);
             }
 
             return result;

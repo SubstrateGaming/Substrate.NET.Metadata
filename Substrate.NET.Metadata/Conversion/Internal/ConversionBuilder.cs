@@ -85,7 +85,9 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             "sp_std::marker::PhantomData<(AccountId, Event)>", // V11 => TechnicalMembership => v1 => Events => Dummy
             "Vec<UpwardMessage>", // V11 => Parachains => v1 => Storage => RelayDispatchQueue
             "IncludedBlocks<T>", // V11 => Attestations => v1 => Storage => RecentParaBlocks
-            "BlockAttestations", // V11 => Attestations => v1 => Storage => ParaBlockAttestations
+            "BlockAttestations<T>", // V11 => Attestations => v1 => Storage => ParaBlockAttestations
+            "WinningData<T>", // V11 => Slots => v1 => Storage => Winning
+            "(LeasePeriodOf<T>, IncomingParachain<T::AccountId, T::Hash>)", // V11 => Slots => v1 => Storage => Onboarding
         };
 
         public U32 GetNewIndex()
@@ -239,7 +241,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
         public static string HarmonizeTypeName(string className)
         {
-            return className.Replace("T::", "");
+            return className.Replace("T::", "").Replace("<T>", "");
         }
 
         public static List<string> HarmonizeFullType(string className)
@@ -660,10 +662,17 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 portableType.Ty.TypeDef.Create(TypeDefEnum.Composite, tdc);
             }
 
+            if (node is TypeDefSequence tds)
+            {
+                portableType.Ty.TypeDef = new TypeDefExt();
+                portableType.Ty.TypeDef.Create(TypeDefEnum.Sequence, tds);
+            }
+
             PortableTypes.Add(portableType);
 
             return portableType;
         }
+
         public TypeDefTuple BuildTuple(List<TType> types)
         {
             var node = new TypeDefTuple();
@@ -671,6 +680,24 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             node.Fields = new BaseVec<TType>(types.ToArray());
 
             return node;
+        }
+
+        public void CreateRuntime(string blockchainName)
+        {
+            var portableType = new PortableType();
+
+            portableType.Id = GetNewIndex();
+            portableType.Ty = new TypePortableForm();
+            portableType.Ty.Docs = new BaseVec<Str>([new Str($"{blockchainName}_runtime"), new Str("runtime")]);
+            portableType.Ty.Path = new Base.Portable.Path();
+            portableType.Ty.Path.Create(new Str[0]);
+            portableType.Ty.TypeParams = new BaseVec<TypeParameter>(new TypeParameter[0]);
+
+            var emptyComposite = new TypeDefComposite();
+            portableType.Ty.TypeDef = new TypeDefExt();
+            portableType.Ty.TypeDef.Create(emptyComposite.Encode());
+
+            PortableTypes.Add(portableType);
         }
         #endregion
     }

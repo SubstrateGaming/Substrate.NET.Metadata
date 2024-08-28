@@ -41,7 +41,10 @@ namespace Substrate.NET.Metadata.Conversion.Tests
         }
 
         [Test]
-        //[TestCase("<T as Trait<I>>::Proposal", 46, 4, "ImOnline")]
+        [TestCase("&[u8]", 10, 2, "Claims")]
+        [TestCase("Vec<Vec<(ParaId, CollatorId)>>", 1000, 1)]
+        [TestCase("Vec<BalanceOf<T>>", 1000, 1)]
+        [TestCase("LeasePeriod", 4, 1)]
         [TestCase("LockIdentifier", 125, 2)]
         [TestCase("(T::BlockNumber, Hash)", 1000, 1)]
         [TestCase("(BalanceOf<T>, Vec<T::AccountId>)", 1000, 1)]

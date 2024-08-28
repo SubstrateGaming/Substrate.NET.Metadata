@@ -157,7 +157,7 @@ namespace Substrate.NET.Metadata.Base
             TypeSize = p - start;
         }
 
-        public TType ElemType { get; private set; }
+        public TType ElemType { get; internal set; }
     }
 
     public class TypeDefArray : BaseType, IMetadataType

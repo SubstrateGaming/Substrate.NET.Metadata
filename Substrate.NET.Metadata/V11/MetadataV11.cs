@@ -19,8 +19,12 @@ namespace Substrate.NET.Metadata.V11
 
         public MetadataV14 ToMetadataV14()
         {
-            //var res = new MetadataV14()
-            return null;
+            var res = new MetadataV14();
+
+            res.MetaDataInfo = MetaDataInfo;
+            res.RuntimeMetadataData = RuntimeMetadataData.ToRuntimeMetadataV14();
+
+            return res;
         }
     }
 }

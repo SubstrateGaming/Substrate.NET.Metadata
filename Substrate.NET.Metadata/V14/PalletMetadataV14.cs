@@ -155,7 +155,7 @@ namespace Substrate.NET.Metadata.V14
             TypeSize = p - start;
         }
 
-        public TType ElemType { get; private set; } = default!;
+        public TType ElemType { get; internal set; } = default!;
         public Str Name => new Str(ElemType.ToString());
     }
 
