@@ -51,7 +51,7 @@ namespace Substrate.NET.Metadata.Base
             TypeSize = p - num;
         }
 
-        public StorageEntryTypeMapV14 ToStorageEntryTypeMapV14(ConversionBuilder conversionBuilder)
+        internal StorageEntryTypeMapV14 ToStorageEntryTypeMapV14(ConversionBuilder conversionBuilder)
         {
             var result = new StorageEntryTypeMapV14();
 

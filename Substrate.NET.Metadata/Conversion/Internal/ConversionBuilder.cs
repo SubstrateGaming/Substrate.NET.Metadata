@@ -75,7 +75,9 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         /// </summary>
         public static List<string> UnhandleConversion = new List<string>()
         {
-            "Vec<Option<Scheduled<<T as Trait>::Call, T::BlockNumber>>>", // Pallet scheduler => Storage => Agenda
+            "Vec<Option<Scheduled<<T as Trait>::Call, T::BlockNumber>>>", // v11 => Scheduler => v1 => Storage => Agenda
+            "Vec<Option<Scheduled<<T as Trait>::Call, T::BlockNumber, T::PalletsOrigin, T::AccountId>>>", // v12 => Scheduler => v25 => Storage => Agenda
+            "Vec<Option<Scheduled<<T as Config>::Call, T::BlockNumber, T::PalletsOrigin, T::AccountId>>>", // v12 => Scheduler => v27 => Storage => Agenda
             "ElectionResult<T::AccountId, BalanceOf<T>>", // V11 => Staking => v1 => Storage => QueuedElected
             "PhragmenScore", // V11 => Staking => v1 => Storage => QueuedScore
             "ElectionStatus<T::BlockNumber>", // V11 => Staking => v1 => Storage => EraElectionStatus
@@ -88,6 +90,12 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             "BlockAttestations<T>", // V11 => Attestations => v1 => Storage => ParaBlockAttestations
             "WinningData<T>", // V11 => Slots => v1 => Storage => Winning
             "(LeasePeriodOf<T>, IncomingParachain<T::AccountId, T::Hash>)", // V11 => Slots => v1 => Storage => Onboarding
+            "ElectionScore", // V12 => Staking => v25 => Storage => QueuedScore
+            "(OpaqueCall, T::AccountId, BalanceOf<T>)", // V12 => Multisig => v25 => Storage => Calls
+            "<T as Config<I>>::Proposal", // V12 => Council => v27 => Storage => ProposalOf
+            "ProxyState<T::AccountId>", // V11 => Democracy => v1 => Storage => Proxy
+            "NewBidder<AccountId>", // V11 => Slots => v1 => Events => WonDeploy
+            "Bidder<T::AccountId>", // V11 => Slots => v1 => Storage => ReservedAmounts
         };
 
         public U32 GetNewIndex()
@@ -98,6 +106,8 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
         public U32 BuildPortableTypes(string className)
         {
+            className = className.Replace("\r", string.Empty).Replace("\n", string.Empty);
+
             if (UnhandleConversion.Contains(className)) 
                 return new U32(UnknowIndex!.Value); // Ok this is bad
 
@@ -531,7 +541,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 "Vec<IdentificationTuple>" => "Vec<IdentificationTuple<T>>",
                 "Vec<AccountId>" => "Vec<T::AccountId>",
                 "Vec<(AccountId, Balance)>" => "Vec<(<T as frame_system::Config>::AccountId, BalanceOf<T>)>",
-                "sp_std::marker::PhantomData<(AccountId, Event)>" => "BaseVoid", // Pas sur de moi
+                //"sp_std::marker::PhantomData<(AccountId, Event)>" => "BaseVoid", // Pas sur de moi
                 "Timepoint<BlockNumber>" => "Timepoint<T::BlockNumber>",
                 "limits::BlockWeights" => "BlockWeights",
                 "limits::BlockLength" => "BlockLength",
@@ -541,6 +551,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 "Moment" => "u64",
                 "ModuleId" => "PalletId",
                 "LeasePeriod" => "LeasePeriodOf<T>",
+                "weights::ExtrinsicsWeight" => "PerDispatchClass",
                 _ => className
             };
         }
@@ -638,16 +649,31 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
             return pt;
         }
-        public PortableType CreatePortableTypeFromNode(BaseType node)
+
+        public PortableType CreatePortableTypeFromNode(BaseType node, List<string>? path = null, List<string>? docs = null)
         {
             
             var portableType = new PortableType();
 
             portableType.Id = GetNewIndex();
             portableType.Ty = new TypePortableForm();
-            portableType.Ty.Docs = new BaseVec<Str>(new Str[0]);
-            portableType.Ty.Path = new Base.Portable.Path();
-            portableType.Ty.Path.Create(new Str[0]);
+
+            if(docs is not null)
+                portableType.Ty.Docs = new BaseVec<Str>(docs.Select(x => new Str(x)).ToArray());
+            else
+                portableType.Ty.Docs = new BaseVec<Str>(new Str[0]);
+
+            if(path is not null)
+            {
+                portableType.Ty.Path = new Base.Portable.Path();
+                portableType.Ty.Path.Create(path.Select(x => new Str(x)).ToArray());
+            }
+            else
+            {
+                portableType.Ty.Path = new Base.Portable.Path();
+                portableType.Ty.Path.Create(new Str[0]);
+            }
+
             portableType.Ty.TypeParams = new BaseVec<TypeParameter>(new TypeParameter[0]);
 
             if (node is TypeDefTuple tdt)
@@ -668,6 +694,12 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 portableType.Ty.TypeDef.Create(TypeDefEnum.Sequence, tds);
             }
 
+            if (node is TypeDefArray tda)
+            {
+                portableType.Ty.TypeDef = new TypeDefExt();
+                portableType.Ty.TypeDef.Create(TypeDefEnum.Array, tda);
+            }
+
             PortableTypes.Add(portableType);
 
             return portableType;
@@ -682,22 +714,12 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             return node;
         }
 
-        public void CreateRuntime(string blockchainName)
+        public void CreateRuntime()
         {
-            var portableType = new PortableType();
-
-            portableType.Id = GetNewIndex();
-            portableType.Ty = new TypePortableForm();
-            portableType.Ty.Docs = new BaseVec<Str>([new Str($"{blockchainName}_runtime"), new Str("runtime")]);
-            portableType.Ty.Path = new Base.Portable.Path();
-            portableType.Ty.Path.Create(new Str[0]);
-            portableType.Ty.TypeParams = new BaseVec<TypeParameter>(new TypeParameter[0]);
-
             var emptyComposite = new TypeDefComposite();
-            portableType.Ty.TypeDef = new TypeDefExt();
-            portableType.Ty.TypeDef.Create(emptyComposite.Encode());
+            emptyComposite.Fields = new BaseVec<Field>(new Field[0]);
 
-            PortableTypes.Add(portableType);
+            CreatePortableTypeFromNode(node: emptyComposite, path:  new List<string>() { "conversion_runtime", "runtime" });
         }
         #endregion
     }

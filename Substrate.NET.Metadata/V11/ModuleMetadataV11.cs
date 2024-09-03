@@ -73,7 +73,7 @@ namespace Substrate.NET.Metadata.V11
             };
         }
 
-        public ModuleMetadataV14 ToModuleMetadataV14(ConversionBuilder conversionBuilder, int index)
+        internal ModuleMetadataV14 ToModuleMetadataV14(ConversionBuilder conversionBuilder, int index)
         {
             var result = new ModuleMetadataV14();
             result.Name = Name;
@@ -96,7 +96,7 @@ namespace Substrate.NET.Metadata.V11
 
                 var eventVariant = new Variant(
                     name: Name,
-                    variantFields: new BaseVec<Field>(new Field[1] { variantField }),
+                    variantFields: new BaseVec<Field>([variantField]),
                     index: new U8((byte)index),
                     docs: new BaseVec<Str>(new Str[0]));
 

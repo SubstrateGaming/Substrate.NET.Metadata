@@ -31,7 +31,7 @@ namespace Substrate.NET.Metadata.V11
             return result.ToArray();
         }
 
-        public RuntimeMetadataV14 ToRuntimeMetadataV14()
+        internal RuntimeMetadataV14 ToRuntimeMetadataV14()
         {
             var conversion = new ConversionBuilder(new List<PortableType>());
 
@@ -46,7 +46,7 @@ namespace Substrate.NET.Metadata.V11
 
             res.Extrinsic = Extrinsic.ToExtrinsicMetadataV14(conversion);
 
-            conversion.CreateRuntime("polkadot");
+            conversion.CreateRuntime();
             res.Lookup = new PortableRegistry();
             res.Lookup.Create(conversion.PortableTypes.ToArray());
 

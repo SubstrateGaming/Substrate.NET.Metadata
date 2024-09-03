@@ -185,8 +185,8 @@ namespace Substrate.NET.Metadata.Base
             TypeSize = p - start;
         }
 
-        public U32 Len { get; private set; }
-        public TType ElemType { get; private set; }
+        public U32 Len { get; internal set; } = default!;
+        public TType ElemType { get; internal set; } = default!;
     }
 
     public class TypeDefTuple : BaseType

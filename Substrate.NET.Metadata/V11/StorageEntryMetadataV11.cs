@@ -50,14 +50,13 @@ namespace Substrate.NET.Metadata.V11
         public ByteGetter StorageDefault { get; private set; } = default!;
         public BaseVec<Str> Documentation { get; private set; } = default!;
 
-        public StorageEntryMetadataV14 ToStorageEntryMetadataV14(ConversionBuilder conversionBuilder)
+        internal StorageEntryMetadataV14 ToStorageEntryMetadataV14(ConversionBuilder conversionBuilder)
         {
             var mapStorageType = new BaseEnumExt<StorageType.Type, TType, StorageEntryTypeMapV14>();
 
             if (StorageType.Value == Metadata.StorageType.TypeV9.Plain)
             {
                 var val = StorageType.Value2 as Str;
-                //var idx = ConversionV14Helper.AddToLookup(lookup, val!.Value);
                 var index = conversionBuilder.BuildPortableTypes(val!.Value);
 
                 mapStorageType.Create(Metadata.StorageType.Type.Plain, TType.From(index.Value));
@@ -74,7 +73,7 @@ namespace Substrate.NET.Metadata.V11
                 
             } else
             {
-                // DoubleMap and NMap exists but should never happened
+                // NMap exists but should never happened
                 throw new MetadataConversionException($"Error while converting StorageEntryMetadataV11. Received storage type {StorageType.Value} while should never happened");
             }
 

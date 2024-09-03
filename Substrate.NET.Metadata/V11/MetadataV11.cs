@@ -1,9 +1,10 @@
 ﻿using Substrate.NET.Metadata.Base;
+using Substrate.NET.Metadata.Conversion;
 using Substrate.NET.Metadata.V14;
 
 namespace Substrate.NET.Metadata.V11
 {
-    public class MetadataV11 : BaseMetadata<RuntimeMetadataV11>
+    public class MetadataV11 : BaseMetadata<RuntimeMetadataV11>, IMetadataToV14
     {
         public MetadataV11() : base()
         {

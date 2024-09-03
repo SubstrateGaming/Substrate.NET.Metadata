@@ -10,6 +10,8 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 {
     public abstract class NodeBuilderType
     {
+        public int? Index { get; set; } = null;
+
         public abstract TypeDefEnum TypeDef {  get; }
 
         /// <summary>
@@ -86,7 +88,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
     {
         public TypeDefPrimitive Primitive { get; set; }
 
-        public NodeBuilderTypePrimitive(string content, TypeDefPrimitive primitive, string palletContext): base(content, content, palletContext)
+        public NodeBuilderTypePrimitive(string content, string raw, TypeDefPrimitive primitive, string palletContext): base(content, raw, palletContext)
         {
             Primitive = primitive;
         }
@@ -105,7 +107,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
     public class NodeBuilderTypeSequence : NodeBuilderType
     {
-        public NodeBuilderTypeSequence(string content, string palletContext) : base(content, content, palletContext)
+        public NodeBuilderTypeSequence(string content, string raw, string palletContext) : base(content, raw, palletContext)
         {
         }
 
@@ -114,7 +116,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
     public class NodeBuilderTypeTuple : NodeBuilderType
     {
-        public NodeBuilderTypeTuple(string content, string palletContext) : base(content, content, palletContext)
+        public NodeBuilderTypeTuple(string content, string raw, string palletContext) : base(content, raw, palletContext)
         {
         }
 
@@ -144,7 +146,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
     public class NodeBuilderTypeVariant : NodeBuilderType
     {
-        public NodeBuilderTypeVariant(string content, string palletContext) : base(content, content, palletContext)
+        public NodeBuilderTypeVariant(string content, string raw, string palletContext) : base(content, raw, palletContext)
         {
             PalletContext = palletContext;
         }

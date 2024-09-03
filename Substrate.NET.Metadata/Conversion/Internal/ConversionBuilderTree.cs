@@ -237,7 +237,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
             if (match.Success)
             {
-                var nodeTuple = new NodeBuilderTypeTuple(node.Adapted, node.PalletContext);
+                var nodeTuple = new NodeBuilderTypeTuple(node.Adapted, node.Raw, node.PalletContext);
 
                 if (ExtractParameters(match.Groups[1].Value) is List<string> parameters)
                 {
@@ -311,7 +311,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             object? res = null;
             if (Enum.TryParse(typeof(TypeDefPrimitive), node.Adapted, true, out res))
             {
-                return new NodeBuilderTypePrimitive(node.Adapted, (TypeDefPrimitive)res, node.PalletContext);
+                return new NodeBuilderTypePrimitive(node.Adapted, node.Raw, (TypeDefPrimitive)res, node.PalletContext);
             }
 
             return null;
@@ -336,31 +336,38 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
                 NodeBuilderType result = typeDef switch
                 {
-                    TypeDefEnum.Sequence => new NodeBuilderTypeSequence(node.Adapted, node.PalletContext),
+                    TypeDefEnum.Sequence => new NodeBuilderTypeSequence(node.Adapted, node.Raw, node.PalletContext),
                     TypeDefEnum.Variant when match.Groups[1].Value == "Option" => new NodeBuilderTypeOption(node.Adapted, node.Raw, node.PalletContext),
-                    TypeDefEnum.Variant => new NodeBuilderTypeVariant(node.Adapted, node.PalletContext),
+                    TypeDefEnum.Variant => new NodeBuilderTypeVariant(node.Adapted, node.Raw, node.PalletContext),
                     TypeDefEnum.Composite => new NodeBuilderTypeComposite(
                         SearchV14.HardBinding(match.Groups[1].Value, node.PalletContext),
                         node.Adapted, node.PalletContext),
                     _ => throw new MetadataConversionException($"TypeDef {typeDef} is not handled")
                 };
 
-                if (!GenericValueToIgnore.Contains(genericParameters))
+                if (result is NodeBuilderTypeComposite c && c.Raw != c.Adapted)
                 {
-                    if (ExtractParameters(genericParameters) is List<string> parameters)
+                    return Build(new NodeBuilderTypeUndefined(c.Adapted, c.Raw, c.PalletContext));
+                }
+                else
+                {
+                    if (!GenericValueToIgnore.Contains(genericParameters))
                     {
-                        foreach (var param in parameters)
+                        if (ExtractParameters(genericParameters) is List<string> parameters)
                         {
-                            result.Children.Add(new NodeBuilderTypeUndefined(param, node.PalletContext));
+                            foreach (var param in parameters)
+                            {
+                                result.Children.Add(new NodeBuilderTypeUndefined(param, node.PalletContext));
+                            }
+                        }
+                        else
+                        {
+                            result.Children.Add(new NodeBuilderTypeUndefined(genericParameters, node.PalletContext));
                         }
                     }
-                    else
-                    {
-                        result.Children.Add(new NodeBuilderTypeUndefined(genericParameters, node.PalletContext));
-                    }
-                }
 
-                return result;
+                    return result;
+                }
             }
 
             return null;

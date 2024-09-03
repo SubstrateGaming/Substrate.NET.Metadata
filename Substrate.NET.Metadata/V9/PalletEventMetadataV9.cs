@@ -36,7 +36,7 @@ namespace Substrate.NET.Metadata.V9
         public BaseVec<Str> Args { get; set; }
         public BaseVec<Str> Docs { get; set; }
 
-        public Variant ToVariant(ConversionBuilder conversionBuilder, int index)
+        internal Variant ToVariant(ConversionBuilder conversionBuilder, int index)
         {
             var res = new Variant();
 

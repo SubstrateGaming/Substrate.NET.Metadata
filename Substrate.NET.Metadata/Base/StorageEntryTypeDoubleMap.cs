@@ -1,4 +1,5 @@
-﻿using Substrate.NET.Metadata.Conversion.Internal;
+﻿using Substrate.NET.Metadata.Conversion;
+using Substrate.NET.Metadata.Conversion.Internal;
 using Substrate.NET.Metadata.V14;
 using Substrate.NetApi.Model.Types.Base;
 using Substrate.NetApi.Model.Types.Primitive;
@@ -19,13 +20,13 @@ namespace Substrate.NET.Metadata.Base
     public class StorageEntryTypeDoubleMap<THasher> : BaseType
         where THasher : Enum
     {
-        public BaseEnum<THasher> Key1Hasher { get; private set; }
-        public BaseEnum<THasher> Key2Hasher { get; private set; }
+        public BaseEnum<THasher> Key1Hasher { get; private set; } = default!;
+        public BaseEnum<THasher> Key2Hasher { get; private set; } = default!;
 
-        public Str Key1 { get; private set; }
-        public Str Key2 { get; private set; }
+        public Str Key1 { get; private set; } = default!;
+        public Str Key2 { get; private set; } = default!;
 
-        public Str Value { get; private set; }
+        public Str Value { get; private set; } = default!;
 
         public override byte[] Encode()
         {
@@ -60,7 +61,7 @@ namespace Substrate.NET.Metadata.Base
             TypeSize = p - num;
         }
 
-        public StorageEntryTypeMapV14 ToStorageEntryTypeMapV14(ConversionBuilder conversionBuilder)
+        internal StorageEntryTypeMapV14 ToStorageEntryTypeMapV14(ConversionBuilder conversionBuilder)
         {
             var result = new StorageEntryTypeMapV14();
 

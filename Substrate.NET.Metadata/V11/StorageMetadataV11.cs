@@ -33,7 +33,7 @@ namespace Substrate.NET.Metadata.V11
         public Str Prefix { get; private set; } = default!;
         public BaseVec<StorageEntryMetadataV11> Entries { get; private set; } = default!;
 
-        public PalletStorageMetadataV14 ToStorageMetadataV14(ConversionBuilder conversionBuilder)
+        internal PalletStorageMetadataV14 ToStorageMetadataV14(ConversionBuilder conversionBuilder)
         {
             var storage = new PalletStorageMetadataV14(
                 prefix: Prefix.Value,

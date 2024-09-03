@@ -36,7 +36,7 @@ namespace Substrate.NET.Metadata.V9
             TypeSize = p - num;
         }
 
-        public Variant ToVariant(ConversionBuilder conversionBuilder, int index)
+        internal Variant ToVariant(ConversionBuilder conversionBuilder, int index)
         {
             var res = new Variant();
 

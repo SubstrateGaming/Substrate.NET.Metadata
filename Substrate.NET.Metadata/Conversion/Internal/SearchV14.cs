@@ -35,6 +35,10 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         }
 
         public const int StorageEventIndex = 18;
+
+        /// <summary>
+        /// The hard coded Polkadot event runtime index in the V14 Types dictionary
+        /// </summary>
         public const int PolkadotRuntimeEventIndex = 20;
         public static uint? HardIndexBinding(string type)
         {
@@ -78,19 +82,30 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 "SlotRange" => "U32", // Just a guess
                 "CollatorId" => "U32",
                 "&[u8]" when palletContext == "Claims" => "Vec<U8>",
+                "& 'static[u8]" when palletContext == "Claims" => "Vec<U8>",
+                "weights::ExtrinsicsWeight" => "PerDispatchClass",
+                "ConsumedWeight" => "PerDispatchClass", // Just a guess
+                "Approvals" => "[u8;4]",
+                "TransactionPriority" => "U64",
+                "SubmissionIndicesOf" => "Vec<([U128;3],U32)>",
                 _ => type
             };
         }
 
         public static PortableType FindTypeByIndex(int index)
         {
-            return MetadataV14.RuntimeMetadataData.Lookup.Value.Single(x => x.Id.Value == index);
+            var x =  MetadataV14.RuntimeMetadataData.Lookup.Value.SingleOrDefault(x => x.Id.Value == index);
+            return x;
         }
 
         public static (int index, SearchResult searchResult) SearchIndexByNode(NodeBuilderType node, ConversionBuilder conversionBuilder)
         {
             var potentialIndex = FindIndexByClass(node.Adapted);
-            if (potentialIndex != null) return (potentialIndex.Value, SearchResult.Founded);
+            if (potentialIndex != null)
+            {
+                node.Index = potentialIndex.Value;
+                return (potentialIndex.Value, SearchResult.Founded);
+            }
 
             var typeDefs = MetadataV14.RuntimeMetadataData.Lookup.Value.Where(x => x.Ty.TypeDef.Value == node.TypeDef);
 
@@ -108,14 +123,16 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 {
                     if (tds.ElemType.Value == indexesToSearch[0].index)
                     {
-                        return ((int)typeDef.Id.Value, SearchResult.Founded);
+                        node.Index = (int)typeDef.Id.Value;
+                        return (node.Index.Value, SearchResult.Founded);
                     }
                 }
                 else if (typeDef.Ty.TypeDef.Value2 is TypeDefArray tda)
                 {
                     if (tda.ElemType.Value == indexesToSearch[0].index && tda.Len.Value == ((NodeBuilderTypeArray)node).Length)
                     {
-                        return ((int)typeDef.Id.Value, SearchResult.Founded);
+                        node.Index = (int)typeDef.Id.Value;
+                        return (node.Index.Value, SearchResult.Founded);
                     }
                 }
                 else if (typeDef.Ty.TypeDef.Value2 is TypeDefBitSequence tdbs)
@@ -125,7 +142,8 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
                     if (tdbs.BitOrderType.Value == child1.index && tdbs.BitStoreType.Value == child2.index)
                     {
-                        return ((int)typeDef.Id.Value, SearchResult.Founded);
+                        node.Index = (int)typeDef.Id.Value;
+                        return (node.Index.Value, SearchResult.Founded);
                     }
                 }
                 else if (typeDef.Ty.TypeDef.Value2 is TypeDefCompact tdc)
@@ -134,20 +152,19 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
                     if (tdc.ElemType.Value == childIndex.index)
                     {
-                        return ((int)typeDef.Id.Value, SearchResult.Founded);
+                        node.Index = (int)typeDef.Id.Value;
+                        return (node.Index.Value, SearchResult.Founded);
                     }
                 }
                 else if (typeDef.Ty.TypeDef.Value2 is TypeDefComposite tdcomposite)
                 {
-                    if (indexesToSearch.Count == 1 && indexesToSearch[0].index == 0)
+                    var sameName = typeDef.Ty.Path.Value.Any() && typeDef.Ty.Path.Value[^1].Value == node.Adapted;
+                    var sameChildren = indexesToSearch.Select(x => x.index).SequenceEqual(tdcomposite.Fields.Value.Select(x => (int)x.ElemType.Value));
+                    if (sameName && sameChildren)
                     {
-                        return ((int)typeDef.Id.Value, SearchResult.Founded);
+                        node.Index = (int)typeDef.Id.Value;
+                        return (node.Index.Value, SearchResult.Founded);
                     }
-                    //var indexes = node.Children.Select(n => FindIndexByNode(n)!.Value);
-                    //if(indexes.SequenceEqual(tdcomposite.Fields.Value.Select(x => (int)x.ElemType.Value)))
-                    //{
-                    //    return (int)typeDef.Id.Value;
-                    //}
                 }
                 else if (typeDef.Ty.TypeDef.Value2 is BaseEnum<TypeDefPrimitive> tdp)
                 {
@@ -155,11 +172,13 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
                     if (index == null) throw new MetadataConversionException($"Primitive {tdp} not found. Should never happened");
 
-                    return ((int)typeDef.Id.Value, SearchResult.Founded);
+                    node.Index = (int)typeDef.Id.Value;
+                    return (node.Index.Value, SearchResult.Founded);
                 }
                 else if (typeDef.Ty.TypeDef.Value2 is TypeDefTuple tdt && FoundAllChildren(indexesToSearch.Select(x => x.index).ToList(), tdt))
                 {
-                    return ((int)typeDef.Id.Value, SearchResult.Founded);
+                    node.Index = (int)typeDef.Id.Value;
+                    return (node.Index.Value, SearchResult.Founded);
                 }
                 else if (typeDef.Ty.TypeDef.Value2 is TypeDefVariant tdv)
                 {
@@ -168,7 +187,10 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                         if (tdv.TypeParam.Value.Length == 2 &&
                             tdv.TypeParam.Value[0].IsNone() &&
                             tdv.TypeParam.Value[1].IsSome(indexesToSearch[0]!.index))
-                            return ((int)typeDef.Id.Value, SearchResult.Founded);
+                        {
+                            node.Index = (int)typeDef.Id.Value;
+                            return (node.Index.Value, SearchResult.Founded);
+                        }
                     }
                     else
                     {
@@ -177,7 +199,10 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                         {
                             var isIdentical = ConversionUtils.AreArraysIdentical(variant.VariantFields.Value.Select(x => (int)x.FieldTy.Value).ToArray(), indexesToSearch.Select(x => x.index).ToArray());
 
-                            if (isIdentical) return ((int)typeDef.Id.Value, SearchResult.Founded);
+                            if (isIdentical) {
+                                node.Index = (int)typeDef.Id.Value;
+                                return (node.Index.Value, SearchResult.Founded);
+                            } 
                         }
                     }
                 }
@@ -188,7 +213,8 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 var tuple = new TypeDefTuple();
                 tuple.Fields = new BaseVec<TType>(indexesToSearch.Select(x => TType.From((uint)x.index)).ToArray());
 
-                return ((int)conversionBuilder.CreatePortableTypeFromNode(tuple).Id.Value, SearchResult.Created);
+                node.Index = (int)conversionBuilder.CreatePortableTypeFromNode(tuple).Id.Value;
+                return (node.Index.Value, SearchResult.Created);
             }
 
             if(node.TypeDef == TypeDefEnum.Sequence)
@@ -196,7 +222,18 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 var sequence = new TypeDefSequence();
                 sequence.ElemType = TType.From((uint)indexesToSearch[0].index);
 
-                return ((int)conversionBuilder.CreatePortableTypeFromNode(sequence).Id.Value, SearchResult.Created);
+                node.Index = (int)conversionBuilder.CreatePortableTypeFromNode(sequence).Id.Value;
+                return (node.Index.Value, SearchResult.Created);
+            }
+
+            if (node.TypeDef == TypeDefEnum.Array)
+            {
+                var array = new TypeDefArray();
+                array.Len = new NetApi.Model.Types.Primitive.U32((uint)((NodeBuilderTypeArray)node).Length);
+                array.ElemType = TType.From((uint)indexesToSearch[0].index);
+
+                node.Index = (int)conversionBuilder.CreatePortableTypeFromNode(array).Id.Value;
+                return (node.Index.Value, SearchResult.Created);
             }
 
             throw new MetadataConversionException($"Unable to find or create {node.Raw}");

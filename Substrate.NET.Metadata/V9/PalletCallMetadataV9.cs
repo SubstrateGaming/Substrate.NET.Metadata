@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Substrate.NET.Metadata.V9
 {
-    public class PalletCallMetadataV9 : BaseType, IMetadataName, IMetadataConversion
+    public class PalletCallMetadataV9 : BaseType, IMetadataName
     {
         public override byte[] Encode()
         {
@@ -34,50 +34,8 @@ namespace Substrate.NET.Metadata.V9
             TypeSize = p - start;
         }
 
-        public Str Name { get; set; }
-        public BaseVec<PalletCallArgsMetadataV9> Args { get; set; }
-        public BaseVec<Str> Docs { get; set; }
-
-        public void AddToDictionnary(PortableRegistry lookup, string palletName)
-        {
-            var variant = new Variant(
-                name: Name,
-                index: new U8(0), // todo change
-                docs: Docs,
-                variantFields: new BaseVec<Field>(
-                    new List<Field>() {
-                        new Field(
-                            name: new BaseOpt<Str>(Name),
-                            fieldTy: new TType(),
-                            fieldTypeName: new BaseOpt<Str>(),
-                            docs: new BaseVec<Str>()
-                        )
-                    }.ToArray()
-                )
-            );
-
-
-            //var newId = new U32(lookup.Value.Any() ? lookup.Value.Max(x => x.Id.Value) + 1 : 0);
-            //var path = new Base.Portable.Path();
-            //path.Create(new List<Str>() { new Str($"pallet_{palletName.ToLower()}"), new Str($"Pallet"), new Str($"Call") }.ToArray());
-
-            //var typePortableForm = new TypePortableForm(path, new BaseVec<TypeParameter>(), null, Docs);
-
-            //var portableType = new PortableType(newId, typePortableForm);
-            //lookup.Value.ToList().Add(portableType);
-        }
-    }
-
-    public class PalletCallMetadataV9Comparer : IEqualityComparer<PalletCallMetadataV9>
-    {
-        public bool Equals(PalletCallMetadataV9? x, PalletCallMetadataV9? y)
-        {
-            return x?.Name == y?.Name;
-        }
-
-        public int GetHashCode([DisallowNull] PalletCallMetadataV9 obj)
-        {
-            return obj.Name.GetHashCode();
-        }
+        public Str Name { get; set; } = default!;
+        public BaseVec<PalletCallArgsMetadataV9> Args { get; set; } = default!;
+        public BaseVec<Str> Docs { get; set; } = default!;
     }
 }
