@@ -10,7 +10,7 @@ using Substrate.NetApi.Model.Meta;
 
 namespace Substrate.NET.Metadata.Node.Tests
 {
-    public class Tests
+    public class ConvertToV14Test
     {
         private SubstrateClient _substrateClient;
 

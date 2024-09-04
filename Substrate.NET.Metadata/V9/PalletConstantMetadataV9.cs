@@ -44,7 +44,7 @@ namespace Substrate.NET.Metadata.V9
             TypeSize = p - num;
         }
 
-        public PalletConstantMetadataV14 ToPalletConstantMetadataV14(ConversionBuilder conversionBuilder)
+        internal PalletConstantMetadataV14 ToPalletConstantMetadataV14(ConversionBuilder conversionBuilder)
         {
             var result = new PalletConstantMetadataV14();
 

@@ -8,7 +8,7 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace Substrate.NET.Metadata.Conversion.Internal
 {
-    public static class SearchV14
+    internal static class SearchV14
     {
         public enum SearchResult
         {
@@ -34,12 +34,11 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             }
         }
 
-        public const int StorageEventIndex = 18;
-
         /// <summary>
         /// The hard coded Polkadot event runtime index in the V14 Types dictionary
         /// </summary>
         public const int PolkadotRuntimeEventIndex = 20;
+
         public static uint? HardIndexBinding(string type)
         {
             return type switch
@@ -95,8 +94,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
         public static PortableType FindTypeByIndex(int index)
         {
-            var x =  MetadataV14.RuntimeMetadataData.Lookup.Value.SingleOrDefault(x => x.Id.Value == index);
-            return x;
+            return MetadataV14.RuntimeMetadataData.Lookup.Value.Single(x => x.Id.Value == index);
         }
 
         public static (int index, SearchResult searchResult) SearchIndexByNode(NodeBuilderType node, ConversionBuilder conversionBuilder)
@@ -240,8 +238,6 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             throw new MetadataConversionException($"Unable to find or create {node.Raw}");
         }
 
-
-
         private static bool FoundAllChildren(List<int> indexesToSearch, TypeDefTuple tdt)
         {
             return indexesToSearch.Select(x => x).SequenceEqual(tdt.Fields.Value.Select(x => (int)x.Value));
@@ -261,11 +257,6 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
                 foreach (var entry in storage.Entries.Value)
                 {
-                    //if (entry.Name.Value == storageClass)
-                    //{
-                    //    return ((CompactIntegerType)entry.StorageType.Value2).Value;
-                    //}
-
                     if (entry.StorageType.Value == StorageType.Type.Plain)
                     {
                         var storagePlainIndex = entry.StorageType.Value2 as TType ?? throw new InvalidOperationException();
@@ -280,10 +271,6 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                         if (typeDef.Value2 is BaseEnum<TypeDefPrimitive> typeDefPrimitive)
                         {
                             storagePlainName = typeDefPrimitive.Value.ToString();
-                        }
-                        else
-                        {
-
                         }
 
                         if (StorageClass.WriteStoragePlain(storagePlainName).Equals(storageClass, StringComparison.CurrentCultureIgnoreCase))

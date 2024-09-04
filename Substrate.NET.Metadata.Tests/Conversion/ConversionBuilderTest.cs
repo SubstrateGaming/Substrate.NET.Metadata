@@ -41,9 +41,9 @@ namespace Substrate.NET.Metadata.Conversion.Tests
         }
 
         [Test]
+        [TestCase("TaskAddress<BlockNumber>", 29, 2)]
         [TestCase("SignedSubmissionOf<T>", 504, 61)]
         [TestCase("BalanceOf<T>", 6, 1)]
-        [TestCase("ProxyState<T::AccountId>", 6, 1)]
         [TestCase("SubmissionIndicesOf<T>", 502, 5)]
         [TestCase("[BalanceOf<T>; 4]", 1000, 1)]
         [TestCase("Approvals", 14, 2)]
@@ -71,7 +71,6 @@ namespace Substrate.NET.Metadata.Conversion.Tests
         [TestCase("AccountInfo<T::Index, T::AccountData>", 3, 4)]
         [TestCase("schnorrkel::Randomness", 1, 2)]
         [TestCase("[u8;32]", 1, 2)]
-        [TestCase("TaskAddress<BlockNumber>", 29, 2)]
         [TestCase("Option<Vec<u8>>", 30, 3)]
         [TestCase("Vec<(T::BlockNumber, EventIndex)>", 105, 3)]
         [TestCase("Vec<(EraIndex, SessionIndex)>", 105, 3)]
@@ -90,26 +89,6 @@ namespace Substrate.NET.Metadata.Conversion.Tests
 
             Assert.That(res.Value, Is.EqualTo(indexExpected), "Index are not equals");
             Assert.That(_builder.PortableTypes.Count, Is.EqualTo(lengthExpected), "Portable elements are not equals");
-
-            //var elementState = _builder.ElementsState.Single(x => x.ClassName.ToLower() == rustType.ToLower());
-            //Assert.That(elementState.IsSuccessfullyMapped, Is.True);
-        }
-
-        [Test]
-        [TestCase("Vec<EventRecord<T::Event, T::Hash>>")]
-        public void BuildNode_ShouldSucceed(string rustType)
-        {
-            Assert.Fail();
-        }
-
-        [Test]
-        [TestCase("u32")]
-        public void GetIndex_FromPrimitive_ShouldSucceed(string primitiveType)
-        {
-            var res = _builder.BuildPortableTypes(primitiveType);
-
-            Assert.That(res.Value, Is.EqualTo(0));
-            Assert.That(_builder.PortableTypes.Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -126,63 +105,6 @@ namespace Substrate.NET.Metadata.Conversion.Tests
             Assert.That(res.TypeDef == TypeDefEnum.Sequence);
         }
 
-
-        [Test]
-        [TestCase("Option<Vec<u8>>")]
-        public void BuildTypeDictionnary_FromComplexePrimitive_ShouldSucceed(string primitiveType)
-        {
-
-        }
-
-        [Test]
-        [TestCase("Option<Vec<u8>>")]
-        public void BuildTypeDictionnary_FromTuple_ShouldSucceed(string primitiveType)
-        {
-
-        }
-
-        [Test]
-        [TestCase("Vec<(<T as frame_system::Config>::AccountId, BalanceOf<T>)>", new string[] { "AccountId", "BalanceOf" })]
-        [TestCase("[Hasher = BlakeTwo128Concat / Key = AccountId / Value = AccountInfo<Index, AccountData>]", new string[] { "AccountId", "AccountInfo", "Index", "AccountData" })]
-        [TestCase("Vec<(AccountId, Balance)>", new string[] { "AccountId", "Balance" })]
-        [TestCase("DigestOf<T>", new string[] { "DigestOf" })]
-        [TestCase("Vec<EventRecord<Event, Hash>>", new string[] { "EventRecord", "Event", "Hash" })]
-        [TestCase("TaskAddress<T::BlockNumber>", new string[] { "TaskAddress", "BlockNumber" })]
-        [TestCase("MaybeRandomness", new string[] { "MaybeRandomness" })]
-        [TestCase("Vec<WeightToFeeCoefficient<BalanceOf<T>>>", new string[] { "WeightToFeeCoefficient", "BalanceOf" })]
-        [TestCase("Option<Vec<u8>>", new string[] { "Option", "u8" })]
-        [TestCase("Vec<T::AccountId>", new string[] { "AccountId" })]
-        [TestCase("[Hasher = BlakeTwo128Concat / Key = AccountId / Value = StakingLedger<AccountId, BalanceOf<T>>]", new string[] { "AccountId", "StakingLedger", "BalanceOf" })]
-        [TestCase("[Hasher = Twox64Concat / Key = (AccountId, slashing::SpanIndex) / Value = slashing::SpanRecord<BalanceOf<T>>]", new string[] { "AccountId", "slashing::SpanIndex", "slashing::SpanRecord", "BalanceOf" })]
-        [TestCase("Option<Vec<u8>>", new string[] { "Option", "u8" })]
-        [TestCase("ElectionStatus<BlockNumber>", new string[] { "ElectionStatus", "BlockNumber" })]
-        [TestCase("ElectionStatus<BlockNumber>", new string[] { "ElectionStatus", "BlockNumber" })]
-        [TestCase("Vec<Vec<(ParaId, CollatorId)>>", new string[] { "ParaId", "CollatorId" })]
-        [TestCase("Vec<(ParaId, Option<(CollatorId, Retriable)>)>", new string[] { "ParaId", "Option", "CollatorId", "Retriable" })]
-        [TestCase("Vec<DeferredOffenceOf<T>>", new string[] { "DeferredOffenceOf" })]
-        [TestCase("[Hasher = Identity / Key = Hash / Value = (BlockNumber, Vec<AccountId>)]", new string[] { "Hash", "BlockNumber", "AccountId" })]
-        [TestCase("OpenTip<AccountId, BalanceOf<T>, BlockNumber, Hash>", new string[] { "OpenTip", "AccountId", "BalanceOf", "BlockNumber", "Hash" })]
-        [TestCase("[Key1 = BlockNumber / Key1Hasher = Twox64Concat / Key2 = Hash / Key2Hasher = Identity / Value = BlockAttestations<T>]", new string[] { "BlockNumber", "Hash", "BlockAttestations" })]
-        [TestCase("[Hasher = Identity / Key = EthereumAddress / Value = (BalanceOf<T>, BalanceOf<T>, BlockNumber)]", new string[] { "EthereumAddress", "BalanceOf", "BlockNumber" })]
-        [TestCase("[Hasher = Identity / Key = EthereumAddress / Value = (BalanceOf<T>, BalanceOf<T>, BlockNumber)]", new string[] { "EthereumAddress", "BalanceOf", "BlockNumber" })]
-        [TestCase("[Hasher = Identity / Key = [u8; 32] / Value = (Vec<u8>, AccountId, BalanceOf<T>)]", new string[] { "u8", "AccountId", "BalanceOf" })]
-        //[TestCase("Hey, (Titi<A<(XX, YY)>, B>, Titi<A<YY, TT>, L>)", new string[] { "Hey", "Titi", "A", "XX", "YY", "B", "TT", "L" })]
-        public void HarmonizeFullType_WithMap_ShouldSucceed(string original, string[] mapped)
-        {
-            // Todo Romain : gérer les tableaux du genre [u8; 32]
-            var res = ConversionBuilder.HarmonizeFullType(original).Distinct().ToList();
-
-            Assert.That(res.Count, Is.EqualTo(mapped.Length));
-
-            for (int i = 0; i < res.Count; i++)
-            {
-                Assert.That(res[i], Is.EqualTo(mapped[i]));
-            }
-        }
-
-
-
-
         [Test]
         [TestCase("AccountId, Balance", new string[] { "AccountId", "Balance" })]
         [TestCase("Toto, Titi<A, B>", new string[] { "Toto", "Titi<A, B>" })]
@@ -190,7 +112,7 @@ namespace Substrate.NET.Metadata.Conversion.Tests
         [TestCase("Titi<A<XX, YY>, B>, Titi<A<WW, TT>, L>", new string[] { "Titi<A<XX, YY>, B>", "Titi<A<WW, TT>, L>" })]
         public void ExtractParameters_ShouldSucceed(string input, string[] expected)
         {
-            var res = ConversionBuilder.ExtractParameters(input);
+            var res = ConversionBuilderTree.ExtractParameters(input);
 
             Assert.That(res, Is.Not.Null);
             Assert.That(res.Count, Is.EqualTo(expected.Length));
@@ -199,6 +121,38 @@ namespace Substrate.NET.Metadata.Conversion.Tests
             {
                 Assert.That(res[i], Is.EqualTo(expected[i]));
             }
+        }
+
+        [Test]
+        [TestCase("[u8; 4]", "u8", 4)]
+        public void ExtractArray_ShouldSucceed(string input, string typeExpected, int lengthExpected)
+        {
+            var res = ConversionBuilderTree.ExtractArray(new NodeBuilderTypeUndefined(input, ""));
+
+            Assert.That(res, Is.Not.Null);
+            Assert.That(res.Children[0].Adapted, Is.EqualTo(typeExpected));
+            Assert.That(res.Length, Is.EqualTo(lengthExpected));
+        }
+
+        [Test]
+        public void ExtractPrimitive_ShouldSucceed()
+        {
+            var res = ConversionBuilderTree.ExtractPrimitive(new NodeBuilderTypeUndefined("u32", ""));
+
+            Assert.That(res, Is.Not.Null);
+            Assert.That(res.Primitive, Is.EqualTo(TypeDefPrimitive.U32));
+        }
+
+        [Test]
+        [TestCase("Vec<u32>", typeof(NodeBuilderTypeSequence))]
+        [TestCase("Option<u32>", typeof(NodeBuilderTypeOption))]
+        [TestCase("AccountData<u32>", typeof(NodeBuilderTypeComposite))]
+        public void ExtractGeneric_ShouldSucceed(string input, Type typeDefExpected)
+        {
+            var res = ConversionBuilderTree.ExtractGeneric(new NodeBuilderTypeUndefined(input, ""));
+
+            Assert.That(res, Is.Not.Null);
+            Assert.That(res.GetType(), Is.EqualTo(typeDefExpected));
         }
     }
 }

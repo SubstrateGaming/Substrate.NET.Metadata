@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 namespace Substrate.NET.Metadata.Conversion.Internal
 {
-    public abstract class NodeBuilderType
+    internal abstract class NodeBuilderType
     {
         public int? Index { get; set; } = null;
 
@@ -59,7 +59,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
     }
 
-    public class NodeBuilderTypeUndefined : NodeBuilderType
+    internal class NodeBuilderTypeUndefined : NodeBuilderType
     {
         public override TypeDefEnum TypeDef => throw new NotImplementedException();
         
@@ -75,7 +75,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
     /// <summary>
     /// A variant of <see cref="NodeBuilderTypeVariant"/> to handle Option<T> more easily
     /// </summary>
-    public class NodeBuilderTypeOption : NodeBuilderType
+    internal class NodeBuilderTypeOption : NodeBuilderType
     {
         public override TypeDefEnum TypeDef => TypeDefEnum.Variant;
 
@@ -84,7 +84,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         }
     }
 
-    public class NodeBuilderTypePrimitive : NodeBuilderType
+    internal class NodeBuilderTypePrimitive : NodeBuilderType
     {
         public TypeDefPrimitive Primitive { get; set; }
 
@@ -96,7 +96,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         public override TypeDefEnum TypeDef => TypeDefEnum.Primitive;
     }
 
-    public class NodeBuilderTypeComposite : NodeBuilderType
+    internal class NodeBuilderTypeComposite : NodeBuilderType
     {
         public NodeBuilderTypeComposite(string content, string raw, string palletContext) : base(content, raw, palletContext)
         {
@@ -105,7 +105,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         public override TypeDefEnum TypeDef => TypeDefEnum.Composite;
     }
 
-    public class NodeBuilderTypeSequence : NodeBuilderType
+    internal class NodeBuilderTypeSequence : NodeBuilderType
     {
         public NodeBuilderTypeSequence(string content, string raw, string palletContext) : base(content, raw, palletContext)
         {
@@ -114,7 +114,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         public override TypeDefEnum TypeDef => TypeDefEnum.Sequence;
     }
 
-    public class NodeBuilderTypeTuple : NodeBuilderType
+    internal class NodeBuilderTypeTuple : NodeBuilderType
     {
         public NodeBuilderTypeTuple(string content, string raw, string palletContext) : base(content, raw, palletContext)
         {
@@ -123,7 +123,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         public override TypeDefEnum TypeDef => TypeDefEnum.Tuple;
     }
 
-    public class NodeBuilderTypeArray : NodeBuilderType
+    internal class NodeBuilderTypeArray : NodeBuilderType
     {
         public NodeBuilderTypeArray(string content, string raw, int length, string palletContext): base(content, raw, palletContext)
         {
@@ -135,7 +135,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         public override TypeDefEnum TypeDef => TypeDefEnum.Array;
     }
 
-    public class NodeBuilderTypeCompact : NodeBuilderType
+    internal class NodeBuilderTypeCompact : NodeBuilderType
     {
         public NodeBuilderTypeCompact(string content, string palletContext) : base(content, content, palletContext)
         {
@@ -144,7 +144,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         public override TypeDefEnum TypeDef => TypeDefEnum.Compact;
     }
 
-    public class NodeBuilderTypeVariant : NodeBuilderType
+    internal class NodeBuilderTypeVariant : NodeBuilderType
     {
         public NodeBuilderTypeVariant(string content, string raw, string palletContext) : base(content, raw, palletContext)
         {

@@ -12,12 +12,14 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 {
     public static class ConversionBuilderTree
     {
+        public static string[] GenericValueToIgnore { get; set; } = ["T"];
+
         public static string HarmonizeTypeName(string className)
         {
             return className.Replace("T::", "");
         }
 
-        public static NodeBuilderType Build(NodeBuilderType nodeBuilderType)
+        internal static NodeBuilderType Build(NodeBuilderType nodeBuilderType)
         {
             if (ExtractTuple(nodeBuilderType) is NodeBuilderTypeTuple tuples &&
                 nodeBuilderType is NodeBuilderTypeUndefined)
@@ -40,7 +42,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             if (ExtractPrimitive(nodeBuilderType) is NodeBuilderTypePrimitive primitive && nodeBuilderType is NodeBuilderTypeUndefined)
             {
                 nodeBuilderType = primitive!;
-                return primitive;
+                //return primitive;
             }
 
             if (nodeBuilderType is NodeBuilderTypeUndefined)
@@ -69,42 +71,15 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 }
             }
 
-            //return new NodeBuilderTypeComposite(className);
             return nodeBuilderType;
-
-
-
-            //if (ExtractRustGeneric(className) is string param)
-            //{
-            //    res.Add(param);
-            //    return ExtractDeeper(res);
-            //}
-
-            //res.Add(HarmonizeTypeName(className));
-            //return res;
         }
 
         /// <summary>
-        /// Extract Rust generic from a class name
-        /// For example <T as frame_system::Config>::AccountId => AccountId
+        /// Extract parameters from a class name
         /// </summary>
         /// <param name="className"></param>
         /// <returns></returns>
-        internal static string? ExtractRustGeneric(string className)
-        {
-            string pattern = @"<[^>]+>::(\w+)";
-
-            Match match = Regex.Match(className, pattern);
-
-            if (match.Success)
-            {
-                return match.Groups[1].Value;
-            }
-
-            return null;
-        }
-
-        public static List<string>? ExtractParameters(string className)
+        internal static List<string>? ExtractParameters(string className)
         {
             List<string> result = new();
 
@@ -139,7 +114,6 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
                             var sub = string.Join(", ", splitted.GetRange(start, end - start + 1));
 
-                            //result.RemoveRange(start - lastIndexRemoved, end - start + 1 - lastIndexRemoved);
                             Enumerable.Range(start, end - start + 1).ToList().ForEach(x => result.Remove(splitted[x]));
                             result.Insert(start - lastIndexRemoved, sub);
 
@@ -157,58 +131,13 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             return null;
         }
 
-        //public static List<NodeBuilderTypeUndefined>? ExtractParameters(string className)
-        //{
-        //    List<NodeBuilderTypeUndefined> result = new();
-
-        //    var splitted = className.Split(new[] { "," }, StringSplitOptions.None).Select(x => x.Trim()).ToList();
-        //    result.AddRange(splitted.Select(x => new NodeBuilderTypeUndefined(x)));
-
-        //    if (splitted.Count > 1)
-        //    {
-        //        List<int> indexBracketOpen = new();
-        //        List<int> indexBracketClose = new();
-        //        int lastIndexRemoved = 0;
-
-        //        for (int i = 0; i < splitted.Count; i++)
-        //        {
-        //            var diff = splitted[i].Count(i => i == '<') - splitted[i].Count(i => i == '>');
-
-        //            if (diff > 0)
-        //            {
-        //                Enumerable.Range(0, diff).ToList().ForEach(x => indexBracketOpen.Add(i));
-        //            }
-
-        //            if (diff < 0)
-        //            {
-        //                Enumerable.Range(0, Math.Abs(diff)).ToList().ForEach(x => indexBracketClose.Add(i));
-
-        //                if (indexBracketClose.Count == indexBracketOpen.Count)
-        //                {
-        //                    var start = indexBracketOpen.First();
-        //                    var end = indexBracketClose.Last();
-
-        //                    var sub = string.Join(", ", splitted.GetRange(start, end - start + 1));
-
-        //                    //result.RemoveRange(start - lastIndexRemoved, end - start + 1 - lastIndexRemoved);
-        //                    Enumerable.Range(start, end - start + 1).ToList().ForEach(x => result.Remove(new NodeBuilderTypeUndefined(splitted[x])));
-        //                    result.Insert(start - lastIndexRemoved, new NodeBuilderTypeUndefined(sub));
-
-        //                    lastIndexRemoved = end;
-        //                    indexBracketOpen.Clear();
-        //                    indexBracketClose.Clear();
-        //                }
-        //            }
-        //        }
-
-        //        // At the end, let's check if something has changed
-        //        return result.First() == new NodeBuilderTypeUndefined(className) ? null : result;
-        //    }
-
-        //    return null;
-        //}
-
-        private static NodeBuilderTypeArray? ExtractArray(NodeBuilderType node)
+        /// <summary>
+        /// Extract an array from a class name
+        /// For example : [u8; 4] will build an NodeBuilderTypeArray with type u8 with a 4 length
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        internal static NodeBuilderTypeArray? ExtractArray(NodeBuilderType node)
         {
             string pattern = @"\[(.*);\s*(\d+)\]";
             Match match = Regex.Match(node.Adapted, pattern);
@@ -230,7 +159,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             return null;
         }
 
-        private static NodeBuilderTypeTuple? ExtractTuple(NodeBuilderType node)
+        internal static NodeBuilderTypeTuple? ExtractTuple(NodeBuilderType node)
         {
             string pattern = @"\((.*)\)$";
             Match match = Regex.Match(node.Adapted, pattern);
@@ -253,60 +182,12 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             return null;
         }
 
-        //private static List<string> ExtractDeeper(NodeBuilderType nodeBuilderType, string content)
-        //{
-        //    //if (res.Count > 1)
-        //    //{
-        //    for (int i = 0; i < res.Count; i++)
-        //    {
-        //        var r = Build(res[i]);
-        //        if (r.Count > 1)
-        //        {
-        //            res.Remove(res[i]);
-        //            res.AddRange(r);
-        //            i = -1;
-        //        }
-        //        else
-        //        {
-        //            res[i] = r[0];
-        //        }
-        //    }
-        //    //}
-
-        //    return res;
-        //}
-
-        public static (string key1, string key2, string value)? ExtractDoubleMap(string className)
-        {
-            string pattern = @"Key1\s*=\s*([^\/]+)\s*\/\s*Key1Hasher\s*=\s*([^\/]+)\s*\/\s*Key2\s*=\s*([^\/]+)\s*\/\s*Key2Hasher\s*=\s*([^\/]+)\s*\/\s*Value\s*=\s*([^\]]+)";
-
-            Match match = Regex.Match(className, pattern);
-            if (match.Success)
-            {
-                string key1 = match.Groups[1].Value.Trim();
-                string key2 = match.Groups[3].Value.Trim();
-                string value = match.Groups[5].Value.Trim();
-                return (key1, key2, value);
-            }
-
-            return null;
-        }
-        public static (string key, string value)? ExtractMap(string className)
-        {
-            string pattern = @"Key\s*=\s*([^\/]+)\s*\/\s*Value\s*=\s*([^\]]+)";
-
-            Match match = Regex.Match(className, pattern);
-            if (match.Success)
-            {
-                string key = match.Groups[1].Value.Trim();
-                string value = match.Groups[2].Value.Trim();
-                return (key, value);
-            }
-
-            return null;
-        }
-
-        public static NodeBuilderTypePrimitive? ExtractPrimitive(NodeBuilderType node)
+        /// <summary>
+        /// Convert a primitive string to a NodeBuilderTypePrimitive
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        internal static NodeBuilderTypePrimitive? ExtractPrimitive(NodeBuilderType node)
         {
             object? res = null;
             if (Enum.TryParse(typeof(TypeDefPrimitive), node.Adapted, true, out res))
@@ -317,7 +198,13 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             return null;
         }
 
-        public static NodeBuilderType? ExtractGeneric(NodeBuilderType node)
+        /// <summary>
+        /// Convert a class name to a generic class
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        /// <exception cref="MetadataConversionException"></exception>
+        internal static NodeBuilderType? ExtractGeneric(NodeBuilderType node)
         {
             string pattern = @"([a-zA-Z:]*|)<(.*)>$";
             Match match = Regex.Match(node.Adapted, pattern);
@@ -387,9 +274,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 nbOpenBracket == 0 || (genericParameters.IndexOf('<') < genericParameters.IndexOf('>'));
         }
 
-        public static string[] GenericValueToIgnore = ["T"];
-
-        public static TypeDefEnum GetTypeDefFromString(string genericType)
+        private static TypeDefEnum GetTypeDefFromString(string genericType)
         {
             return genericType switch
             {
