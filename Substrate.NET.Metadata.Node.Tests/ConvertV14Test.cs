@@ -14,7 +14,7 @@ namespace Substrate.NET.Metadata.Node.Tests
     {
         private SubstrateClient _substrateClient;
 
-        [OneTimeSetUp]
+        [SetUp]
         public async Task SetupAsync()
         {
             _substrateClient = new SubstrateClient(new Uri("wss://polkadot-rpc.dwellir.com"), ChargeTransactionPayment.Default());
@@ -23,7 +23,7 @@ namespace Substrate.NET.Metadata.Node.Tests
             Assert.That(_substrateClient.IsConnected, Is.True);
         }
 
-        [OneTimeTearDown]
+        [TearDown]
         public void Teardown()
         {
             _substrateClient.Dispose();
@@ -34,7 +34,7 @@ namespace Substrate.NET.Metadata.Node.Tests
         [TestCase("0x49a695416fcf55487adf9b9f5808619cee6618bd285a0119a78db60c5a7f3e13", 11)]
         [TestCase("0xdab56553594fd489adc085d2f83f3dcb65f5de5b1878325d5547fcf72b6dd6b3", 11)]
         [TestCase("0xaff11447ba47e853bcadb73920c0780013e581a0286831eadce0e48bf1db9942", 11)]
-        [TestCase("0x4eba9b7a60fb063fbd8b9ceb8028c1c7b5a3cc2ea7b0ad703885ce580dee327c\r\n", 11)]
+        [TestCase("0x4eba9b7a60fb063fbd8b9ceb8028c1c7b5a3cc2ea7b0ad703885ce580dee327c", 11)]
         [TestCase("0x773e8d8c1fdcbc94d79bb2cdcaf2f7fca5ff869d34c50171fe50ac1640f3e05c", 11)]
         [TestCase("0x209d24943d81e5910bfb7a57c8a5c3037c4a434af7c486a536d4f96a2160c9f5", 11)]
         [TestCase("0x3eef3df8dd7eedfe6baaed544dcef9c36ee7a142035bd6ae3fd7fd2969ad5933", 11)]

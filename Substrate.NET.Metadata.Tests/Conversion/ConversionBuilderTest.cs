@@ -41,6 +41,7 @@ namespace Substrate.NET.Metadata.Conversion.Tests
         }
 
         [Test]
+        [TestCase("SignedSubmissionOf<T>", 504, 61)]
         [TestCase("BalanceOf<T>", 6, 1)]
         [TestCase("ProxyState<T::AccountId>", 6, 1)]
         [TestCase("SubmissionIndicesOf<T>", 502, 5)]

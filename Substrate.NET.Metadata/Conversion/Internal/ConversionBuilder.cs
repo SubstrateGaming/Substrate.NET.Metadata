@@ -62,6 +62,8 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         public List<ConversionElementState> ElementsState { get; init; }
         public string CurrentPallet { get; set; } = string.Empty;
         public uint? UnknowIndex { get; set; } = null;
+        public uint? PolkadotRuntimeEventIndex { get; private set; } = null;
+
         public const int START_INDEX = 1_000;
 
         public ConversionBuilder(List<PortableType> portableTypes)
@@ -96,6 +98,9 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             "ProxyState<T::AccountId>", // V11 => Democracy => v1 => Storage => Proxy
             "NewBidder<AccountId>", // V11 => Slots => v1 => Events => WonDeploy
             "Bidder<T::AccountId>", // V11 => Slots => v1 => Storage => ReservedAmounts
+            "Vec<DownwardMessage<T::AccountId>>", // V11 => Parachains => v14 => Storage => DownwardMessageQueue
+            "AccountValidity", // V11 => Purchase => v16 => Event => ValidityUpdated // https://docs.rs/crate/polkadot-runtime-common/latest/source/src/purchase.rs
+            "AccountStatus<BalanceOf<T>>", // V11 => Purchase => v16 => Storage => Accounts // https://docs.rs/crate/polkadot-runtime-common/latest/source/src/purchase.rs
         };
 
         public U32 GetNewIndex()
@@ -613,17 +618,19 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             return res;
         }
 
-        public uint GetStorageEventIndex() => SearchV14.HardIndexBinding("Vec<EventRecord<T::Event, T::Hash>>").Value;
-
-        public void ClearEventBlockchainRuntimeEvent()
+        public void CreateEventBlockchainRuntimeEvent()
         {
-            var portableType = LoopFromV14(SearchV14.PolkadotRuntimeEventIndex);
-            var tdv = portableType.Ty.TypeDef.Value2 as TypeDefVariant;
-            tdv.TypeParam = new BaseVec<Variant>(new Variant[0]);
+            //var portableType = SearchV14.FindTypeByIndex(SearchV14.PolkadotRuntimeEventIndex);
+            var node = new TypeDefVariant();
+            node.TypeParam = new BaseVec<Variant>(new Variant[0]);
+
+            var eventsPortableType = CreatePortableTypeFromNode(node, ["polkadot_runtime", "Event"], null);
+
+            PolkadotRuntimeEventIndex = eventsPortableType.Id.Value;
         }
         public void AddPalletEventBlockchainRuntimeEvent(Variant variant)
         {
-            var portableType = LoopFromV14(SearchV14.PolkadotRuntimeEventIndex);
+            var portableType = LoopFromV14((int)PolkadotRuntimeEventIndex!);
 
             var tdv = portableType.Ty.TypeDef.Value2 as TypeDefVariant;
 
@@ -698,6 +705,12 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             {
                 portableType.Ty.TypeDef = new TypeDefExt();
                 portableType.Ty.TypeDef.Create(TypeDefEnum.Array, tda);
+            }
+
+            if (node is TypeDefVariant tdv)
+            {
+                portableType.Ty.TypeDef = new TypeDefExt();
+                portableType.Ty.TypeDef.Create(TypeDefEnum.Variant, tdv);
             }
 
             PortableTypes.Add(portableType);

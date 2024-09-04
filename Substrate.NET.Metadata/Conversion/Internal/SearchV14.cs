@@ -88,6 +88,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 "Approvals" => "[u8;4]",
                 "TransactionPriority" => "U64",
                 "SubmissionIndicesOf" => "Vec<([U128;3],U32)>",
+                "SignedSubmissionOf" => "SignedSubmission",
                 _ => type
             };
         }
