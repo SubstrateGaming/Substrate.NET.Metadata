@@ -11,7 +11,7 @@
 //using Substrate.NET.Metadata.V9;
 //using Substrate.NET.Metadata.V10;
 //using Substrate.NET.Metadata.Base;
-//using Substrate.NetApi.Model.Types.Metadata.V14;
+//using Substrate.NetApi.Model.Types.Metadata.Base;
 
 //namespace Substrate.NET.Metadata.Common
 //{

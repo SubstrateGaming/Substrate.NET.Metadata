@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 using Substrate.NetApi;
 using Substrate.NetApi.Model.Types;
 using Substrate.NetApi.Model.Types.Base;
-using Substrate.NetApi.Model.Types.Metadata.V14;
+using Substrate.NetApi.Model.Types.Metadata.Base;
 using Substrate.NetApi.Model.Types.Primitive;
 
 namespace Substrate.NET.Metadata.Base
@@ -110,6 +110,13 @@ namespace Substrate.NET.Metadata.Base
         }
 
         public BaseVec<Field> Fields { get; internal set; }
+
+        public NetApi.Model.Types.Metadata.Base.TypeDefComposite ToNetApi()
+        {
+            var result = new Substrate.NetApi.Model.Types.Metadata.Base.TypeDefComposite();
+            result.Create(Encode());
+            return result;
+        }
     }
 
     public class TypeDefVariant : BaseType
@@ -134,6 +141,13 @@ namespace Substrate.NET.Metadata.Base
         }
 
         public BaseVec<Variant> TypeParam { get; internal set; }
+
+        public NetApi.Model.Types.Metadata.Base.TypeDefVariant ToNetApi()
+        {
+            var result = new Substrate.NetApi.Model.Types.Metadata.Base.TypeDefVariant();
+            result.Create(Encode());
+            return result;
+        }
     }
 
     public class TypeDefSequence : BaseType, IMetadataType
@@ -158,6 +172,13 @@ namespace Substrate.NET.Metadata.Base
         }
 
         public TType ElemType { get; internal set; }
+
+        public NetApi.Model.Types.Metadata.Base.TypeDefSequence ToNetApi()
+        {
+            var result = new Substrate.NetApi.Model.Types.Metadata.Base.TypeDefSequence();
+            result.Create(Encode());
+            return result;
+        }
     }
 
     public class TypeDefArray : BaseType, IMetadataType
@@ -187,6 +208,13 @@ namespace Substrate.NET.Metadata.Base
 
         public U32 Len { get; internal set; } = default!;
         public TType ElemType { get; internal set; } = default!;
+
+        public NetApi.Model.Types.Metadata.Base.TypeDefArray ToNetApi()
+        {
+            var result = new Substrate.NetApi.Model.Types.Metadata.Base.TypeDefArray();
+            result.Create(Encode());
+            return result;
+        }
     }
 
     public class TypeDefTuple : BaseType
@@ -211,6 +239,13 @@ namespace Substrate.NET.Metadata.Base
         }
 
         public BaseVec<TType> Fields { get; internal set; }
+
+        public NetApi.Model.Types.Metadata.Base.TypeDefTuple ToNetApi()
+        {
+            var result = new Substrate.NetApi.Model.Types.Metadata.Base.TypeDefTuple();
+            result.Create(Encode());
+            return result;
+        }
     }
 
     public enum TypeDefPrimitive
@@ -283,6 +318,13 @@ namespace Substrate.NET.Metadata.Base
         }
 
         public TType ElemType { get; private set; }
+
+        public NetApi.Model.Types.Metadata.Base.TypeDefCompact ToNetApi()
+        {
+            var result = new Substrate.NetApi.Model.Types.Metadata.Base.TypeDefCompact();
+            result.Create(Encode());
+            return result;
+        }
     }
 
     public class TypeDefBitSequence : BaseType
@@ -312,5 +354,12 @@ namespace Substrate.NET.Metadata.Base
 
         public TType BitStoreType { get; private set; }
         public TType BitOrderType { get; private set; }
+
+        public NetApi.Model.Types.Metadata.Base.TypeDefBitSequence ToNetApi()
+        {
+            var result = new Substrate.NetApi.Model.Types.Metadata.Base.TypeDefBitSequence();
+            result.Create(Encode());
+            return result;
+        }
     }
 }

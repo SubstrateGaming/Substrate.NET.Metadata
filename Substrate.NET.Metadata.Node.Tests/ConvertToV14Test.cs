@@ -14,22 +14,24 @@ namespace Substrate.NET.Metadata.Node.Tests
     {
         private SubstrateClient _substrateClient;
 
-        [SetUp]
+        [OneTimeSetUp]
         public async Task SetupAsync()
         {
-            _substrateClient = new SubstrateClient(new Uri("wss://polkadot-rpc.dwellir.com"), ChargeTransactionPayment.Default());
+            //_substrateClient = new SubstrateClient(new Uri("wss://polkadot-rpc.dwellir.com"), ChargeTransactionPayment.Default());
+            _substrateClient = new SubstrateClient(new Uri("wss://polkadot.api.onfinality.io/public-ws"), ChargeTransactionPayment.Default());
 
             await _substrateClient.ConnectAsync();
             Assert.That(_substrateClient.IsConnected, Is.True);
         }
 
-        [TearDown]
+        [OneTimeTearDown]
         public void Teardown()
         {
             _substrateClient.Dispose();
         }
 
         [Test]
+        [TestCase("0xc0096358534ec8d21d01d34b836eed476a1c343f8724fa2153dc0725ad797a90", 11)]
         [TestCase("0xa15bf122d7a9b2cd07956c3af8f7eda61298aff0a3bd1193018df413d982a4ef", 11)]
         [TestCase("0x49a695416fcf55487adf9b9f5808619cee6618bd285a0119a78db60c5a7f3e13", 11)]
         [TestCase("0xdab56553594fd489adc085d2f83f3dcb65f5de5b1878325d5547fcf72b6dd6b3", 11)]
@@ -59,7 +61,7 @@ namespace Substrate.NET.Metadata.Node.Tests
         [TestCase("0x8192df1609d4478d1c1fcf5d39975596a8162d42d745c141c22148b0931708f2", 13)]
         public async Task ConvertMetadataToV14_ShouldSucceedAsync(string blockHash, int version)
         {
-            var metadataHex = await _substrateClient.State.GetMetaDataAtAsync(Utils.HexToByteArray(blockHash), CancellationToken.None);
+            var metadataHex = await _substrateClient.State.GetMetaDataAsync(Utils.HexToByteArray(blockHash), CancellationToken.None);
 
             IMetadataToV14 metadata = version switch
             {
@@ -74,6 +76,11 @@ namespace Substrate.NET.Metadata.Node.Tests
             var v14 = metadata.ToMetadataV14();
 
             Assert.That(v14, Is.Not.Null);
+
+            // Now let's convert to NetApi classes (ok this should be done in another UT)
+            var v14NetApi = v14.ToNetApiMetadata();
+
+            Assert.That(v14NetApi, Is.Not.Null);
         }
     }
 }

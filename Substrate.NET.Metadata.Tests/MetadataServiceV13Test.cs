@@ -30,19 +30,19 @@ namespace Substrate.NET.Metadata.Tests
             var changedModules = res.ChangedModules.ToList();
 
             Assert.That(changedModules[0].ModuleName, Is.EqualTo("Authorship"));
-            Assert.IsTrue(changedModules[0].HasConstantAdded("UncleGenerations"));
+            Assert.That(changedModules[0].HasConstantAdded("UncleGenerations"));
 
             Assert.That(changedModules[1].ModuleName, Is.EqualTo("Balances"));
-            Assert.IsTrue(changedModules[1].HasConstantAdded("MaxLocks"));
-            Assert.IsTrue(changedModules[1].HasConstantAdded("MaxReserves"));
+            Assert.That(changedModules[1].HasConstantAdded("MaxLocks"));
+            Assert.That(changedModules[1].HasConstantAdded("MaxReserves"));
 
             Assert.That(changedModules[2].ModuleName, Is.EqualTo("Democracy"));
             Assert.That(changedModules[2].Constants.Count(), Is.EqualTo(2));
-            Assert.IsTrue(changedModules[2].HasConstantAdded("InstantAllowed"));
-            Assert.IsTrue(changedModules[2].HasConstantAdded("MaxProposals"));
+            Assert.That(changedModules[2].HasConstantAdded("InstantAllowed"));
+            Assert.That(changedModules[2].HasConstantAdded("MaxProposals"));
             Assert.That(changedModules[2].Errors.Count(), Is.EqualTo(5));
-            Assert.IsFalse(changedModules[2].HasErrorAdded("test"));
-            Assert.IsFalse(changedModules[2].HasErrorRemoved("test2"));
+            Assert.That(changedModules[2].HasErrorAdded("test"), Is.False);
+            Assert.That(changedModules[2].HasErrorRemoved("test2"), Is.False);
         }
 
         [Test]
@@ -51,8 +51,8 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V13\\MetadataV13_9080");
             var metadataDestination = readMetadataFromFile("V13\\MetadataV13_9090");
 
-            Assert.IsTrue(_metadataService.HasPalletChangedVersionBetween("Balances", metadataSource, metadataDestination));
-            Assert.IsFalse(_metadataService.HasPalletChangedVersionBetween("Babe", metadataSource, metadataDestination));
+            Assert.That(_metadataService.HasPalletChangedVersionBetween("Balances", metadataSource, metadataDestination));
+            Assert.That(_metadataService.HasPalletChangedVersionBetween("Babe", metadataSource, metadataDestination), Is.False);
         }
     }
 }

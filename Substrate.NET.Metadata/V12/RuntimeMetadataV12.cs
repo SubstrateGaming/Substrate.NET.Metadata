@@ -41,7 +41,7 @@ namespace Substrate.NET.Metadata.V12
         {
             var conversion = new ConversionBuilder(new List<PortableType>());
 
-            conversion.CreateUnknownNode();
+            conversion.CreateUnknownType();
             conversion.CreateEventBlockchainRuntimeEvent();
 
             var res = new RuntimeMetadataV14();

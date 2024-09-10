@@ -34,16 +34,11 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             }
         }
 
-        /// <summary>
-        /// The hard coded Polkadot event runtime index in the V14 Types dictionary
-        /// </summary>
-        public const int PolkadotRuntimeEventIndex = 20;
-
         public static uint? HardIndexBinding(string type)
         {
             return type switch
             {
-                "Vec<EventRecord<T::Event, T::Hash>>" => 18,
+                //"Vec<EventRecord<T::Event, T::Hash>>" => 18,
                 "TaskAddress<BlockNumber>" => 29,
                 "TaskAddress<T::BlockNumber>" => 29,
                 _ => null
@@ -88,9 +83,16 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 "TransactionPriority" => "U64",
                 "SubmissionIndicesOf" => "Vec<([U128;3],U32)>",
                 "SignedSubmissionOf" => "SignedSubmission",
+                "EventRecord" => "EventRecord",
                 _ => type
             };
         }
+
+        //public static bool HasOverride(int index, ConversionBuilder conversionBuilder)
+        //{
+        //    var pt = FindTypeByIndex(index);
+
+        //}
 
         public static PortableType FindTypeByIndex(int index)
         {
@@ -100,8 +102,11 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         public static (int index, SearchResult searchResult) SearchIndexByNode(NodeBuilderType node, ConversionBuilder conversionBuilder)
         {
             var potentialIndex = FindIndexByClass(node.Adapted);
+
             if (potentialIndex != null)
             {
+                //var b = HasOverride(potentialIndex!.Value, conversionBuilder);
+
                 node.Index = potentialIndex.Value;
                 return (potentialIndex.Value, SearchResult.Founded);
             }

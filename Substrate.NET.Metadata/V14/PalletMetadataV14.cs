@@ -134,6 +134,13 @@ namespace Substrate.NET.Metadata.V14
         public BaseVec<BaseEnum<Hasher>> Hashers { get; internal set; } = default!;
         public TType Key { get; internal set; } = default!;
         public TType Value { get; internal set; } = default!;
+
+        public NetApi.Model.Types.Metadata.Base.StorageEntryTypeMap ToStorageEntryTypeMap()
+        {
+            var res = new NetApi.Model.Types.Metadata.Base.StorageEntryTypeMap();
+            res.Create(Encode());
+            return res;
+        }
     }
 
     public class PalletCallMetadataV14 : BaseType, IMetadataName, IMetadataType
@@ -218,6 +225,14 @@ namespace Substrate.NET.Metadata.V14
         public TType ConstantType { get; internal set; } = default!;
         public ByteGetter ConstantValue { get; internal set; } = default!;
         public BaseVec<Str> Documentation { get; internal set; } = default!;
+
+        public NetApi.Model.Types.Metadata.V14.PalletConstantMetadata ToPalletConstantNetApi()
+        {
+            var res = new NetApi.Model.Types.Metadata.V14.PalletConstantMetadata();
+            res.Create(Encode());
+
+            return res;
+        }
     }
 
     public class PalletErrorMetadataV14 : BaseType, IMetadataName, IMetadataType

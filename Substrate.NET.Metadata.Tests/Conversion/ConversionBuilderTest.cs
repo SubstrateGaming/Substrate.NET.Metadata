@@ -41,20 +41,32 @@ namespace Substrate.NET.Metadata.Conversion.Tests
         }
 
         [Test]
+        [TestCase("Vec<EventRecord<T::Event, T::Hash>>", "System")]
+        public void GetSystemEvent_WhenOverrided_ShouldReturnOverride(string rustType, string palletContext = "")
+        {
+            _builder.CurrentPallet = palletContext;
+            _builder.CreateEventBlockchainRuntimeEvent();
+            //_builder.AddEventRuntimeLookup(palletContext, new Variant[0]);
+            var res = _builder.BuildPortableTypes(rustType);
+
+            Assert.That(res.Value, Is.EqualTo(18), "Index are not equals");
+        }
+
+        [Test]
         [TestCase("TaskAddress<BlockNumber>", 29, 2)]
         [TestCase("SignedSubmissionOf<T>", 504, 61)]
         [TestCase("BalanceOf<T>", 6, 1)]
         [TestCase("SubmissionIndicesOf<T>", 502, 5)]
-        [TestCase("[BalanceOf<T>; 4]", 1000, 1)]
+        [TestCase("[BalanceOf<T>; 4]", 1000, 2)]
         [TestCase("Approvals", 14, 2)]
-        [TestCase("(Vec<ProxyDefinition<T::AccountId, T::ProxyType, T::BlockNumber>>,\n BalanceOf<T>)", 1000, 1)]
+        [TestCase("(Vec<ProxyDefinition<T::AccountId, T::ProxyType, T::BlockNumber>>,\n BalanceOf<T>)", 1000, 9)]
         [TestCase("&[u8]", 10, 2, "Claims")]
-        [TestCase("Vec<Vec<(ParaId, CollatorId)>>", 1000, 1)]
-        [TestCase("Vec<BalanceOf<T>>", 1000, 1)]
+        [TestCase("Vec<Vec<(ParaId, CollatorId)>>", 1000, 5)]
+        [TestCase("Vec<BalanceOf<T>>", 1000, 2)]
         [TestCase("LeasePeriod", 4, 1)]
         [TestCase("LockIdentifier", 125, 2)]
-        [TestCase("(T::BlockNumber, Hash)", 1000, 1)]
-        [TestCase("(BalanceOf<T>, Vec<T::AccountId>)", 1000, 1)]
+        [TestCase("(T::BlockNumber, Hash)", 1000, 5)]
+        [TestCase("(BalanceOf<T>, Vec<T::AccountId>)", 1000, 6)]
         [TestCase("AuthorityId", 46, 4, "ImOnline")]
         [TestCase("AuthorityId", 137, 4, "Babe")]
         [TestCase("Vec<(AuthorityId, BabeAuthorityWeight)>", 367, 7, "Babe")]
@@ -82,7 +94,7 @@ namespace Substrate.NET.Metadata.Conversion.Tests
         [TestCase("T::AccountId", 0, 3)]
         [TestCase("Vec<AccountId>", 55, 4)]
         //[TestCase("Vec<DeferredOffenceOf<T>>", 22, 4)]
-        public void GetIndex_FromComposite_ShouldSucceed(string rustType, int indexExpected, int lengthExpected, string palletContext = "")
+        public void GetIndex_FromRustClass_ShouldSucceed(string rustType, int indexExpected, int lengthExpected, string palletContext = "")
         {
             _builder.CurrentPallet = palletContext;
             var res = _builder.BuildPortableTypes(rustType);

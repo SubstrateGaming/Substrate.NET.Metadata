@@ -221,18 +221,20 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
                 var typeDef = GetTypeDefFromString(match.Groups[1].Value);
 
+                var binding = SearchV14.HardBinding(match.Groups[1].Value, node.PalletContext);
+                var hasBeenHardBinded = binding != match.Groups[1].Value;
+
                 NodeBuilderType result = typeDef switch
                 {
                     TypeDefEnum.Sequence => new NodeBuilderTypeSequence(node.Adapted, node.Raw, node.PalletContext),
                     TypeDefEnum.Variant when match.Groups[1].Value == "Option" => new NodeBuilderTypeOption(node.Adapted, node.Raw, node.PalletContext),
                     TypeDefEnum.Variant => new NodeBuilderTypeVariant(node.Adapted, node.Raw, node.PalletContext),
-                    TypeDefEnum.Composite => new NodeBuilderTypeComposite(
-                        SearchV14.HardBinding(match.Groups[1].Value, node.PalletContext),
-                        node.Adapted, node.PalletContext),
+                    TypeDefEnum.Composite => new NodeBuilderTypeComposite(binding, node.Adapted, node.PalletContext),
                     _ => throw new MetadataConversionException($"TypeDef {typeDef} is not handled")
                 };
 
-                if (result is NodeBuilderTypeComposite c && c.Raw != c.Adapted)
+                    //if (result is NodeBuilderTypeComposite c && c.Raw != c.Adapted)
+                if (result is NodeBuilderTypeComposite c && hasBeenHardBinded)
                 {
                     return Build(new NodeBuilderTypeUndefined(c.Adapted, c.Raw, c.PalletContext));
                 }

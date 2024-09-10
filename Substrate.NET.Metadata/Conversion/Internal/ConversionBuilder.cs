@@ -1,8 +1,10 @@
 ﻿using Substrate.NET.Metadata.Base;
 using Substrate.NET.Metadata.Base.Portable;
 using Substrate.NET.Metadata.V14;
+using Substrate.NetApi;
 using Substrate.NetApi.Model.Types.Base;
 using Substrate.NetApi.Model.Types.Primitive;
+using System;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using static Substrate.NET.Metadata.Conversion.Internal.SearchV14;
@@ -75,6 +77,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
     {
         public List<PortableType> PortableTypes { get; init; }
         public List<ConversionElementState> ElementsState { get; init; }
+        public IDictionary<int, int> OverrideTypeMapping { get; init; }
         public string CurrentPallet { get; set; } = string.Empty;
         public uint? UnknowIndex { get; set; } = null;
         public uint? PolkadotRuntimeEventIndex { get; private set; } = null;
@@ -85,6 +88,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         {
             PortableTypes = portableTypes;
             ElementsState = new List<ConversionElementState>();
+            OverrideTypeMapping = new Dictionary<int, int>();
         }
 
         /// <summary>
@@ -174,6 +178,21 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             return (LoopFromV14(index.index), index.searchResult);
         }
 
+        /// <summary>
+        /// Check if the index has been override. If true return the override index, otherwise return self
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        private int GetIndexOrMapped(int index)
+        {
+            if(OverrideTypeMapping.TryGetValue(index, out var newIndex))
+            {
+                return newIndex;
+            }
+
+            return index;
+        }
+
         public PortableType LoopFromV14(int index)
         {
             var alreadyInserted = PortableTypes.SingleOrDefault(x => x.Id.Value == index);
@@ -189,11 +208,14 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
                     foreach (var field in composite.Fields.Value)
                     {
+                        field.FieldTy.Value = GetIndexOrMapped(field.FieldTy.Value);
                         _ = LoopFromV14(field.FieldTy.Value);
                     }
                     break;
                 case TypeDefEnum.Array:
                     var array = (TypeDefArray)portableType.Ty.TypeDef.Value2;
+
+                    array.ElemType.Value = GetIndexOrMapped(array.ElemType.Value);
                     _ = LoopFromV14(array.ElemType.Value);
                     break;
                 case TypeDefEnum.Variant:
@@ -202,28 +224,38 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                     {
                         foreach (var field in variant.VariantFields.Value)
                         {
+                            field.FieldTy.Value = GetIndexOrMapped(field.FieldTy.Value);
                             _ = LoopFromV14(field.FieldTy.Value);
                         }
                     }
                     break;
                 case TypeDefEnum.Sequence:
                     var sequence = (TypeDefSequence)portableType.Ty.TypeDef.Value2;
+
+                    sequence.ElemType.Value = GetIndexOrMapped(sequence.ElemType.Value);
                     _ = LoopFromV14(sequence.ElemType.Value);
                     break;
                 case TypeDefEnum.Tuple:
                     var tuple = (TypeDefTuple)portableType.Ty.TypeDef.Value2;
                     foreach (var field in tuple.Fields.Value)
                     {
+                        field.Value = GetIndexOrMapped(field.Value);
                         _ = LoopFromV14(field.Value);
                     }
                     break;
                 case TypeDefEnum.Primitive: break;
                 case TypeDefEnum.Compact:
                     var compact = (TypeDefCompact)portableType.Ty.TypeDef.Value2;
+
+                    compact.ElemType.Value = GetIndexOrMapped(compact.ElemType.Value);
                     _ = LoopFromV14(compact.ElemType.Value);
                     break;
                 case TypeDefEnum.BitSequence:
                     var bitSequence = (TypeDefBitSequence)portableType.Ty.TypeDef.Value2;
+
+                    bitSequence.BitOrderType.Value = GetIndexOrMapped(bitSequence.BitOrderType.Value);
+                    bitSequence.BitStoreType.Value = GetIndexOrMapped(bitSequence.BitStoreType.Value);
+
                     _ = LoopFromV14(bitSequence.BitOrderType.Value);
                     _ = LoopFromV14(bitSequence.BitStoreType.Value);
                     break;
@@ -263,7 +295,14 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         private U32 AddRuntimeLookup(string objType, string palletName, Variant[] variants)
         {
             var path = new Base.Portable.Path();
-            path.Create(new List<string>() { palletName, "pallet", objType }.Select(x => new Str(x)).ToArray());
+
+            var palletNameCasted = palletName.ToLower() switch
+            {
+                "system" => "frame_system",
+                _ => "pallet_" + palletName.ToLower()
+            };
+
+            path.Create(new List<string>() { palletNameCasted, "pallet", objType }.Select(x => new Str(x)).ToArray());
 
             var typeParams = new BaseVec<TypeParameter>([
                 new TypeParameter(new Str("T"), new BaseOpt<TType>())
@@ -304,7 +343,11 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             var eventsPortableType = CreatePortableTypeFromNode(node, ["polkadot_runtime", "Event"], null);
 
             PolkadotRuntimeEventIndex = eventsPortableType.Id.Value;
+
+            // Keep track of the override
+            OverrideTypeMapping.Add(FindIndexByClass("polkadot_runtime::Event")!.Value, (int)PolkadotRuntimeEventIndex.Value);
         }
+
         public void AddPalletEventBlockchainRuntimeEvent(Variant variant)
         {
             var portableType = LoopFromV14((int)PolkadotRuntimeEventIndex!);
@@ -326,12 +369,12 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         /// Composite class use for undefined mapping
         /// </summary>
         /// <returns></returns>
-        public PortableType CreateUnknownNode()
+        public PortableType CreateUnknownType()
         {
-            var unknownNode = new TypeDefComposite();
-            unknownNode.Fields = new BaseVec<Field>(new Field[0]);
+            var unknownType = new TypeDefComposite();
+            unknownType.Fields = new BaseVec<Field>([]);
 
-            var pt = CreatePortableTypeFromNode(unknownNode);
+            var pt = CreatePortableTypeFromNode(unknownType, ["unknownType"]);
             UnknowIndex = pt.Id.Value;
 
             return pt;
@@ -339,7 +382,6 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
         public PortableType CreatePortableTypeFromNode(BaseType node, List<string>? path = null, List<string>? docs = null)
         {
-
             var portableType = new PortableType();
 
             portableType.Id = GetNewIndex();
@@ -367,30 +409,48 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             {
                 portableType.Ty.TypeDef = new TypeDefExt();
                 portableType.Ty.TypeDef.Create(TypeDefEnum.Tuple, tdt);
-            }
 
-            if (node is TypeDefComposite tdc)
+                // Loop through the fields to add them to lookup. WARNING : Call LoopFromV14 could lead to an error if one of the children is not present in V14 (never happened until now, but could be possible I think)
+                foreach(var field in tdt.Fields.Value)
+                {
+                    LoopFromV14((int)field.Value);
+                }
+                
+            }
+            else if (node is TypeDefComposite tdc)
             {
                 portableType.Ty.TypeDef = new TypeDefExt();
                 portableType.Ty.TypeDef.Create(TypeDefEnum.Composite, tdc);
-            }
 
-            if (node is TypeDefSequence tds)
+                // Loop through the fields to add them to lookup. WARNING : Call LoopFromV14 could lead to an error if one of the children is not present in V14 (never happened until now, but could be possible I think)
+                foreach (var field in tdc.Fields.Value)
+                {
+                    LoopFromV14((int)field.FieldTy.Value);
+                }
+            } 
+            else if (node is TypeDefSequence tds)
             {
                 portableType.Ty.TypeDef = new TypeDefExt();
                 portableType.Ty.TypeDef.Create(TypeDefEnum.Sequence, tds);
-            }
 
-            if (node is TypeDefArray tda)
+                LoopFromV14((int)tds.ElemType.Value);
+            } 
+            else if (node is TypeDefArray tda)
             {
                 portableType.Ty.TypeDef = new TypeDefExt();
                 portableType.Ty.TypeDef.Create(TypeDefEnum.Array, tda);
-            }
 
-            if (node is TypeDefVariant tdv)
+                LoopFromV14((int)tda.ElemType.Value);
+            } 
+            else if (node is TypeDefVariant tdv)
             {
                 portableType.Ty.TypeDef = new TypeDefExt();
                 portableType.Ty.TypeDef.Create(TypeDefEnum.Variant, tdv);
+
+                foreach (var variant in tdv.TypeParam.Value.SelectMany(x => x.VariantFields.Value))
+                {
+                    LoopFromV14((int)variant.ElemType.Value);
+                }
             }
 
             PortableTypes.Add(portableType);
