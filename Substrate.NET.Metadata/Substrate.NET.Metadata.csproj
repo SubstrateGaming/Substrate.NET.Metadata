@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses" Version="4.6.0" />
-    <PackageReference Include="Substrate.NET.API" Version="0.9.24-rc3" />
+    <PackageReference Include="Substrate.NET.API" Version="0.9.24-rc5" />
 
     <None Include="../README.md" Pack="true" PackagePath="\" />
     <None Include="../LICENSE" Pack="true" PackagePath="\" />
