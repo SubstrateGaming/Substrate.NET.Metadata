@@ -7,12 +7,5 @@ namespace Substrate.NET.Metadata.Tests
 {
     public class MetadataServiceV15Test : MetadataBaseTest
     {
-        private MetadataService _metadataService;
-
-        [SetUp]
-        public void Setup()
-        {
-            _metadataService = new MetadataService();
-        }
     }
 }

@@ -6,23 +6,15 @@ namespace Substrate.NET.Metadata.Tests
 {
     public class MetadataServiceV11Test : MetadataBaseTest
     {
-        private MetadataService _metadataService;
-
-        [SetUp]
-        public void Setup()
-        {
-            _metadataService = new MetadataService();
-        }
-
         [Test]
         public void MetadataV11_SpecVersionCompare_V0_And_V1_ShouldSucceed()
         {
             var metadataSource = readMetadataFromFile("V11\\MetadataV11_0");
             var metadataDestination = readMetadataFromFile("V11\\MetadataV11_1");
 
-            Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V11));
+            Assert.That(MetadataUtils.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V11));
 
-            var res = _metadataService.MetadataCompareV11(
+            var res = MetadataUtils.MetadataCompareV11(
                 new MetadataV11(metadataSource),
                 new MetadataV11(metadataDestination));
 
@@ -51,9 +43,9 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V11\\MetadataV11_6");
             var metadataDestination = readMetadataFromFile("V11\\MetadataV11_7");
 
-            Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V11));
+            Assert.That(MetadataUtils.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V11));
 
-            var res = _metadataService.MetadataCompareV11(
+            var res = MetadataUtils.MetadataCompareV11(
                 new MetadataV11(metadataSource),
                 new MetadataV11(metadataDestination));
 
@@ -81,9 +73,9 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V11\\MetadataV11_23");
             var metadataDestination = readMetadataFromFile("V11\\MetadataV11_24");
 
-            Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V11));
+            Assert.That(MetadataUtils.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V11));
 
-            var res = _metadataService.MetadataCompareV11(
+            var res = MetadataUtils.MetadataCompareV11(
                 new MetadataV11(metadataSource),
                 new MetadataV11(metadataDestination));
 
@@ -133,10 +125,10 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V11\\MetadataV11_23");
             var metadataDestination = readMetadataFromFile("V11\\MetadataV11_24");
 
-            Assert.That(_metadataService.HasPalletChangedVersionBetween("Multisig", metadataSource, metadataDestination));
+            Assert.That(MetadataUtils.HasPalletChangedVersionBetween("Multisig", metadataSource, metadataDestination));
 
             // Purschase has been removed, but does not count as changed
-            Assert.That(_metadataService.HasPalletChangedVersionBetween("Purchase", metadataSource, metadataDestination), Is.False);
+            Assert.That(MetadataUtils.HasPalletChangedVersionBetween("Purchase", metadataSource, metadataDestination), Is.False);
         }
 
         [Test]

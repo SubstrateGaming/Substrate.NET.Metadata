@@ -6,23 +6,15 @@ namespace Substrate.NET.Metadata.Tests
 {
     public class MetadataServiceV14Test : MetadataBaseTest
     {
-        private MetadataService _metadataService;
-
-        [SetUp]
-        public void Setup()
-        {
-            _metadataService = new MetadataService();
-        }
-
         [Test]
         public void MetadataV14_SpecVersionCompare_V9110_And_V9122_ShouldSucceed()
         {
             var metadataSource = readMetadataFromFile("V14\\MetadataV14_9110");
             var metadataDestination = readMetadataFromFile("V14\\MetadataV14_9122");
 
-            Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V14));
+            Assert.That(MetadataUtils.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V14));
 
-            var res = _metadataService.MetadataCompareV14(
+            var res = MetadataUtils.MetadataCompareV14(
                 new MetadataV14(metadataSource),
                 new MetadataV14(metadataDestination));
 
@@ -35,9 +27,9 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V14\\MetadataV14_9420");
             var metadataDestination = readMetadataFromFile("V14\\MetadataV14_9430");
 
-            Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V14));
+            Assert.That(MetadataUtils.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V14));
 
-            var res = _metadataService.MetadataCompareV14(
+            var res = MetadataUtils.MetadataCompareV14(
                 new MetadataV14(metadataSource),
                 new MetadataV14(metadataDestination));
 
@@ -50,9 +42,9 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V14\\MetadataV14_9370");
             var metadataDestination = readMetadataFromFile("V14\\MetadataV14_9420");
 
-            Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V14));
+            Assert.That(MetadataUtils.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V14));
 
-            var res = _metadataService.MetadataCompareV14(
+            var res = MetadataUtils.MetadataCompareV14(
                 new MetadataV14(metadataSource),
                 new MetadataV14(metadataDestination));
 
@@ -87,9 +79,9 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V14\\MetadataV14_9270");
             var metadataDestination = readMetadataFromFile("V14\\MetadataV14_9280");
 
-            Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V14));
+            Assert.That(MetadataUtils.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V14));
 
-            var res = _metadataService.MetadataCompareV14(
+            var res = MetadataUtils.MetadataCompareV14(
                 new MetadataV14(metadataSource),
                 new MetadataV14(metadataDestination));
 
@@ -105,9 +97,9 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V14\\MetadataV14_9270");
             var metadataDestination = readMetadataFromFile("V14\\MetadataV14_9280");
 
-            Assert.That(_metadataService.HasPalletChangedVersionBetween("Auctions", metadataSource, metadataDestination));
+            Assert.That(MetadataUtils.HasPalletChangedVersionBetween("Auctions", metadataSource, metadataDestination));
 
-            Assert.That(_metadataService.HasPalletChangedVersionBetween("AuthorityDiscovery", metadataSource, metadataDestination), Is.False);
+            Assert.That(MetadataUtils.HasPalletChangedVersionBetween("AuthorityDiscovery", metadataSource, metadataDestination), Is.False);
         }
 
         [Test]

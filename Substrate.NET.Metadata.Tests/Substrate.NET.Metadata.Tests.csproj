@@ -20,7 +20,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Substrate.NET.API" Version="0.9.24-rc3" />
+    <PackageReference Include="Substrate.NET.API" Version="0.9.24-rc6" />
   </ItemGroup>
 
   <ItemGroup>

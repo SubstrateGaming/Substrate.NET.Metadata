@@ -6,23 +6,15 @@ namespace Substrate.NET.Metadata.Tests
 {
     public class MetadataServiceV13Test : MetadataBaseTest
     {
-        private MetadataService _metadataService;
-
-        [SetUp]
-        public void Setup()
-        {
-            _metadataService = new MetadataService();
-        }
-
         [Test]
         public void MetadataV13_SpecVersionCompare_V9080_And_V9090_ShouldSucceed()
         {
             var metadataSource = readMetadataFromFile("V13\\MetadataV13_9080");
             var metadataDestination = readMetadataFromFile("V13\\MetadataV13_9090");
 
-            Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V13));
+            Assert.That(MetadataUtils.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V13));
 
-            var res = _metadataService.MetadataCompareV13(
+            var res = MetadataUtils.MetadataCompareV13(
                 new MetadataV13(metadataSource),
                 new MetadataV13(metadataDestination));
 
@@ -51,8 +43,8 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V13\\MetadataV13_9080");
             var metadataDestination = readMetadataFromFile("V13\\MetadataV13_9090");
 
-            Assert.That(_metadataService.HasPalletChangedVersionBetween("Balances", metadataSource, metadataDestination));
-            Assert.That(_metadataService.HasPalletChangedVersionBetween("Babe", metadataSource, metadataDestination), Is.False);
+            Assert.That(MetadataUtils.HasPalletChangedVersionBetween("Balances", metadataSource, metadataDestination));
+            Assert.That(MetadataUtils.HasPalletChangedVersionBetween("Babe", metadataSource, metadataDestination), Is.False);
         }
     }
 }

@@ -17,7 +17,7 @@ using Substrate.NetApi.Model.Types.Primitive;
 
 namespace Substrate.NET.Metadata.Service
 {
-    public class MetadataService : IMetadataService
+    public class MetadataUtils
     {
         /// <summary>
         /// Get major version from metadata
@@ -25,7 +25,7 @@ namespace Substrate.NET.Metadata.Service
         /// <param name="hexMetadata"></param>
         /// <returns>The major version (V9 to v15)</returns>
         /// <exception cref="MetadataException"></exception>
-        public MetadataVersion GetMetadataVersion(string hexMetadata)
+        public static MetadataVersion GetMetadataVersion(string hexMetadata)
         {
             Guard.Against.NullOrEmpty(hexMetadata);
             CheckRuntimeMetadata checkVersion = new(hexMetadata);
@@ -50,7 +50,7 @@ namespace Substrate.NET.Metadata.Service
         /// <param name="hexMetadata2"></param>
         /// <returns></returns>
         /// <exception cref="MetadataException"></exception>
-        public MetadataVersion EnsureMetadataVersion(string hexMetadata1, string hexMetadata2)
+        public static MetadataVersion EnsureMetadataVersion(string hexMetadata1, string hexMetadata2)
         {
             // To be compared, Metadata should have same Major version
             var v1 = GetMetadataVersion(hexMetadata1);
@@ -62,7 +62,7 @@ namespace Substrate.NET.Metadata.Service
             return v1;
         }
 
-        public bool HasPalletChangedVersionBetween(string palletName, string hexMetadata1, string hexMetadata2)
+        public static bool HasPalletChangedVersionBetween(string palletName, string hexMetadata1, string hexMetadata2)
         {
             Guard.Against.NullOrEmpty(palletName);
 
@@ -90,7 +90,7 @@ namespace Substrate.NET.Metadata.Service
         /// <param name="source"></param>
         /// <param name="destination"></param>
         /// <returns></returns>
-        public IEnumerable<(CompareStatus, T)> CompareName<T>(
+        public static IEnumerable<(CompareStatus, T)> CompareName<T>(
             IEnumerable<T>? source,
             IEnumerable<T>? destination)
             where T : IMetadataName
@@ -103,7 +103,7 @@ namespace Substrate.NET.Metadata.Service
         /// <param name="source"></param>
         /// <param name="destination"></param>
         /// <returns></returns>
-        public IEnumerable<(CompareStatus, T)> CompareType<T>(
+        public static IEnumerable<(CompareStatus, T)> CompareType<T>(
             IEnumerable<T>? source,
             IEnumerable<T>? destination)
             where T : IMetadataType
@@ -115,7 +115,7 @@ namespace Substrate.NET.Metadata.Service
         /// <param name="source"></param>
         /// <param name="destination"></param>
         /// <returns></returns>
-        public IEnumerable<(CompareStatus, TType)> CompareType(
+        public static IEnumerable<(CompareStatus, TType)> CompareType(
             IEnumerable<TType>? source,
             IEnumerable<TType>? destination)
             => MetadataModuleCompare(source, destination, (x, y) => x.Value == y.Value);
@@ -128,7 +128,7 @@ namespace Substrate.NET.Metadata.Service
         /// <param name="uncommonModules"></param>
         /// <param name="status"></param>
         /// <returns></returns>
-        protected IEnumerable<T> FilterModuleByStatus<T>(IEnumerable<T> modulesStart, IEnumerable<(CompareStatus, T)> uncommonModules, CompareStatus status)
+        protected static IEnumerable<T> FilterModuleByStatus<T>(IEnumerable<T> modulesStart, IEnumerable<(CompareStatus, T)> uncommonModules, CompareStatus status)
             where T : IMetadataName, IType, new()
         {
             if (uncommonModules.Any())
@@ -151,7 +151,7 @@ namespace Substrate.NET.Metadata.Service
         /// <param name="destination"></param>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        private IEnumerable<(CompareStatus, T)> MetadataModuleCompare<T>(
+        private static IEnumerable<(CompareStatus, T)> MetadataModuleCompare<T>(
             IEnumerable<T>? source,
             IEnumerable<T>? destination,
             Func<T, T, bool> predicate)
@@ -178,7 +178,7 @@ namespace Substrate.NET.Metadata.Service
         /// <param name="source"></param>
         /// <param name="target"></param>
         /// <returns></returns>
-        private bool AreStringsEquals(BaseVec<Str> source, BaseVec<Str> target)
+        private static bool AreStringsEquals(BaseVec<Str> source, BaseVec<Str> target)
             => AreStringsEquals(source.Value, target.Value);
 
         /// <summary>
@@ -187,12 +187,12 @@ namespace Substrate.NET.Metadata.Service
         /// <param name="source"></param>
         /// <param name="target"></param>
         /// <returns></returns>
-        private bool AreStringsEquals(IEnumerable<Str> source, IEnumerable<Str> target)
+        private static bool AreStringsEquals(IEnumerable<Str> source, IEnumerable<Str> target)
         {
             return !source.Select(x => x.Value).Except(target.Select(x => x.Value)).Any();
         }
 
-        private IEnumerable<T> Sanitize<T>(BaseOpt<BaseVec<T>> elems)
+        private static IEnumerable<T> Sanitize<T>(BaseOpt<BaseVec<T>> elems)
             where T : IType, new()
         {
             if (elems == null || !elems.OptionFlag) return Enumerable.Empty<T>();
@@ -200,7 +200,7 @@ namespace Substrate.NET.Metadata.Service
             return elems.Value.Value;
         }
 
-        private IEnumerable<T> Sanitize<T>(BaseVec<T> elems)
+        private static IEnumerable<T> Sanitize<T>(BaseVec<T> elems)
             where T : IType, new()
         {
             if (elems == null) return Enumerable.Empty<T>();
@@ -210,7 +210,7 @@ namespace Substrate.NET.Metadata.Service
         #endregion
 
         #region Compare V9
-        public MetadataDiffV9 MetadataCompareV9(MetadataV9 m1, MetadataV9 m2)
+        public static MetadataDiffV9 MetadataCompareV9(MetadataV9 m1, MetadataV9 m2)
         {
             var resModulesDiff = new List<MetadataDifferentialModulesV9>();
 
@@ -242,7 +242,7 @@ namespace Substrate.NET.Metadata.Service
             };
         }
 
-        protected IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV9 storage))> CompareModuleStorageV9(
+        protected static IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV9 storage))> CompareModuleStorageV9(
             PalletStorageMetadataV9 source,
             PalletStorageMetadataV9 destination)
         {
@@ -260,7 +260,7 @@ namespace Substrate.NET.Metadata.Service
         #endregion
 
         #region Compare V10
-        public MetadataDiffV10 MetadataCompareV10(MetadataV10 m1, MetadataV10 m2)
+        public static MetadataDiffV10 MetadataCompareV10(MetadataV10 m1, MetadataV10 m2)
         {
             var resModulesDiff = new List<MetadataDifferentialModulesV10>();
 
@@ -294,7 +294,7 @@ namespace Substrate.NET.Metadata.Service
             };
         }
 
-        protected IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV10 storage))> CompareModuleStorageV10(
+        protected static IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV10 storage))> CompareModuleStorageV10(
             PalletStorageMetadataV10? source,
             PalletStorageMetadataV10? destination)
         {
@@ -311,7 +311,7 @@ namespace Substrate.NET.Metadata.Service
         #endregion
 
         #region Compare V11
-        public MetadataDiffV11 MetadataCompareV11(MetadataV11 m1, MetadataV11 m2)
+        public static MetadataDiffV11 MetadataCompareV11(MetadataV11 m1, MetadataV11 m2)
         {
             var resModulesDiff = new List<MetadataDifferentialModulesV11>();
 
@@ -345,7 +345,7 @@ namespace Substrate.NET.Metadata.Service
             };
         }
 
-        protected IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV11 storage))> CompareModuleStorageV11(
+        protected static IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV11 storage))> CompareModuleStorageV11(
             PalletStorageMetadataV11? source,
             PalletStorageMetadataV11? destination)
         {
@@ -362,7 +362,7 @@ namespace Substrate.NET.Metadata.Service
         #endregion
 
         #region Compare V12
-        public MetadataDiffV12 MetadataCompareV12(MetadataV12 m1, MetadataV12 m2)
+        public static MetadataDiffV12 MetadataCompareV12(MetadataV12 m1, MetadataV12 m2)
         {
             var resModulesDiff = new List<MetadataDifferentialModulesV12>();
 
@@ -396,7 +396,7 @@ namespace Substrate.NET.Metadata.Service
             };
         }
 
-        protected IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV11 storage))> CompareModuleStorageV12(
+        protected static IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV11 storage))> CompareModuleStorageV12(
             PalletStorageMetadataV12? source,
             PalletStorageMetadataV12? destination)
         {
@@ -413,7 +413,7 @@ namespace Substrate.NET.Metadata.Service
         #endregion
 
         #region Compare V13
-        public MetadataDiffV13 MetadataCompareV13(MetadataV13 m1, MetadataV13 m2)
+        public static MetadataDiffV13 MetadataCompareV13(MetadataV13 m1, MetadataV13 m2)
         {
             var resModulesDiff = new List<MetadataDifferentialModulesV13>();
 
@@ -447,7 +447,7 @@ namespace Substrate.NET.Metadata.Service
             };
         }
 
-        protected IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV13 storage))> CompareModuleStorageV13(
+        protected static IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV13 storage))> CompareModuleStorageV13(
             PalletStorageMetadataV13? source,
             PalletStorageMetadataV13? destination)
         {
@@ -464,7 +464,7 @@ namespace Substrate.NET.Metadata.Service
         #endregion
 
         #region Compare V14
-        public MetadataDiffV14 MetadataCompareV14(MetadataV14 m1, MetadataV14 m2)
+        public static MetadataDiffV14 MetadataCompareV14(MetadataV14 m1, MetadataV14 m2)
         {
             var resModulesDiff = new List<MetadataDifferentialModulesV14>();
 
@@ -505,7 +505,7 @@ namespace Substrate.NET.Metadata.Service
             };
         }
 
-        protected LookupDifferential CompareModuleV14<T>(
+        protected static LookupDifferential CompareModuleV14<T>(
             BaseOpt<T> source,
             BaseOpt<T> destination,
             PortableRegistry lookupSource,
@@ -526,7 +526,7 @@ namespace Substrate.NET.Metadata.Service
                 (uint)destination.Value.ElemType.Value.Value, lookupSource, lookupDestination);
         }
 
-        protected IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV14 storage))> CompareModuleStorageV14(
+        protected static IEnumerable<(string prefix, (CompareStatus status, StorageEntryMetadataV14 storage))> CompareModuleStorageV14(
             PalletStorageMetadataV14? source,
             PalletStorageMetadataV14? destination)
         {
@@ -541,7 +541,7 @@ namespace Substrate.NET.Metadata.Service
                 .Select(x => (prefix, x));
         }
 
-        protected LookupDifferential CompareLookup(
+        protected static LookupDifferential CompareLookup(
             uint idSource, uint idDestination, PortableRegistry lookupSource, PortableRegistry lookupDestination)
         {
             var result = new LookupDifferential();
@@ -559,7 +559,7 @@ namespace Substrate.NET.Metadata.Service
 
         }
 
-        private IList<(CompareStatus status, U32 id)> CompareId(U32 source, U32 destination)
+        private static IList<(CompareStatus status, U32 id)> CompareId(U32 source, U32 destination)
         {
             var res = new List<(CompareStatus status, U32 id)>();
             if (source.Value != destination.Value)
@@ -574,7 +574,7 @@ namespace Substrate.NET.Metadata.Service
             return res;
         }
 
-        private IList<(CompareStatus status, BaseVec<Str> docs)> ComparePath(Base.Portable.Path source, Base.Portable.Path destination)
+        private static IList<(CompareStatus status, BaseVec<Str> docs)> ComparePath(Base.Portable.Path source, Base.Portable.Path destination)
         {
             var res = new List<(CompareStatus status, BaseVec<Str> docs)>();
             if (!AreStringsEquals(source, destination))
@@ -589,7 +589,7 @@ namespace Substrate.NET.Metadata.Service
             return res;
         }
 
-        private IList<(CompareStatus status, BaseVec<TypeParameter> param)> CompareParams(BaseVec<TypeParameter> source, BaseVec<TypeParameter> destination)
+        private static IList<(CompareStatus status, BaseVec<TypeParameter> param)> CompareParams(BaseVec<TypeParameter> source, BaseVec<TypeParameter> destination)
         {
             var res = new List<(CompareStatus status, BaseVec<TypeParameter> param)>();
 
@@ -605,7 +605,7 @@ namespace Substrate.NET.Metadata.Service
             return res;
         }
 
-        private LookupDifferentialTypeDef CompareTypeDef(PortableType typeSource, PortableType typeDestination)
+        private static LookupDifferentialTypeDef CompareTypeDef(PortableType typeSource, PortableType typeDestination)
         {
             var result = new LookupDifferentialTypeDef();
             if (typeSource.Ty.TypeDef.Value != typeDestination.Ty.TypeDef.Value)
@@ -677,7 +677,7 @@ namespace Substrate.NET.Metadata.Service
             return result;
         }
 
-        private IList<(CompareStatus, T)> CompareTypeBased<T>(T source, T destination)
+        private static IList<(CompareStatus, T)> CompareTypeBased<T>(T source, T destination)
             where T : BaseType, IMetadataType, new()
         {
             if (source.ElemType != destination.ElemType)
@@ -692,7 +692,7 @@ namespace Substrate.NET.Metadata.Service
             return new List<(CompareStatus, T)>();
         }
 
-        private DifferentialComposite CompareComposite(TypeDefComposite source, TypeDefComposite destination)
+        private static DifferentialComposite CompareComposite(TypeDefComposite source, TypeDefComposite destination)
         {
             return new DifferentialComposite()
             {
@@ -700,14 +700,14 @@ namespace Substrate.NET.Metadata.Service
             };
         }
 
-        private IEnumerable<(CompareStatus, Variant)> CompareVariant(TypeDefVariant variantSource, TypeDefVariant variantDestination)
+        private static IEnumerable<(CompareStatus, Variant)> CompareVariant(TypeDefVariant variantSource, TypeDefVariant variantDestination)
         {
             var res = CompareName(variantSource.TypeParam.Value, variantDestination.TypeParam.Value);
 
             return res;
         }
 
-        private DifferentialTuple CompareTuple(TypeDefTuple source, TypeDefTuple destination)
+        private static DifferentialTuple CompareTuple(TypeDefTuple source, TypeDefTuple destination)
         {
             return new DifferentialTuple()
             {
@@ -715,7 +715,7 @@ namespace Substrate.NET.Metadata.Service
             };
         }
 
-        private IList<(CompareStatus status, BaseVec<Str> docs)> CompareDocs(BaseVec<Str> source, BaseVec<Str> typeDestination)
+        private static IList<(CompareStatus status, BaseVec<Str> docs)> CompareDocs(BaseVec<Str> source, BaseVec<Str> typeDestination)
         {
             var res = new List<(CompareStatus status, BaseVec<Str> docs)>();
             if (!AreStringsEquals(source, typeDestination))

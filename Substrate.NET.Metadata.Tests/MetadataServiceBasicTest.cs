@@ -11,14 +11,6 @@ namespace Substrate.NET.Metadata.Tests
 {
     public class MetadataServiceBasicTest : MetadataBaseTest
     {
-        private MetadataService _metadataService;
-
-        [SetUp]
-        public void Setup()
-        {
-            _metadataService = new MetadataService();
-        }
-
         private IList<PalletCallMetadataV9> generatePalletCallMetadataV9(int nb)
         {
             return Enumerable.Range(1, nb).Select(x => new PalletCallMetadataV9()
@@ -81,7 +73,7 @@ namespace Substrate.NET.Metadata.Tests
             calls2[2].Args.Value[0].CallType.Value = "Changed !";
             var calls_2 = new List<PalletCallMetadataV9>() { calls2[1], calls2[2], calls2[3] };
 
-            var res = _metadataService.CompareName(calls_1, calls_2).ToList();
+            var res = MetadataUtils.CompareName(calls_1, calls_2).ToList();
 
             Assert.That(res, Is.Not.Null);
             Assert.That(res[0], Is.EqualTo((CompareStatus.Added, calls2[3])));
@@ -99,7 +91,7 @@ namespace Substrate.NET.Metadata.Tests
             calls2[2].Args.Value[0].Value = "Changed !";
             var calls_2 = new List<PalletEventMetadataV9>() { calls2[1], calls2[2], calls2[3] };
 
-            var res = _metadataService.CompareName(calls_1, calls_2).ToList();
+            var res = MetadataUtils.CompareName(calls_1, calls_2).ToList();
 
             Assert.That(res, Is.Not.Null);
             Assert.That(res[0], Is.EqualTo((CompareStatus.Added, calls2[3])));
@@ -117,7 +109,7 @@ namespace Substrate.NET.Metadata.Tests
             calls2[2].ConstantType.Value = "Changed !";
             var calls_2 = new List<PalletConstantMetadataV9>() { calls2[1], calls2[2], calls2[3] };
 
-            var res = _metadataService.CompareName(calls_1, calls_2).ToList();
+            var res = MetadataUtils.CompareName(calls_1, calls_2).ToList();
 
             Assert.That(res, Is.Not.Null);
             Assert.That(res[0], Is.EqualTo((CompareStatus.Added, calls2[3])));
@@ -135,7 +127,7 @@ namespace Substrate.NET.Metadata.Tests
             calls2[2].Docs.Value[0].Value = "Changed !";
             var calls_2 = new List<PalletErrorMetadataV9>() { calls2[1], calls2[2], calls2[3] };
 
-            var res = _metadataService.CompareName(calls_1, calls_2).ToList();
+            var res = MetadataUtils.CompareName(calls_1, calls_2).ToList();
 
             Assert.That(res, Is.Not.Null);
             Assert.That(res[0], Is.EqualTo((CompareStatus.Added, calls2[3])));
@@ -177,25 +169,25 @@ namespace Substrate.NET.Metadata.Tests
                 }
             };
 
-            Assert.That(_metadataService.CompareName<ModuleMetadataV11>(null, null).Count(), Is.EqualTo(0));
+            Assert.That(MetadataUtils.CompareName<ModuleMetadataV11>(null, null).Count(), Is.EqualTo(0));
 
-            var resOnlyFirstListNull = _metadataService.CompareName(m1, null);
+            var resOnlyFirstListNull = MetadataUtils.CompareName(m1, null);
             Assert.That(resOnlyFirstListNull.All(x => x.Item1 == CompareStatus.Removed), Is.True);
             Assert.That(resOnlyFirstListNull.Count(), Is.EqualTo(m1.Count));
 
-            var resOnlyFirstListEmpty = _metadataService.CompareName(m1, new List<ModuleMetadataV11>());
+            var resOnlyFirstListEmpty = MetadataUtils.CompareName(m1, new List<ModuleMetadataV11>());
             Assert.That(resOnlyFirstListEmpty.All(x => x.Item1 == CompareStatus.Removed), Is.True);
             Assert.That(resOnlyFirstListEmpty.Count(), Is.EqualTo(m1.Count));
 
-            var resOnlySecondListNull = _metadataService.CompareName(null, m2);
+            var resOnlySecondListNull = MetadataUtils.CompareName(null, m2);
             Assert.That(resOnlySecondListNull.All(x => x.Item1 == CompareStatus.Added), Is.True);
             Assert.That(resOnlySecondListNull.Count(), Is.EqualTo(m2.Count));
 
-            var resOnlySecondListEmpty = _metadataService.CompareName(null, m2);
+            var resOnlySecondListEmpty = MetadataUtils.CompareName(null, m2);
             Assert.That(resOnlySecondListEmpty.All(x => x.Item1 == CompareStatus.Added), Is.True);
             Assert.That(resOnlySecondListEmpty.Count(), Is.EqualTo(m2.Count));
 
-            var res = _metadataService.CompareName(m1, m2).ToList();
+            var res = MetadataUtils.CompareName(m1, m2).ToList();
             Assert.That(res[0].Item1, Is.EqualTo(CompareStatus.Added));
             Assert.That(res[1].Item1, Is.EqualTo(CompareStatus.Removed));
 
@@ -204,7 +196,7 @@ namespace Substrate.NET.Metadata.Tests
         [Test]
         public void DifferentMetadataMajorVersion_ShouldFail()
         {
-            Assert.Throws<MetadataException>(() => _metadataService.EnsureMetadataVersion(
+            Assert.Throws<MetadataException>(() => MetadataUtils.EnsureMetadataVersion(
                 readMetadataFromFile("V11\\MetadataV11_0"), 
                 readMetadataFromFile("V14\\MetadataV14_9420")));
         }
@@ -213,7 +205,7 @@ namespace Substrate.NET.Metadata.Tests
         public void MetadataV14_GetMetadataVersion_ShouldSucceed()
         {
             Assert.That(
-                _metadataService.GetMetadataVersion(readMetadataFromFile("V14\\MetadataV14_9420")), 
+                MetadataUtils.GetMetadataVersion(readMetadataFromFile("V14\\MetadataV14_9420")), 
                 Is.EqualTo(MetadataVersion.V14));
         }
     }

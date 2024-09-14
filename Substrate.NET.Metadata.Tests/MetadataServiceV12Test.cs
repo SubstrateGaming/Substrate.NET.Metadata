@@ -6,23 +6,15 @@ namespace Substrate.NET.Metadata.Tests
 {
     public class MetadataServiceV12Test : MetadataBaseTest
     {
-        private MetadataService _metadataService;
-
-        [SetUp]
-        public void Setup()
-        {
-            _metadataService = new MetadataService();
-        }
-
         [Test]
         public void MetadataV12_SpecVersionCompare_V27_And_V28_ShouldSucceed()
         {
             var metadataSource = readMetadataFromFile("V12\\MetadataV12_27");
             var metadataDestination = readMetadataFromFile("V12\\MetadataV12_28");
 
-            Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V12));
+            Assert.That(MetadataUtils.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V12));
 
-            var res = _metadataService.MetadataCompareV12(
+            var res = MetadataUtils.MetadataCompareV12(
                 new MetadataV12(metadataSource),
                 new MetadataV12(metadataDestination));
 
@@ -105,9 +97,9 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V12\\MetadataV12_27");
             var metadataDestination = readMetadataFromFile("V12\\MetadataV12_28");
 
-            Assert.That(_metadataService.HasPalletChangedVersionBetween("ElectionsPhragmen", metadataSource, metadataDestination));
+            Assert.That(MetadataUtils.HasPalletChangedVersionBetween("ElectionsPhragmen", metadataSource, metadataDestination));
 
-            Assert.That(_metadataService.HasPalletChangedVersionBetween("Balances", metadataSource, metadataDestination), Is.False);
+            Assert.That(MetadataUtils.HasPalletChangedVersionBetween("Balances", metadataSource, metadataDestination), Is.False);
         }
     }
 }

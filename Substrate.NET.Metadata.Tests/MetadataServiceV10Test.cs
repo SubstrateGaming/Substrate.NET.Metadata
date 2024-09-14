@@ -12,14 +12,6 @@ namespace Substrate.NET.Metadata.Tests
 {
     public class MetadataServiceV10Test : MetadataBaseTest
     {
-        private MetadataService _metadataService;
-
-        [SetUp]
-        public void Setup()
-        {
-            _metadataService = new MetadataService();
-        }
-
         [Test]
         public void MetadataV10_SpecVersionCompare_V1032_And_V1039_ShouldSucceed()
         {
@@ -29,7 +21,7 @@ namespace Substrate.NET.Metadata.Tests
             // TODO : debug this
             //Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V10));
 
-            var res = _metadataService.MetadataCompareV10(
+            var res = MetadataUtils.MetadataCompareV10(
                 new MetadataV10(metadataSource),
                 new MetadataV10(metadataDestination));
 
@@ -42,9 +34,9 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V10\\MetadataV10_Kusama_1039");
             var metadataDestination = readMetadataFromFile("V10\\MetadataV10_Kusama_1040");
 
-            Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V10));
+            Assert.That(MetadataUtils.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V10));
 
-            var res = _metadataService.MetadataCompareV10(
+            var res = MetadataUtils.MetadataCompareV10(
                 new MetadataV10(metadataSource),
                 new MetadataV10(metadataDestination));
 
@@ -58,8 +50,8 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V10\\MetadataV10_Kusama_1039");
             var metadataDestination = readMetadataFromFile("V10\\MetadataV10_Kusama_1040");
 
-            Assert.That(_metadataService.HasPalletChangedVersionBetween("Society", metadataSource, metadataDestination), Is.False);
-            Assert.That(_metadataService.HasPalletChangedVersionBetween("Balances", metadataSource, metadataDestination), Is.False);
+            Assert.That(MetadataUtils.HasPalletChangedVersionBetween("Society", metadataSource, metadataDestination), Is.False);
+            Assert.That(MetadataUtils.HasPalletChangedVersionBetween("Balances", metadataSource, metadataDestination), Is.False);
         }
     }
 }
