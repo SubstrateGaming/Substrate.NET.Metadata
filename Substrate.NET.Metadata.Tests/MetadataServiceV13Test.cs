@@ -1,4 +1,5 @@
 ﻿using Substrate.NET.Metadata.Base;
+using Substrate.NET.Metadata.Conversion;
 using Substrate.NET.Metadata.Service;
 using Substrate.NET.Metadata.V13;
 
@@ -6,6 +7,14 @@ namespace Substrate.NET.Metadata.Tests
 {
     public class MetadataServiceV13Test : MetadataBaseTest
     {
+        [Test]
+        public void MetadataV13_Encode_ShouldSucceed()
+        {
+            var metadataSource = readMetadataFromFile("V13\\MetadataV13_9080");
+
+            Assert.That(new MetadataV13(metadataSource).Encode(), Is.Not.Null);
+        }
+
         [Test]
         public void MetadataV13_SpecVersionCompare_V9080_And_V9090_ShouldSucceed()
         {
@@ -45,6 +54,17 @@ namespace Substrate.NET.Metadata.Tests
 
             Assert.That(MetadataUtils.HasPalletChangedVersionBetween("Balances", metadataSource, metadataDestination));
             Assert.That(MetadataUtils.HasPalletChangedVersionBetween("Babe", metadataSource, metadataDestination), Is.False);
+        }
+
+        [Test]
+        public void StorageEntryMetadataV13_WhenNMap_ShouldThrowException()
+        {
+            var storageEntry = new StorageEntryMetadataV13();
+            storageEntry.StorageType = new NetApi.Model.Types.Base.BaseEnumExt<StorageType.Type, NetApi.Model.Types.Primitive.Str, V11.StorageEntryTypeMapV11, V11.StorageEntryTypeDoubleMapV11, StorageEntryTypeNMapV13>();
+            
+            storageEntry.StorageType.Value = StorageType.Type.NMap;
+
+            Assert.Throws<MetadataConversionException>(() => storageEntry.ToStorageEntryMetadataV14(new Conversion.Internal.ConversionBuilder(new List<Base.Portable.PortableType>())));
         }
     }
 }

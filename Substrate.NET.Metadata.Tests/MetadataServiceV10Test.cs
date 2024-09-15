@@ -13,6 +13,14 @@ namespace Substrate.NET.Metadata.Tests
     public class MetadataServiceV10Test : MetadataBaseTest
     {
         [Test]
+        public void MetadataV10_Encode_ShouldSucceed()
+        {
+            var metadataSource = readMetadataFromFile("V10\\MetadataV10_Kusama_1032");
+
+            Assert.That(new MetadataV10(metadataSource).Encode(), Is.Not.Null);
+        }
+
+        [Test]
         public void MetadataV10_SpecVersionCompare_V1032_And_V1039_ShouldSucceed()
         {
             var metadataSource = readMetadataFromFile("V10\\MetadataV10_Kusama_1032");

@@ -1,11 +1,20 @@
 ﻿using Substrate.NET.Metadata.Base;
 using Substrate.NET.Metadata.Service;
 using Substrate.NET.Metadata.V11;
+using Substrate.NET.Metadata.V9;
 
 namespace Substrate.NET.Metadata.Tests
 {
     public class MetadataServiceV11Test : MetadataBaseTest
     {
+        [Test]
+        public void MetadataV11_Encode_ShouldSucceed()
+        {
+            var metadataSource = readMetadataFromFile("V11\\MetadataV11_0");
+
+            Assert.That(new MetadataV11(metadataSource).Encode(), Is.Not.Null);
+        }
+
         [Test]
         public void MetadataV11_SpecVersionCompare_V0_And_V1_ShouldSucceed()
         {

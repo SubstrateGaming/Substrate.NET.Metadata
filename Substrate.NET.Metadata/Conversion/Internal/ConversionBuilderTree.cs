@@ -140,7 +140,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         internal static NodeBuilderTypeArray? ExtractArray(NodeBuilderType node)
         {
             string pattern = @"\[(.*);\s*(\d+)\]";
-            Match match = Regex.Match(node.Adapted, pattern);
+            Match match = Regex.Match(node.Adapted, pattern, RegexOptions.None, TimeSpan.FromMilliseconds(100));
 
             if (match.Success)
             {
@@ -162,7 +162,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         internal static NodeBuilderTypeTuple? ExtractTuple(NodeBuilderType node)
         {
             string pattern = @"\((.*)\)$";
-            Match match = Regex.Match(node.Adapted, pattern);
+            Match match = Regex.Match(node.Adapted, pattern, RegexOptions.None, TimeSpan.FromMilliseconds(100));
 
             if (match.Success)
             {
@@ -207,7 +207,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         internal static NodeBuilderType? ExtractGeneric(NodeBuilderType node)
         {
             string pattern = @"([a-zA-Z:]*|)<(.*)>$";
-            Match match = Regex.Match(node.Adapted, pattern);
+            Match match = Regex.Match(node.Adapted, pattern, RegexOptions.None, TimeSpan.FromMilliseconds(100));
 
             if (match.Success)
             {

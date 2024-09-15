@@ -7,6 +7,14 @@ namespace Substrate.NET.Metadata.Tests
     public class MetadataServiceV12Test : MetadataBaseTest
     {
         [Test]
+        public void MetadataV12_Encode_ShouldSucceed()
+        {
+            var metadataSource = readMetadataFromFile("V12\\MetadataV12_27");
+
+            Assert.That(new MetadataV12(metadataSource).Encode(), Is.Not.Null);
+        }
+
+        [Test]
         public void MetadataV12_SpecVersionCompare_V27_And_V28_ShouldSucceed()
         {
             var metadataSource = readMetadataFromFile("V12\\MetadataV12_27");

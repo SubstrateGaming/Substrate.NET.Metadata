@@ -44,11 +44,11 @@ namespace Substrate.NET.Metadata.V13
             TypeSize = p - start;
         }
 
-        public Str Name { get; private set; } = default!;
-        public BaseEnum<StorageType.ModifierV9> StorageModifier { get; private set; } = default!;
-        public BaseEnumExt<StorageType.Type, Str, StorageEntryTypeMapV11, StorageEntryTypeDoubleMapV11, StorageEntryTypeNMapV13> StorageType { get; private set; } = default!;
-        public ByteGetter StorageDefault { get; private set; } = default!;
-        public BaseVec<Str> Documentation { get; private set; } = default!;
+        public Str Name { get; internal set; } = default!;
+        public BaseEnum<StorageType.ModifierV9> StorageModifier { get; internal set; } = default!;
+        public BaseEnumExt<StorageType.Type, Str, StorageEntryTypeMapV11, StorageEntryTypeDoubleMapV11, StorageEntryTypeNMapV13> StorageType { get; internal set; } = default!;
+        public ByteGetter StorageDefault { get; internal set; } = default!;
+        public BaseVec<Str> Documentation { get; internal set; } = default!;
 
         internal StorageEntryMetadataV14 ToStorageEntryMetadataV14(ConversionBuilder conversionBuilder)
         {

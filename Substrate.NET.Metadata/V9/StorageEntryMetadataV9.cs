@@ -44,11 +44,11 @@ namespace Substrate.NET.Metadata.V9
             TypeSize = p - start;
         }
 
-        public Str Name { get; private set; } = default!;
-        public BaseEnum<StorageType.ModifierV9> StorageModifier { get; private set; } = default!;
-        public BaseEnumExt<StorageType.TypeV9, Str, StorageEntryTypeMapV9, StorageEntryTypeDoubleMapV9> StorageType { get; private set; } = default!;
-        public ByteGetter StorageDefault { get; private set; } = default!;
-        public BaseVec<Str> Documentation { get; private set; } = default!;
+        public Str Name { get; internal set; } = default!;
+        public BaseEnum<StorageType.ModifierV9> StorageModifier { get; internal set; } = default!;
+        public BaseEnumExt<StorageType.TypeV9, Str, StorageEntryTypeMapV9, StorageEntryTypeDoubleMapV9> StorageType { get; internal set; } = default!;
+        public ByteGetter StorageDefault { get; internal set; } = default!;
+        public BaseVec<Str> Documentation { get; internal set; } = default!;
 
         internal StorageEntryMetadataV14 ToStorageEntryMetadataV14(ConversionBuilder conversionBuilder)
         {
@@ -71,11 +71,6 @@ namespace Substrate.NET.Metadata.V9
                 var map = (StorageEntryTypeDoubleMapV11)StorageType.Value2;
                 mapStorageType.Create(Metadata.StorageType.Type.Map, map.ToStorageEntryTypeMapV14(conversionBuilder));
 
-            }
-            else
-            {
-                // NMap exists but should never happened
-                throw new MetadataConversionException($"Error while converting StorageEntryMetadataV11. Received storage type {StorageType.Value} while should never happened");
             }
 
             var storageEntry = new StorageEntryMetadataV14(

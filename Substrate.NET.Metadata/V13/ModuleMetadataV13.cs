@@ -79,8 +79,6 @@ namespace Substrate.NET.Metadata.V13
 
         internal ModuleMetadataV14 ToModuleMetadataV14(ConversionBuilder conversionBuilder, int index)
         {
-            //if (Index.Value != index) throw new InvalidOperationException($"Incoherent module index. Expected: {Index.Value} but got: {index} for module: {Name.Value}");
-
             var result = new ModuleMetadataV14();
             result.Index = new U8((byte)index);
             result.Name = Name;
