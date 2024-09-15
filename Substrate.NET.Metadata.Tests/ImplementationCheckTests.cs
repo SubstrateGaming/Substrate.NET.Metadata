@@ -35,12 +35,12 @@ namespace Substrate.NET.Metadata.Tests
                 }
 
                 // Ensure the class has the Encode method
-                MethodInfo encodeMethod = type.GetMethod("Encode");
+                MethodInfo encodeMethod = type!.GetMethod("Encode");
                 Assert.That(encodeMethod, Is.Not.Null, $"Class {type.Name} does not implement the Encode() method.");
 
                 try
                 {
-                    _ = (byte[])encodeMethod.Invoke(instance, null);
+                    _ = (byte[])encodeMethod!.Invoke(instance, null);
                 }
                 catch (TargetInvocationException ex) when (ex.InnerException is NotImplementedException)
                 {

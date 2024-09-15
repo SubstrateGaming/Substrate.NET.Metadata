@@ -67,7 +67,7 @@ namespace Substrate.NET.Metadata.Tests
 
 
             // Some calls has been added and one has been removed
-            var callsMethodChanged = palletBalance.Calls.LookupDifferentialType.TypeVariant.Elems;
+            var callsMethodChanged = palletBalance!.Calls.LookupDifferentialType.TypeVariant.Elems;
             Assert.That(callsMethodChanged.Count(), Is.GreaterThan(1)); 
             Assert.That(callsMethodChanged.Any(x => x.Item1 == CompareStatus.Added && x.Item2.Name.Value == "set_balance_deprecated"));
             Assert.That(callsMethodChanged.Any(x => x.Item1 == CompareStatus.Removed && x.Item2.Name.Value == "set_balance"));

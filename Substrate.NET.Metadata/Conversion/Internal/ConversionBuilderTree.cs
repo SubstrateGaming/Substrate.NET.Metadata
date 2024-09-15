@@ -1,12 +1,5 @@
 ﻿using Substrate.NET.Metadata.Base;
-using Substrate.NET.Metadata.Base.Portable;
-using Substrate.NetApi.Model.Meta;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Substrate.NET.Metadata.Conversion.Internal
 {
@@ -42,7 +35,6 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             if (ExtractPrimitive(nodeBuilderType) is NodeBuilderTypePrimitive primitive && nodeBuilderType is NodeBuilderTypeUndefined)
             {
                 nodeBuilderType = primitive!;
-                //return primitive;
             }
 
             if (nodeBuilderType is NodeBuilderTypeUndefined)
@@ -50,7 +42,6 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 var content = HarmonizeTypeName(nodeBuilderType.Adapted);
                 var hardBinding = SearchV14.HardBinding(content, nodeBuilderType.PalletContext);
 
-                //if(!hardBinding.Equals(nodeBuilderType.Raw, StringComparison.CurrentCultureIgnoreCase))
                 if (!string.IsNullOrEmpty(hardBinding) && hardBinding != content)
                 {
                     nodeBuilderType = Build(new NodeBuilderTypeUndefined(hardBinding, nodeBuilderType.Raw, nodeBuilderType.PalletContext));

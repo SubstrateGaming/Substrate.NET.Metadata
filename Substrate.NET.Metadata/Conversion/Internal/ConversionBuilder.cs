@@ -128,7 +128,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
         /// <returns></returns>
         public U32 GetNewIndex()
         {
-            if (!PortableTypes.Any()) return new U32(START_INDEX);
+            if (PortableTypes.Count == 0) return new U32(START_INDEX);
             return new U32(Math.Max(START_INDEX, PortableTypes.Max(x => x.Id.Value) + 1));
         }
 
@@ -326,15 +326,6 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             return index;
         }
 
-        public PalletEventMetadataV14 ConvertToEventV14(string eventName, string eventType)
-        {
-            var res = new PalletEventMetadataV14();
-
-            res.ElemType = TType.From(BuildPortableTypes(eventType).Value);
-
-            return res;
-        }
-
         public void CreateEventBlockchainRuntimeEvent()
         {
             var node = new TypeDefVariant();
@@ -403,7 +394,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 portableType.Ty.Path.Create(new Str[0]);
             }
 
-            portableType.Ty.TypeParams = new BaseVec<TypeParameter>(new TypeParameter[0]);
+            portableType.Ty.TypeParams = new BaseVec<TypeParameter>([]);
 
             if (node is TypeDefTuple tdt)
             {

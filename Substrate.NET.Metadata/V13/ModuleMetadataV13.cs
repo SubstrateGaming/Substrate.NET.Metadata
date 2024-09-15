@@ -12,13 +12,13 @@ namespace Substrate.NET.Metadata.V13
 {
     public class ModuleMetadataV13 : BaseType, IMetadataName
     {
-        public Str Name { get; private set; }
-        public BaseOpt<PalletStorageMetadataV13> Storage { get; private set; }
-        public BaseOpt<BaseVec<PalletCallMetadataV13>> Calls { get; private set; }
-        public BaseOpt<BaseVec<PalletEventMetadataV13>> Events { get; private set; }
-        public BaseVec<PalletConstantMetadataV13> Constants { get; private set; }
-        public BaseVec<PalletErrorMetadataV13> Errors { get; private set; }
-        public U8 Index { get; private set; }
+        public Str Name { get; private set; } = default!;
+        public BaseOpt<PalletStorageMetadataV13> Storage { get; private set; } = default!;
+        public BaseOpt<BaseVec<PalletCallMetadataV13>> Calls { get; private set; } = default!;
+        public BaseOpt<BaseVec<PalletEventMetadataV13>> Events { get; private set; } = default!;
+        public BaseVec<PalletConstantMetadataV13> Constants { get; private set; } = default!;
+        public BaseVec<PalletErrorMetadataV13> Errors { get; private set; } = default!;
+        public U8 Index { get; private set; } = default!;
 
         public override void Decode(byte[] byteArray, ref int p)
         {

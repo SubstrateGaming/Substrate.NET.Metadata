@@ -64,7 +64,7 @@ namespace Substrate.NET.Metadata.Tests
             
             storageEntry.StorageType.Value = StorageType.Type.NMap;
 
-            Assert.Throws<MetadataConversionException>(() => storageEntry.ToStorageEntryMetadataV14(new Conversion.Internal.ConversionBuilder(new List<Base.Portable.PortableType>())));
+            Assert.Throws<MetadataConversionException>(() => storageEntry.ToStorageEntryMetadataV14(new Metadata.Conversion.Internal.ConversionBuilder(new List<Base.Portable.PortableType>())));
         }
     }
 }
