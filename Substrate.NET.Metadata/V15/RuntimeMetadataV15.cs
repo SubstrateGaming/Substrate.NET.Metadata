@@ -8,14 +8,14 @@ namespace Substrate.NET.Metadata.V15
     {
         public override byte[] Encode()
         {
-var result = new List<byte>();
+            var result = new List<byte>();
             result.AddRange(Types.Encode());
             result.AddRange(Modules.Encode());
             result.AddRange(Extrinsic.Encode());
             result.AddRange(TypeId.Encode());
             result.AddRange(Apis.Encode());
-	result.AddRange(OuterEnums.Encode());
-	result.AddRange(Custom.Encode());
+            result.AddRange(OuterEnums.Encode());
+            result.AddRange(Custom.Encode());
             return result.ToArray();
         }
 
@@ -54,6 +54,9 @@ var result = new List<byte>();
         public ExtrinsicMetadataV15 Extrinsic { get; private set; } = default!;
 
         public BaseVec<RuntimeApiMetadataV15> Apis { get; private set; } = default!;
+
+        public OuterEnums15 OuterEnums { get; private set; } = default!;
+        public CustomMetadata15 Custom { get; private set; } = default!;
 
         public TType TypeId { get; private set; } = default!;
     }
