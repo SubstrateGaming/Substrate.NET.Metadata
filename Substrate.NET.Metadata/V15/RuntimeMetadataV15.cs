@@ -1,7 +1,6 @@
 ﻿using Substrate.NET.Metadata.Base;
 using Substrate.NET.Metadata.Base.Portable;
 using Substrate.NetApi.Model.Types.Base;
-using System.Linq;
 
 namespace Substrate.NET.Metadata.V15
 {
@@ -9,12 +8,14 @@ namespace Substrate.NET.Metadata.V15
     {
         public override byte[] Encode()
         {
-            var result = new List<byte>();
+var result = new List<byte>();
             result.AddRange(Types.Encode());
             result.AddRange(Modules.Encode());
             result.AddRange(Extrinsic.Encode());
             result.AddRange(TypeId.Encode());
             result.AddRange(Apis.Encode());
+	result.AddRange(OuterEnums.Encode());
+	result.AddRange(Custom.Encode());
             return result.ToArray();
         }
 
@@ -37,17 +38,23 @@ namespace Substrate.NET.Metadata.V15
             Apis = new BaseVec<RuntimeApiMetadataV15>();
             Apis.Decode(byteArray, ref p);
 
+            OuterEnums = new OuterEnums15();
+            OuterEnums.Decode(byteArray, ref p);
+
+            Custom = new CustomMetadata15();
+            Custom.Decode(byteArray, ref p);
+
             TypeSize = p - start;
         }
 
-        public PortableRegistry Types { get; private set; }
+        public PortableRegistry Types { get; private set; } = default!;
 
-        public BaseVec<ModuleMetadataV15> Modules { get; private set; }
+        public BaseVec<ModuleMetadataV15> Modules { get; private set; } = default!;
 
-        public ExtrinsicMetadataV15 Extrinsic { get; private set; }
+        public ExtrinsicMetadataV15 Extrinsic { get; private set; } = default!;
 
-        public BaseVec<RuntimeApiMetadataV15> Apis { get; private set; }
+        public BaseVec<RuntimeApiMetadataV15> Apis { get; private set; } = default!;
 
-        public TType TypeId { get; private set; }
+        public TType TypeId { get; private set; } = default!;
     }
 }
