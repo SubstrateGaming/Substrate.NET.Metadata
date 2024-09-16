@@ -1,4 +1,6 @@
 ﻿using Substrate.NET.Metadata.Base;
+using Substrate.NET.Metadata.Base.Portable;
+using Substrate.NET.Metadata.Conversion;
 using Substrate.NetApi.Model.Types.Base;
 using Substrate.NetApi.Model.Types.Primitive;
 using System.Diagnostics.CodeAnalysis;
@@ -32,21 +34,8 @@ namespace Substrate.NET.Metadata.V9
             TypeSize = p - start;
         }
 
-        public Str Name { get; set; }
-        public BaseVec<PalletCallArgsMetadataV9> Args { get; set; }
-        public BaseVec<Str> Docs { get; set; }
-    }
-
-    public class PalletCallMetadataV9Comparer : IEqualityComparer<PalletCallMetadataV9>
-    {
-        public bool Equals(PalletCallMetadataV9? x, PalletCallMetadataV9? y)
-        {
-            return x?.Name == y?.Name;
-        }
-
-        public int GetHashCode([DisallowNull] PalletCallMetadataV9 obj)
-        {
-            return obj.Name.GetHashCode();
-        }
+        public Str Name { get; set; } = default!;
+        public BaseVec<PalletCallArgsMetadataV9> Args { get; set; } = default!;
+        public BaseVec<Str> Docs { get; set; } = default!;
     }
 }

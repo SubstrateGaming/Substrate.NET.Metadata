@@ -6,11 +6,26 @@ namespace Substrate.NET.Metadata.Base
 {
     public class Field : BaseType, IMetadataType
     {
+        public Field() { }
+
+        public Field(BaseOpt<Str> name, TType fieldTy, BaseOpt<Str> fieldTypeName, BaseVec<Str> docs)
+        {
+            Name = name;
+            FieldTy = fieldTy;
+            FieldTypeName = fieldTypeName;
+            Docs = docs;
+        }
+
         public override string TypeName() => "Field<T: Form = MetaForm>";
 
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Name.Encode());
+            result.AddRange(FieldTy.Encode());
+            result.AddRange(FieldTypeName.Encode());
+            result.AddRange(Docs.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)

@@ -8,15 +8,23 @@ namespace Substrate.NET.Metadata.V15
     {
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Types.Encode());
+            result.AddRange(Modules.Encode());
+            result.AddRange(Extrinsic.Encode());
+            result.AddRange(TypeId.Encode());
+            result.AddRange(Apis.Encode());
+            result.AddRange(OuterEnums.Encode());
+            result.AddRange(Custom.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)
         {
             var start = p;
 
-            Lookup = new PortableRegistry();
-            Lookup.Decode(byteArray, ref p);
+            Types = new PortableRegistry();
+            Types.Decode(byteArray, ref p);
 
             Modules = new BaseVec<ModuleMetadataV15>();
             Modules.Decode(byteArray, ref p);
@@ -39,7 +47,7 @@ namespace Substrate.NET.Metadata.V15
             TypeSize = p - start;
         }
 
-        public PortableRegistry Lookup { get; private set; } = default!;
+        public PortableRegistry Types { get; private set; } = default!;
 
         public BaseVec<ModuleMetadataV15> Modules { get; private set; } = default!;
 
@@ -47,10 +55,9 @@ namespace Substrate.NET.Metadata.V15
 
         public BaseVec<RuntimeApiMetadataV15> Apis { get; private set; } = default!;
 
-        public TType TypeId { get; private set; } = default!;
-
         public OuterEnums15 OuterEnums { get; private set; } = default!;
-
         public CustomMetadata15 Custom { get; private set; } = default!;
+
+        public TType TypeId { get; private set; } = default!;
     }
 }

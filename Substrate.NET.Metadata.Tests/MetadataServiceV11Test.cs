@@ -1,17 +1,18 @@
 ﻿using Substrate.NET.Metadata.Base;
 using Substrate.NET.Metadata.Service;
 using Substrate.NET.Metadata.V11;
+using Substrate.NET.Metadata.V9;
 
 namespace Substrate.NET.Metadata.Tests
 {
     public class MetadataServiceV11Test : MetadataBaseTest
     {
-        private MetadataService _metadataService;
-
-        [SetUp]
-        public void Setup()
+        [Test]
+        public void MetadataV11_Encode_ShouldSucceed()
         {
-            _metadataService = new MetadataService();
+            var metadataSource = readMetadataFromFile("V11\\MetadataV11_0");
+
+            Assert.That(new MetadataV11(metadataSource).Encode(), Is.Not.Null);
         }
 
         [Test]
@@ -20,9 +21,9 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V11\\MetadataV11_0");
             var metadataDestination = readMetadataFromFile("V11\\MetadataV11_1");
 
-            Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V11));
+            Assert.That(MetadataUtils.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V11));
 
-            var res = _metadataService.MetadataCompareV11(
+            var res = MetadataUtils.MetadataCompareV11(
                 new MetadataV11(metadataSource),
                 new MetadataV11(metadataDestination));
 
@@ -51,9 +52,9 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V11\\MetadataV11_6");
             var metadataDestination = readMetadataFromFile("V11\\MetadataV11_7");
 
-            Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V11));
+            Assert.That(MetadataUtils.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V11));
 
-            var res = _metadataService.MetadataCompareV11(
+            var res = MetadataUtils.MetadataCompareV11(
                 new MetadataV11(metadataSource),
                 new MetadataV11(metadataDestination));
 
@@ -81,9 +82,9 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V11\\MetadataV11_23");
             var metadataDestination = readMetadataFromFile("V11\\MetadataV11_24");
 
-            Assert.That(_metadataService.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V11));
+            Assert.That(MetadataUtils.EnsureMetadataVersion(metadataSource, metadataDestination), Is.EqualTo(MetadataVersion.V11));
 
-            var res = _metadataService.MetadataCompareV11(
+            var res = MetadataUtils.MetadataCompareV11(
                 new MetadataV11(metadataSource),
                 new MetadataV11(metadataDestination));
 
@@ -133,10 +134,21 @@ namespace Substrate.NET.Metadata.Tests
             var metadataSource = readMetadataFromFile("V11\\MetadataV11_23");
             var metadataDestination = readMetadataFromFile("V11\\MetadataV11_24");
 
-            Assert.That(_metadataService.HasPalletChangedVersionBetween("Multisig", metadataSource, metadataDestination), Is.True);
+            Assert.That(MetadataUtils.HasPalletChangedVersionBetween("Multisig", metadataSource, metadataDestination));
 
             // Purschase has been removed, but does not count as changed
-            Assert.That(_metadataService.HasPalletChangedVersionBetween("Purchase", metadataSource, metadataDestination), Is.False);
+            Assert.That(MetadataUtils.HasPalletChangedVersionBetween("Purchase", metadataSource, metadataDestination), Is.False);
+        }
+
+        [Test]
+        public void MetadataV11_ConvertToV14_ShouldSucceed()
+        {
+            var metadataV11 = new MetadataV11(readMetadataFromFile("V11\\MetadataV11_0"));
+            Assert.That(metadataV11, Is.Not.Null);
+
+            var metadataV14 = metadataV11.ToMetadataV14();
+
+            Assert.That(metadataV14, Is.Not.Null);
         }
     }
 }

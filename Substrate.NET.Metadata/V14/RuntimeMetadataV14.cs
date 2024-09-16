@@ -8,7 +8,12 @@ namespace Substrate.NET.Metadata.V14
     {
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Lookup.Encode());
+            result.AddRange(Modules.Encode());
+            result.AddRange(Extrinsic.Encode());
+            result.AddRange(TypeId.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)
@@ -30,12 +35,12 @@ namespace Substrate.NET.Metadata.V14
             TypeSize = p - start;
         }
 
-        public PortableRegistry Lookup { get; private set; }
+        public PortableRegistry Lookup { get; internal set; }
 
-        public BaseVec<ModuleMetadataV14> Modules { get; private set; }
+        public BaseVec<ModuleMetadataV14> Modules { get; internal set; }
 
-        public ExtrinsicMetadataV14 Extrinsic { get; private set; }
+        public ExtrinsicMetadataV14 Extrinsic { get; internal set; }
 
-        public TType TypeId { get; private set; }
+        public TType TypeId { get; internal set; }
     }
 }

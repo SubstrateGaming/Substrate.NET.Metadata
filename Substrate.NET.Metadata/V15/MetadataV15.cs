@@ -5,9 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Substrate.NET.Metadata.V15
 {
+    [ExcludeFromCodeCoverage] // Exclude temporary because of incomplete implementation and lack of informations
     public class MetadataV15 : BaseMetadata<RuntimeMetadataV15>
     {
         public MetadataV15() : base()

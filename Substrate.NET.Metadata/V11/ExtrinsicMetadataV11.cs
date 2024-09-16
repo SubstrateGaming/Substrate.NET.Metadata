@@ -1,4 +1,6 @@
-﻿using Substrate.NetApi.Model.Types.Base;
+﻿using Substrate.NET.Metadata.Conversion.Internal;
+using Substrate.NET.Metadata.V14;
+using Substrate.NetApi.Model.Types.Base;
 using Substrate.NetApi.Model.Types.Primitive;
 
 namespace Substrate.NET.Metadata.V11
@@ -23,7 +25,17 @@ namespace Substrate.NET.Metadata.V11
 
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Version.Encode());
+            result.AddRange(SignedExtensions.Encode());
+            return result.ToArray();
+        }
+
+        internal ExtrinsicMetadataV14 ToExtrinsicMetadataV14(ConversionBuilder conversion)
+        {
+            var res = new ExtrinsicMetadataV14();
+
+            return res;
         }
     }
 }

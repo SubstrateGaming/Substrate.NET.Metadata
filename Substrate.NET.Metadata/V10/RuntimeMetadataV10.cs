@@ -1,10 +1,7 @@
-﻿using Substrate.NET.Metadata.V9;
-using Substrate.NetApi.Model.Types.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Substrate.NetApi.Model.Types.Base;
+using Substrate.NET.Metadata.Conversion.Internal;
+using Substrate.NET.Metadata.V14;
+using Substrate.NET.Metadata.Base.Portable;
 
 namespace Substrate.NET.Metadata.V10
 {
@@ -24,7 +21,30 @@ namespace Substrate.NET.Metadata.V10
 
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Modules.Encode());
+            return result.ToArray();
+        }
+
+        internal RuntimeMetadataV14 ToRuntimeMetadataV14()
+        {
+            var conversion = new ConversionBuilder(new List<PortableType>());
+
+            conversion.CreateUnknownType();
+            conversion.CreateEventBlockchainRuntimeEvent();
+
+            var res = new RuntimeMetadataV14();
+
+            res.Modules = new BaseVec<ModuleMetadataV14>(
+                Modules.Value.Select((x, i) => x.ToModuleMetadataV14(conversion, i))
+                .ToArray());
+
+            conversion.CreateRuntime();
+
+            res.Lookup = new PortableRegistry();
+            res.Lookup.Create(conversion.PortableTypes.ToArray());
+
+            return res;
         }
     }
 }

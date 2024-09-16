@@ -1,8 +1,9 @@
-﻿using Substrate.NetApi.Model.Types.Base;
+﻿using Newtonsoft.Json.Linq;
+using Substrate.NetApi.Model.Types.Base;
 
 namespace Substrate.NET.Metadata.Base
 {
-    public abstract class BaseMetadata<T> : BaseType
+    public abstract class BaseMetadata<T> : BaseType, IMetaDataInfo
         where T : BaseType, new()
     {
         protected BaseMetadata()
@@ -18,7 +19,10 @@ namespace Substrate.NET.Metadata.Base
 
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(MetaDataInfo.Encode());
+            result.AddRange(RuntimeMetadataData.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)
@@ -34,7 +38,7 @@ namespace Substrate.NET.Metadata.Base
             TypeSize = p - start;
         }
 
-        public MetaDataInfo MetaDataInfo { get; private set; }
-        public T RuntimeMetadataData { get; private set; }
+        public MetaDataInfo MetaDataInfo { get; internal set; } = default!;
+        public T RuntimeMetadataData { get; internal set; } = default!;
     }
 }

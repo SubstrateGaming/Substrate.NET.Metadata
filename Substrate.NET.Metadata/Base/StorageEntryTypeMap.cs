@@ -1,10 +1,10 @@
-﻿using Substrate.NetApi.Model.Types.Base;
+﻿using Substrate.NET.Metadata.Base.Portable;
+using Substrate.NET.Metadata.Conversion;
+using Substrate.NET.Metadata.Conversion.Internal;
+using Substrate.NET.Metadata.V14;
+using Substrate.NetApi.Model.Types.Base;
 using Substrate.NetApi.Model.Types.Primitive;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using static Substrate.NET.Metadata.StorageType;
 
 namespace Substrate.NET.Metadata.Base
 {
@@ -15,16 +15,21 @@ namespace Substrate.NET.Metadata.Base
     public abstract class StorageEntryTypeMap<THasher> : BaseType
         where THasher : Enum
     {
-        public BaseEnum<THasher> Hasher { get; private set; }
+        public BaseEnum<THasher> Hasher { get; private set; } = default!;
 
-        public Str Key { get; private set; }
+        public Str Key { get; private set; } = default!;
 
-        public Str Value { get; private set; }
-        public Bool Linked { get; private set; }
+        public Str Value { get; private set; } = default!;
+        public Bool Linked { get; private set; } = default;
 
         public override byte[] Encode()
         {
-            throw new NotImplementedException();
+            var result = new List<byte>();
+            result.AddRange(Hasher.Encode());
+            result.AddRange(Key.Encode());
+            result.AddRange(Value.Encode());
+            result.AddRange(Linked.Encode());
+            return result.ToArray();
         }
 
         public override void Decode(byte[] byteArray, ref int p)
@@ -44,6 +49,21 @@ namespace Substrate.NET.Metadata.Base
             Linked.Decode(byteArray, ref p);
 
             TypeSize = p - num;
+        }
+
+        internal StorageEntryTypeMapV14 ToStorageEntryTypeMapV14(ConversionBuilder conversionBuilder)
+        {
+            var result = new StorageEntryTypeMapV14();
+
+            result.Hashers = new BaseVec<BaseEnum<Hasher>>(
+            [
+                new BaseEnum<Hasher>((Hasher)Enum.Parse(typeof(Hasher), Hasher.Value.ToString()))
+            ]);
+
+            result.Key = TType.From(conversionBuilder.BuildPortableTypes(Key.Value).Value);
+            result.Value = TType.From(conversionBuilder.BuildPortableTypes(Value.Value).Value);
+
+            return result;
         }
     }
 }
