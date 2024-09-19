@@ -19,7 +19,11 @@ namespace Substrate.NET.Metadata.Conversion
                 customNodeBuilder.Add(accountInfos.First());
             } else
             {
-                customNodeBuilder.Add(accountInfos.Single(x => x.IsVersionValid(specVersion!.Value)));
+                var optionalCustomVersion = accountInfos.SingleOrDefault(x => x.IsVersionValid(specVersion!.Value));
+                if (optionalCustomVersion is not null)
+                {
+                    customNodeBuilder.Add(optionalCustomVersion);
+                }
             }
 
             return customNodeBuilder;
