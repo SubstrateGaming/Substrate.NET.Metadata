@@ -50,6 +50,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             return type switch
             {
                 "BalanceOf" => "U128",
+                "Index" => "U32",
                 "ExtrinsicsWeight" => "PerDispatchClass",
                 "DigestOf" => "Digest",
                 "EventIndex" => "U32",
@@ -96,7 +97,13 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
         public static PortableType FindTypeByIndex(int index)
         {
-            return MetadataV14.RuntimeMetadataData.Lookup.Value.Single(x => x.Id.Value == index);
+            var res = MetadataV14.RuntimeMetadataData.Lookup.Value.SingleOrDefault(x => x.Id.Value == index);
+            if(res == null)
+            {
+               throw new MetadataConversionException($"Type with index {index} not found");
+            }
+
+            return res;
         }
 
         public static (int index, SearchResult searchResult) SearchIndexByNode(NodeBuilderType node, ConversionBuilder conversionBuilder)

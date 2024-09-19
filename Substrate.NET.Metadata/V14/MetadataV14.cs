@@ -7,10 +7,11 @@ using Substrate.NetApi.Model.Types.Metadata.Base;
 using Substrate.NET.Metadata.Base.Portable;
 using TypeDefEnum = Substrate.NET.Metadata.Base.TypeDefEnum;
 using TypeDefComposite = Substrate.NET.Metadata.Base.TypeDefComposite;
+using Substrate.NET.Metadata.Conversion;
 
 namespace Substrate.NET.Metadata.V14
 {
-    public class MetadataV14 : BaseMetadata<RuntimeMetadataV14>
+    public class MetadataV14 : BaseMetadata<RuntimeMetadataV14>, IMetadataToV14
     {
         public MetadataV14() : base()
         {
@@ -22,6 +23,11 @@ namespace Substrate.NET.Metadata.V14
 
         public override MetadataVersion Version => MetadataVersion.V14;
         public override string TypeName() => nameof(MetadataV14);
+
+        public MetadataV14 ToMetadataV14(uint? specVersion = null)
+        {
+            return this;
+        }
 
         /// <summary>
         /// Convert to <see cref="MetaData"/> to keep compatibility with Substrate.NetApi

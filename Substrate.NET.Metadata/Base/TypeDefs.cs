@@ -109,7 +109,7 @@ namespace Substrate.NET.Metadata.Base
             TypeSize = p - start;
         }
 
-        public BaseVec<Field> Fields { get; internal set; }
+        public BaseVec<Field> Fields { get; internal set; } = default!;
 
         public NetApi.Model.Types.Metadata.Base.TypeDefComposite ToNetApi()
         {

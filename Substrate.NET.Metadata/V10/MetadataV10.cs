@@ -16,12 +16,12 @@ namespace Substrate.NET.Metadata.V10
 
         public override MetadataVersion Version => MetadataVersion.V10;
 
-        public MetadataV14 ToMetadataV14()
+        public MetadataV14 ToMetadataV14(uint? specVersion = null)
         {
             var res = new MetadataV14();
 
             res.MetaDataInfo = MetaDataInfo;
-            res.RuntimeMetadataData = RuntimeMetadataData.ToRuntimeMetadataV14();
+            res.RuntimeMetadataData = RuntimeMetadataData.ToRuntimeMetadataV14(specVersion);
 
             return res;
         }

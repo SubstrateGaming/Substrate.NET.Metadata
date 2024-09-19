@@ -21,7 +21,7 @@ namespace Substrate.NET.Metadata.Base.Portable
         public override byte[] Encode()
         {
             var result = new List<byte>();
-            result.AddRange(Id.Encode());
+            result.AddRange(new CompactInteger(Id).Encode());
             result.AddRange(Ty.Encode());
             return result.ToArray();
         }
@@ -42,5 +42,14 @@ namespace Substrate.NET.Metadata.Base.Portable
 
         public U32 Id { get; internal set; }
         public TypePortableForm Ty { get; internal set; }
+
+        public PortableType Clone()
+        {
+            var portableTypeClone = new PortableType();
+
+            portableTypeClone.Create(Encode());
+
+            return portableTypeClone;
+        }
     }
 }
