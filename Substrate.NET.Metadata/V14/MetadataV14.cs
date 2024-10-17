@@ -44,7 +44,7 @@ namespace Substrate.NET.Metadata.V14
             {
                 Types = CreateNodeTypeDict(RuntimeMetadataData.Lookup.Value),
                 Modules = CreateModuleDict(RuntimeMetadataData.Modules.Value),
-                Extrinsic = CreateExtrinsic(RuntimeMetadataData.Extrinsic),
+                Extrinsic = CreateExtrinsic(RuntimeMetadataData.Extrinsic)
             };
 
             return metadata;
@@ -353,16 +353,18 @@ namespace Substrate.NET.Metadata.V14
         /// <returns></returns>
         private static ExtrinsicMetadata CreateExtrinsic(ExtrinsicMetadataV14 extrinsic)
         {
+            if (extrinsic.Version is null) return new ExtrinsicMetadata();
+
             return new ExtrinsicMetadata()
             {
-                //TypeId = (uint)extrinsic.ExtrinsicType.Value,
-                //Version = (int)extrinsic.Version.Value,
-                //SignedExtensions = extrinsic.SignedExtensions.Value.Select(p => new SignedExtensionMetadata()
-                //{
-                //    SignedIdentifier = p.SignedIdentifier.Value,
-                //    SignedExtType = (uint)p.SignedExtType.Value,
-                //    AddSignedExtType = (uint)p.AddSignedExtType.Value,
-                //}).ToArray()
+                TypeId = (uint)extrinsic.ExtrinsicType.Value,
+                Version = (int)extrinsic.Version.Value,
+                SignedExtensions = extrinsic.SignedExtensions.Value.Select(p => new SignedExtensionMetadata()
+                {
+                    SignedIdentifier = p.SignedIdentifier.Value,
+                    SignedExtType = (uint)p.SignedExtType.Value,
+                    AddSignedExtType = (uint)p.AddSignedExtType.Value,
+                }).ToArray()
             };
         }
     }

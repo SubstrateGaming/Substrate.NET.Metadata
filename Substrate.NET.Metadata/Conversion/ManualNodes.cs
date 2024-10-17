@@ -39,21 +39,21 @@ namespace Substrate.NET.Metadata.Conversion
             return new List<CustomCompositeBuilder>()
             {
                 new CustomCompositeBuilder()
-                .FromVersion(0).ToVersion(10)
+                .FromVersion(0).ToVersion(25)
                 .AddField("nonce", "Index")
                 .AddField("refcount", "u8")
                 .AddField("data", "AccountData")
                 .WithPath("frame_system", "AccountInfo"),
 
                 new CustomCompositeBuilder()
-                .FromVersion(11).ToVersion(20)
+                .FromVersion(26).ToVersion(27)
                 .AddField("nonce", "Index")
                 .AddField("refcount", "u32")
                 .AddField("data", "AccountData")
                 .WithPath("frame_system", "AccountInfo"),
 
                 new CustomCompositeBuilder()
-                .FromVersion(21).ToVersion(30)
+                .FromVersion(28).ToVersion(29)
                 .AddField("nonce", "Index")
                 .AddField("consumers", "u32")
                 .AddField("providers", "u32")
@@ -61,7 +61,7 @@ namespace Substrate.NET.Metadata.Conversion
                 .WithPath("frame_system", "AccountInfo"),
 
                 new CustomCompositeBuilder()
-                .FromVersion(31).ToVersion(40)
+                .FromVersion(31).ToVersion(9100)
                 .AddField("nonce", "Index")
                 .AddField("consumers", "u32")
                 .AddField("providers", "u32")

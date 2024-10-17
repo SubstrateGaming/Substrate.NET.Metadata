@@ -111,9 +111,12 @@ namespace Substrate.NET.Metadata.Tests
         }
 
         [Test]
-        public void MetadataV14_ConvertToNetApiMetadata_ShouldSucceed()
+        [TestCase("V14\\MetadataV14_1003000")]
+        [TestCase("V14\\MetadataV14_1002007")]
+        [TestCase("V14\\MetadataV14_9270")]
+        public void MetadataV14_ConvertToNetApiMetadata_ShouldSucceed(string metadataPath)
         {
-            var metadata = new MetadataV14(readMetadataFromFile("V14\\MetadataV14_9270"));
+            var metadata = new MetadataV14(readMetadataFromFile(metadataPath));
             var netApiMetadata = metadata.ToNetApiMetadata();
 
             Assert.That(netApiMetadata, Is.Not.Null);
