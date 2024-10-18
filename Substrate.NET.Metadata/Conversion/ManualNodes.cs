@@ -16,7 +16,7 @@ namespace Substrate.NET.Metadata.Conversion
             var accountInfos = AccountInfo();
             if (specVersion is null)
             {
-                customNodeBuilder.Add(accountInfos.First());
+                customNodeBuilder.Add(accountInfos[0]);
             } else
             {
                 var optionalCustomVersion = accountInfos.SingleOrDefault(x => x.IsVersionValid(specVersion!.Value));

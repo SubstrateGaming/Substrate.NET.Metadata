@@ -54,8 +54,11 @@ namespace Substrate.NET.Metadata.Tests.Conversion
             var accountData = conversion.PortableTypes.SingleOrDefault(x => x.Id.Value == accountInfoComposite!.Fields.Value[^1].FieldTy.Value);
             var accountDataComposite = accountData!.Ty.TypeDef.Value2 as TypeDefComposite;
 
-            Assert.That(accountDataComposite!.Fields.Value[0].Name.Value.Value, Is.EqualTo("free"));
-            Assert.That(accountDataComposite!.Fields.Value[1].Name.Value.Value, Is.EqualTo("notFree"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(accountDataComposite!.Fields.Value[0].Name.Value.Value, Is.EqualTo("free"));
+                Assert.That(accountDataComposite!.Fields.Value[1].Name.Value.Value, Is.EqualTo("notFree"));
+            });
         }
 
         [Test]
@@ -68,11 +71,14 @@ namespace Substrate.NET.Metadata.Tests.Conversion
                 .FromVersion(10)
                 .ToVersion(20);
 
-            Assert.That(accountDataBuilder.IsVersionValid(10), Is.True);
-            Assert.That(accountDataBuilder.IsVersionValid(20), Is.True);
-            Assert.That(accountDataBuilder.IsVersionValid(15), Is.True);
-            Assert.That(accountDataBuilder.IsVersionValid(9), Is.False);
-            Assert.That(accountDataBuilder.IsVersionValid(30), Is.False);
+            Assert.Multiple(() =>
+            {
+                Assert.That(accountDataBuilder.IsVersionValid(10), Is.True);
+                Assert.That(accountDataBuilder.IsVersionValid(20), Is.True);
+                Assert.That(accountDataBuilder.IsVersionValid(15), Is.True);
+                Assert.That(accountDataBuilder.IsVersionValid(9), Is.False);
+                Assert.That(accountDataBuilder.IsVersionValid(30), Is.False);
+            });
         }
 
         [Test]

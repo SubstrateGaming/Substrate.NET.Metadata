@@ -44,7 +44,7 @@ namespace Substrate.NET.Metadata.V13
             var conversion = new ConversionBuilder(new List<PortableType>());
 
             // Custom nodes created manually
-            var customNodes = ManualNodes.All(specVersion).Build(conversion);
+            ManualNodes.All(specVersion).Build(conversion);
 
             conversion.CreateUnknownType();
             conversion.CreateEventBlockchainRuntimeEvent();

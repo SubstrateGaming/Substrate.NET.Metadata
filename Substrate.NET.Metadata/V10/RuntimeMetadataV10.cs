@@ -8,7 +8,7 @@ namespace Substrate.NET.Metadata.V10
 {
     public class RuntimeMetadataV10 : BaseType
     {
-        public BaseVec<ModuleMetadataV10> Modules { get; private set; }
+        public BaseVec<ModuleMetadataV10> Modules { get; private set; } = default!;
 
         public override void Decode(byte[] byteArray, ref int p)
         {
@@ -32,7 +32,7 @@ namespace Substrate.NET.Metadata.V10
             var conversion = new ConversionBuilder(new List<PortableType>());
 
             // Custom nodes created manually
-            var customNodes = ManualNodes.All(specVersion).Build(conversion);
+            ManualNodes.All(specVersion).Build(conversion);
 
             conversion.CreateUnknownType();
             conversion.CreateEventBlockchainRuntimeEvent();

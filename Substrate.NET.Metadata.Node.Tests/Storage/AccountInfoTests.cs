@@ -47,15 +47,17 @@ namespace Substrate.NET.Metadata.Node.Tests.Storage
             var parameters = RequestGenerator.GetStorage("System", "Account", Substrate.NetApi.Model.Meta.Storage.Type.Map, [Substrate.NetApi.Model.Meta.Storage.Hasher.BlakeTwo128Concat], [accountId32]);
 
             var result = await _substrateClient.GetStorageAsync<AccountInfoOldVersion>(parameters, "0xC0096358534EC8D21D01D34B836EED476A1C343F8724FA2153DC0725AD797A90", CancellationToken.None);
+
+            Assert.That(result.Data, Is.Not.Null);
         }
     }
 
     public sealed class AccountInfoOldVersion : BaseType
     {
         // https://docs.rs/frame-system/2.0.0/frame_system/struct.AccountInfo.html
-        public Substrate.NetApi.Model.Types.Primitive.U32 Nonce { get; set; }
-        public Substrate.NetApi.Model.Types.Primitive.U8 RefCount { get; set; }
-        public AccountDataOldVersion Data { get; set; }
+        public Substrate.NetApi.Model.Types.Primitive.U32 Nonce { get; set; } = default!;
+        public Substrate.NetApi.Model.Types.Primitive.U8 RefCount { get; set; } = default!;
+        public AccountDataOldVersion Data { get; set; } = default!;
 
         public override System.String TypeName()
         {
@@ -94,10 +96,10 @@ namespace Substrate.NET.Metadata.Node.Tests.Storage
     {
         // https://docs.rs/pallet-balances/2.0.1/pallet_balances/struct.Instance0.html
 
-        public Substrate.NetApi.Model.Types.Primitive.U128 Free { get; set; }
-        public Substrate.NetApi.Model.Types.Primitive.U128 Reserved { get; set; }
-        public Substrate.NetApi.Model.Types.Primitive.U128 MiscFrozen { get; set; }
-        public Substrate.NetApi.Model.Types.Primitive.U128 FeeFrozen { get; set; }
+        public Substrate.NetApi.Model.Types.Primitive.U128 Free { get; set; } = default!;
+        public Substrate.NetApi.Model.Types.Primitive.U128 Reserved { get; set; } = default!;
+        public Substrate.NetApi.Model.Types.Primitive.U128 MiscFrozen { get; set; } = default!;
+        public Substrate.NetApi.Model.Types.Primitive.U128 FeeFrozen { get; set; } = default!;
 
         public override System.String TypeName()
         {
@@ -134,7 +136,7 @@ namespace Substrate.NET.Metadata.Node.Tests.Storage
 
     public sealed class AccountId32 : BaseType
     {
-        public Substrate.NetApi.Model.Types.Primitive.U8[] Value { get; set; }
+        public Substrate.NetApi.Model.Types.Primitive.U8[] Value { get; set; } = default!;
 
         public override System.String TypeName()
         {

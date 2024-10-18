@@ -25,19 +25,13 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
         public bool IsVersionValid(uint version)
         {
-            if (Start is null && End is null)
-                return true;
-
-            if (Start is not null && End is not null)
-                return version >= Start && version <= End;
-
-            if (Start is not null)
-                return version >= Start;
-
-            if (End is not null)
-                return version <= End;
-
-            return false;
+            return (Start, End) switch
+            {
+                (null, null) => true,
+                (>= 0, >= 0) => version >= Start && version <= End,
+                (>= 0, _) => version >= Start,
+                (_, >= 0) => version <= End
+            };
         }
 
         public PortableType Build(ConversionBuilder conversionBuilder)
@@ -71,7 +65,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
 
             conversionBuilder.PortableTypes.Add(pt);
 
-            conversionBuilder.OverrideTypeMapping.Add((int)conversionBuilder.FindIndexByClass(Paths[^1]).index, (int)index.Value);
+            conversionBuilder.OverrideTypeMapping.Add(conversionBuilder.FindIndexByClass(Paths[^1]).index, (int)index.Value);
             return pt;
         }
 
