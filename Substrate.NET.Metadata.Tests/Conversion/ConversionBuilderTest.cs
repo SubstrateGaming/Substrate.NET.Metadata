@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Substrate.NET.Metadata.Conversion.Tests
+namespace Substrate.NET.Metadata.Tests.Conversion
 {
     internal class ConversionBuilderTest
     {

@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Substrate.NET.Metadata", "S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Substrate.NET.Metadata.Tests", "Substrate.NET.Metadata.Tests\Substrate.NET.Metadata.Tests.csproj", "{4698095E-1C43-40BA-925B-B9333599E0E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Substrate.NET.Metadata.Node.Tests", "Substrate.NET.Metadata.Node.Tests\Substrate.NET.Metadata.Node.Tests.csproj", "{07CC3754-3F83-494B-A2D2-49D1F93FA30B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Substrate.NET.Metadata.Node.Tests", "Substrate.NET.Metadata.Node.Tests\Substrate.NET.Metadata.Node.Tests.csproj", "{07CC3754-3F83-494B-A2D2-49D1F93FA30B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

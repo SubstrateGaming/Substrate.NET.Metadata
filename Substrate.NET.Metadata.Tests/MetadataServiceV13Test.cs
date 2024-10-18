@@ -2,6 +2,7 @@
 using Substrate.NET.Metadata.Conversion;
 using Substrate.NET.Metadata.Service;
 using Substrate.NET.Metadata.V13;
+using Substrate.NET.Metadata.V14;
 
 namespace Substrate.NET.Metadata.Tests
 {
@@ -65,6 +66,17 @@ namespace Substrate.NET.Metadata.Tests
             storageEntry.StorageType.Value = StorageType.Type.NMap;
 
             Assert.Throws<MetadataConversionException>(() => storageEntry.ToStorageEntryMetadataV14(new Metadata.Conversion.Internal.ConversionBuilder(new List<Base.Portable.PortableType>())));
+        }
+
+        [Test]
+        public void MetadataV13_WithSpecificVersion_ConvertToNetApiMetadata_ShouldSucceed()
+        {
+            var metadata = new MetadataV13(readMetadataFromFile("V13\\MetadataV13_9050"));
+
+            var tov14 = metadata.ToMetadataV14(9050);
+            var netApiMetadata = tov14.ToNetApiMetadata();
+
+            Assert.That(netApiMetadata, Is.Not.Null);
         }
     }
 }

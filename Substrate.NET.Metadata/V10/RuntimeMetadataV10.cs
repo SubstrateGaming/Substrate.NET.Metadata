@@ -2,12 +2,13 @@
 using Substrate.NET.Metadata.Conversion.Internal;
 using Substrate.NET.Metadata.V14;
 using Substrate.NET.Metadata.Base.Portable;
+using Substrate.NET.Metadata.Conversion;
 
 namespace Substrate.NET.Metadata.V10
 {
     public class RuntimeMetadataV10 : BaseType
     {
-        public BaseVec<ModuleMetadataV10> Modules { get; private set; }
+        public BaseVec<ModuleMetadataV10> Modules { get; private set; } = default!;
 
         public override void Decode(byte[] byteArray, ref int p)
         {
@@ -26,9 +27,12 @@ namespace Substrate.NET.Metadata.V10
             return result.ToArray();
         }
 
-        internal RuntimeMetadataV14 ToRuntimeMetadataV14()
+        internal RuntimeMetadataV14 ToRuntimeMetadataV14(uint? specVersion)
         {
             var conversion = new ConversionBuilder(new List<PortableType>());
+
+            // Custom nodes created manually
+            ManualNodes.All(specVersion).Build(conversion);
 
             conversion.CreateUnknownType();
             conversion.CreateEventBlockchainRuntimeEvent();

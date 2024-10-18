@@ -29,9 +29,12 @@ namespace Substrate.NET.Metadata.V9
             return result.ToArray();
         }
 
-        internal RuntimeMetadataV14 ToRuntimeMetadataV14()
+        internal RuntimeMetadataV14 ToRuntimeMetadataV14(uint? specVersion)
         {
             var conversion = new ConversionBuilder(new List<PortableType>());
+
+            // Custom nodes created manually
+            ManualNodes.All(specVersion).Build(conversion);
 
             conversion.CreateUnknownType();
             conversion.CreateEventBlockchainRuntimeEvent();

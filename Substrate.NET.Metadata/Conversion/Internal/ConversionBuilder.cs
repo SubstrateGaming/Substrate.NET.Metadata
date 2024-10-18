@@ -154,6 +154,20 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             return founded.portableType.Id;
         }
 
+        public (int index, SearchResult searchResult) FindIndexByClass(string className)
+        {
+            var nodeRaw = new NodeBuilderTypeUndefined(className, CurrentPallet);
+
+            var nodeType = ConversionBuilderTree.Build(nodeRaw);
+            var res =  SearchV14.SearchIndexByNode(nodeType, this);
+
+            res.index = GetIndexOrMapped(res.index);
+
+            ElementsState.Add(new ConversionElementState(className, nodeType));
+
+            return res;
+        }
+
         /// <summary>
         /// Try to get the type from V14
         /// </summary>
@@ -170,10 +184,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
                 return (LoopFromV14((int)nodeRaw.IndexHardBinding!), SearchResult.Founded);
             }
 
-            var nodeType = ConversionBuilderTree.Build(nodeRaw);
-            var index = SearchV14.SearchIndexByNode(nodeType, this);
-
-            ElementsState.Add(new ConversionElementState(className, nodeType));
+            var index = FindIndexByClass(className);
 
             return (LoopFromV14(index.index), index.searchResult);
         }
@@ -198,8 +209,8 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             var alreadyInserted = PortableTypes.SingleOrDefault(x => x.Id.Value == index);
             if (alreadyInserted != null) return alreadyInserted;
 
-            var portableType = SearchV14.FindTypeByIndex(index);
-
+            var portableType = SearchV14.FindTypeByIndex(index).Clone();
+            
             PortableTypes.Add(portableType);
             switch (portableType.Ty.TypeDef.Value)
             {
@@ -336,7 +347,7 @@ namespace Substrate.NET.Metadata.Conversion.Internal
             PolkadotRuntimeEventIndex = eventsPortableType.Id.Value;
 
             // Keep track of the override
-            OverrideTypeMapping.Add(FindIndexByClass("polkadot_runtime::Event")!.Value, (int)PolkadotRuntimeEventIndex.Value);
+            OverrideTypeMapping.Add(FindIndexByClass("polkadot_runtime::Event")!.index, (int)PolkadotRuntimeEventIndex.Value);
         }
 
         public void AddPalletEventBlockchainRuntimeEvent(Variant variant)

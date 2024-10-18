@@ -1,4 +1,5 @@
 ﻿using Substrate.NET.Metadata.Base.Portable;
+using Substrate.NET.Metadata.Conversion;
 using Substrate.NET.Metadata.Conversion.Internal;
 using Substrate.NET.Metadata.V11;
 using Substrate.NET.Metadata.V12;
@@ -38,9 +39,12 @@ namespace Substrate.NET.Metadata.V13
             return result.ToArray();
         }
 
-        internal RuntimeMetadataV14 ToRuntimeMetadataV14()
+        internal RuntimeMetadataV14 ToRuntimeMetadataV14(uint? specVersion)
         {
             var conversion = new ConversionBuilder(new List<PortableType>());
+
+            // Custom nodes created manually
+            ManualNodes.All(specVersion).Build(conversion);
 
             conversion.CreateUnknownType();
             conversion.CreateEventBlockchainRuntimeEvent();

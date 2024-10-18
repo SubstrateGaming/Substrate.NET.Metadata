@@ -3,6 +3,7 @@ using Substrate.NET.Metadata.V10;
 using Substrate.NET.Metadata.V11;
 using Substrate.NET.Metadata.V12;
 using Substrate.NET.Metadata.V13;
+using Substrate.NET.Metadata.V14;
 using Substrate.NET.Metadata.V9;
 using Substrate.NetApi;
 using Substrate.NetApi.Model.Extrinsics;
@@ -18,7 +19,7 @@ namespace Substrate.NET.Metadata.Node.Tests
         public async Task SetupAsync()
         {
             //_substrateClient = new SubstrateClient(new Uri("wss://polkadot-rpc.dwellir.com"), ChargeTransactionPayment.Default());
-            _substrateClient = new SubstrateClient(new Uri("wss://polkadot.api.onfinality.io/public-ws"), ChargeTransactionPayment.Default());
+            _substrateClient = new SubstrateClient(new Uri("wss://dot-rpc.stakeworld.io"), ChargeTransactionPayment.Default());
 
             await _substrateClient.ConnectAsync();
             Assert.That(_substrateClient.IsConnected, Is.True);
@@ -59,6 +60,7 @@ namespace Substrate.NET.Metadata.Node.Tests
         [TestCase("0xddca674d4e6e4935b1e5e81ed697f7ce027c2a9602523424bcc8dee3184e4863", 13)]
         [TestCase("0x4b34bd42835a084af0f441c5986d216b18a85abb4d03762096692e6f06365203", 13)]
         [TestCase("0x8192df1609d4478d1c1fcf5d39975596a8162d42d745c141c22148b0931708f2", 13)]
+        [TestCase("0x2395e78d44a83c11eaf3a7019554091229d542c4f709e5233f7a54b4c8635004", 14)]
         public async Task ConvertMetadataToV14_ShouldSucceedAsync(string blockHash, int version)
         {
             var metadataHex = await _substrateClient.State.GetMetaDataAsync(Utils.HexToByteArray(blockHash), CancellationToken.None);
@@ -70,6 +72,7 @@ namespace Substrate.NET.Metadata.Node.Tests
                 11 => new MetadataV11(metadataHex),
                 12 => new MetadataV12(metadataHex),
                 13 => new MetadataV13(metadataHex),
+                14 => new MetadataV14(metadataHex),
                 _ => throw new Exception()
             };
 

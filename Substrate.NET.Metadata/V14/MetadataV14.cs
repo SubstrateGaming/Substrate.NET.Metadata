@@ -7,10 +7,11 @@ using Substrate.NetApi.Model.Types.Metadata.Base;
 using Substrate.NET.Metadata.Base.Portable;
 using TypeDefEnum = Substrate.NET.Metadata.Base.TypeDefEnum;
 using TypeDefComposite = Substrate.NET.Metadata.Base.TypeDefComposite;
+using Substrate.NET.Metadata.Conversion;
 
 namespace Substrate.NET.Metadata.V14
 {
-    public class MetadataV14 : BaseMetadata<RuntimeMetadataV14>
+    public class MetadataV14 : BaseMetadata<RuntimeMetadataV14>, IMetadataToV14
     {
         public MetadataV14() : base()
         {
@@ -22,6 +23,11 @@ namespace Substrate.NET.Metadata.V14
 
         public override MetadataVersion Version => MetadataVersion.V14;
         public override string TypeName() => nameof(MetadataV14);
+
+        public MetadataV14 ToMetadataV14(uint? specVersion = null)
+        {
+            return this;
+        }
 
         /// <summary>
         /// Convert to <see cref="MetaData"/> to keep compatibility with Substrate.NetApi
@@ -38,7 +44,7 @@ namespace Substrate.NET.Metadata.V14
             {
                 Types = CreateNodeTypeDict(RuntimeMetadataData.Lookup.Value),
                 Modules = CreateModuleDict(RuntimeMetadataData.Modules.Value),
-                Extrinsic = CreateExtrinsic(RuntimeMetadataData.Extrinsic),
+                Extrinsic = CreateExtrinsic(RuntimeMetadataData.Extrinsic)
             };
 
             return metadata;
@@ -347,16 +353,18 @@ namespace Substrate.NET.Metadata.V14
         /// <returns></returns>
         private static ExtrinsicMetadata CreateExtrinsic(ExtrinsicMetadataV14 extrinsic)
         {
+            if (extrinsic.Version is null) return new ExtrinsicMetadata();
+
             return new ExtrinsicMetadata()
             {
-                //TypeId = (uint)extrinsic.ExtrinsicType.Value,
-                //Version = (int)extrinsic.Version.Value,
-                //SignedExtensions = extrinsic.SignedExtensions.Value.Select(p => new SignedExtensionMetadata()
-                //{
-                //    SignedIdentifier = p.SignedIdentifier.Value,
-                //    SignedExtType = (uint)p.SignedExtType.Value,
-                //    AddSignedExtType = (uint)p.AddSignedExtType.Value,
-                //}).ToArray()
+                TypeId = (uint)extrinsic.ExtrinsicType.Value,
+                Version = (int)extrinsic.Version.Value,
+                SignedExtensions = extrinsic.SignedExtensions.Value.Select(p => new SignedExtensionMetadata()
+                {
+                    SignedIdentifier = p.SignedIdentifier.Value,
+                    SignedExtType = (uint)p.SignedExtType.Value,
+                    AddSignedExtType = (uint)p.AddSignedExtType.Value,
+                }).ToArray()
             };
         }
     }

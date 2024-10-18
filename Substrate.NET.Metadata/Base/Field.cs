@@ -47,10 +47,10 @@ namespace Substrate.NET.Metadata.Base
             TypeSize = p - start;
         }
 
-        public BaseOpt<Str> Name { get; private set; }
-        public TType FieldTy { get; private set; }
-        public BaseOpt<Str> FieldTypeName { get; private set; }
-        public BaseVec<Str> Docs { get; private set; }
+        public BaseOpt<Str> Name { get; internal set; } = default!;
+        public TType FieldTy { get; internal set; } = default!;
+        public BaseOpt<Str> FieldTypeName { get; internal set; } = default!;
+        public BaseVec<Str> Docs { get; internal set; } = default!;
 
         public TType ElemType => FieldTy;
     }

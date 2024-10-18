@@ -16,6 +16,6 @@ namespace Substrate.NET.Metadata.Conversion
         /// This is use to keep the metadata in the same format and compatible with the Substrate.NET.Toolchain (https://github.com/SubstrateGaming/Substrate.NET.Toolchain)
         /// </summary>
         /// <returns></returns>
-        MetadataV14 ToMetadataV14();
+        MetadataV14 ToMetadataV14(uint? specVersion = null);
     }
 }
