@@ -19,7 +19,7 @@ namespace Substrate.NET.Metadata.Node.Tests
         public async Task SetupAsync()
         {
             //_substrateClient = new SubstrateClient(new Uri("wss://polkadot-rpc.dwellir.com"), ChargeTransactionPayment.Default());
-            _substrateClient = new SubstrateClient(new Uri("wss://polkadot.api.onfinality.io/public-ws"), ChargeTransactionPayment.Default());
+            _substrateClient = new SubstrateClient(new Uri("wss://dot-rpc.stakeworld.io"), ChargeTransactionPayment.Default());
 
             await _substrateClient.ConnectAsync();
             Assert.That(_substrateClient.IsConnected, Is.True);
